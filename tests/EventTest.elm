@@ -9,7 +9,7 @@ import Test exposing (..)
 suite : Test
 suite =
     describe "Basic event functions"
-        [ test "toString builds the correct result" <|
+        [ test "toString gives the correct result" <|
             \_ ->
                 Event.Model "Töpfern" 10
                     |> Event.toString

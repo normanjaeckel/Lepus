@@ -1,6 +1,6 @@
-module Main exposing (EventWithPupils, applyPupils, applyToOne, main)
+module Main exposing (assignGreens, main, pupilsPrefer)
 
-import Array
+import Assignment
 import Browser
 import Event
 import Html exposing (..)
@@ -47,61 +47,205 @@ update _ m =
 
 
 view : Model -> Html msg
-view _ =
-    div [] [ text "hallo" ]
+view m =
+    div []
+        [ div []
+            (finalize m.pupils m.events
+                |> List.map Assignment.toHtml
+            )
+        ]
 
 
-type alias EventsWithPupils =
-    List EventWithPupils
+
+-- LOGIC
 
 
-type alias EventWithPupils =
-    { event : Event.Model
-    , pupils : List Pupil.Model
+finalize : List Pupil.Model -> List Event.Model -> List Assignment.Model
+finalize pupils events =
+    let
+        r : ReturnValue
+        r =
+            assignGreens pupils events
+    in
+    assignRest r.remainingPupils (r.open ++ r.filled)
+
+
+type alias RemainingPupils =
+    List Pupil.Model
+
+
+type alias OpenAssignments =
+    List Assignment.Model
+
+
+type alias FilledAssignments =
+    List Assignment.Model
+
+
+type alias ReturnValue =
+    { remainingPupils : RemainingPupils
+    , open : OpenAssignments
+    , filled : FilledAssignments
     }
 
 
-{-| Applys pupils to events. Use the event with the smallest number of members
-for each.
+{-| Assigns all pupils to the events of their choice. Returns a list of pupils
+that can not be assigned and the open and filled assignments.
 -}
-applyPupils : List Event.Model -> List Pupil.Model -> EventsWithPupils
-applyPupils events pupils =
-    events
-        |> List.map (\e -> EventWithPupils e [])
-        |> (\e -> List.foldl applyToOne e pupils)
+assignGreens : List Pupil.Model -> List Event.Model -> ReturnValue
+assignGreens pupils events =
+    assignGreensStepA pupils (Assignment.empty events) []
 
 
-{-| Applys one pupil to the event with the smallest number of members.
+{-| Assigns pupils to the events of their choice. It accepts a list of
+assingments that have to be done and a list of assignments that are already
+done.
 -}
-applyToOne : Pupil.Model -> EventsWithPupils -> EventsWithPupils
-applyToOne p events =
+assignGreensStepA : RemainingPupils -> OpenAssignments -> FilledAssignments -> ReturnValue
+assignGreensStepA pupils open filled =
     let
-        min =
-            events
-                |> List.map (\e -> List.length e.pupils)
-                |> List.minimum
-                |> Maybe.withDefault 0
+        splitUp : ( List Assignment.Model, List Assignment.Model )
+        splitUp =
+            open
+                |> List.partition
+                    (\a ->
+                        let
+                            howManyPrefer : Int
+                            howManyPrefer =
+                                pupilsPrefer pupils a.event |> List.length
+                        in
+                        howManyPrefer > 0 && howManyPrefer <= a.event.capacity
+                    )
 
-        i : Int
-        i =
-            events
-                |> Array.fromList
-                |> Array.toIndexedList
-                |> List.filter
-                    (\t1 -> min == (t1 |> Tuple.second |> .pupils |> List.length))
-                |> List.map Tuple.first
-                |> List.head
-                |> Maybe.withDefault 0
+        assignFn : Assignment.Model -> ReturnValue -> ReturnValue
+        assignFn =
+            \a rv ->
+                let
+                    pref : List Pupil.Model
+                    pref =
+                        pupilsPrefer rv.remainingPupils a.event
+                in
+                ReturnValue
+                    (rv.remainingPupils |> List.filter (\p -> not <| List.member p pref))
+                    rv.open
+                    ({ a | pupils = pref } :: rv.filled)
 
-        changed =
-            events
-                |> Array.fromList
-                |> Array.get i
-                |> Maybe.map (\e -> { e | pupils = p :: e.pupils })
+        r : ReturnValue
+        r =
+            Tuple.first splitUp
+                |> List.foldl
+                    assignFn
+                    (ReturnValue
+                        pupils
+                        (Tuple.second splitUp)
+                        filled
+                    )
     in
-    case changed of
-        Nothing ->
-            events
+    assignGreensStepB
+        r.remainingPupils
+        r.open
+        r.filled
 
-        Just new ->
-            events |> Array.fromList |> Array.set i new |> Array.toList
+
+assignGreensStepB : List Pupil.Model -> OpenAssignments -> FilledAssignments -> ReturnValue
+assignGreensStepB pupils open filled =
+    let
+        checkFn : Assignment.Model -> Bool
+        checkFn =
+            -- TODO: Check if the assignment is empty and there are less oder equal remaining green wishes than capacity.
+            \_ -> False
+    in
+    if List.any checkFn open then
+        assignGreensStepA pupils open filled
+
+    else if List.isEmpty open then
+        ReturnValue pupils open filled
+
+    else
+        assignGreensStepC pupils open filled
+
+
+assignGreensStepC : RemainingPupils -> FilledAssignments -> OpenAssignments -> ReturnValue
+assignGreensStepC pupils open filled =
+    -- TODO: Do one event and then run assignGreensPartlyA again.
+    ReturnValue pupils open filled
+
+
+
+-- HELPERS
+
+
+pupilsPrefer : RemainingPupils -> Event.Model -> List Pupil.Model
+pupilsPrefer pupils event =
+    pupils
+        |> List.filter
+            (\p ->
+                p.choices
+                    |> List.any
+                        (\c ->
+                            c.event == event && c.type_ == Pupil.Green
+                        )
+            )
+
+
+
+-- REST
+
+
+{-| Given a list of remaining pupils and all assignments it assigns everybody
+and tries not to assign anybody to a red flagged event.
+-}
+assignRest : RemainingPupils -> List Assignment.Model -> List Assignment.Model
+assignRest _ _ =
+    []
+
+
+
+-- {-| Applys pupils to events. Use the event with the smallest number of members
+-- for each.
+-- -}
+-- applyPupils : List Event.Model -> List Pupil.Model -> EventsWithPupils
+-- applyPupils events pupils =
+--     events
+--         |> List.map (\e -> EventWithPupils e [])
+--         |> (\e -> List.foldl applyToOne e pupils)
+-- {-| Applys one pupil to the event with the smallest number of members but do not
+-- take "red" events.
+-- -}
+-- applyToOne : Pupil.Model -> EventsWithPupils -> EventsWithPupils
+-- applyToOne p events =
+--     let
+--         theReds : List Event.Model
+--         theReds =
+--             Pupil.redEvents p
+--         min : Int
+--         min =
+--             events
+--                 |> List.filter (\e -> not <| List.member e.event theReds)
+--                 |> List.map (\e -> List.length e.pupils)
+--                 |> List.minimum
+--                 |> Maybe.withDefault 0
+--         i : Int
+--         i =
+--             events
+--                 |> Array.fromList
+--                 |> Array.toIndexedList
+--                 |> List.filter
+--                     (\t1 ->
+--                         (min == (t1 |> Tuple.second |> .pupils |> List.length))
+--                             && (not <| List.member (t1 |> Tuple.second |> .event) theReds)
+--                     )
+--                 |> List.map Tuple.first
+--                 |> List.head
+--                 |> Maybe.withDefault 0
+--         changed =
+--             events
+--                 |> Array.fromList
+--                 |> Array.get i
+--                 |> Maybe.map (\e -> { e | pupils = p :: e.pupils })
+--     in
+--     case changed of
+--         Nothing ->
+--             events
+--         Just new ->
+--             events |> Array.fromList |> Array.set i new |> Array.toList
