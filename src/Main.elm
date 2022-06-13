@@ -106,16 +106,7 @@ assignGreensStepA pupils open filled =
     let
         splitUp : ( List Assignment.Model, List Assignment.Model )
         splitUp =
-            open
-                |> List.partition
-                    (\a ->
-                        let
-                            howManyPrefer : Int
-                            howManyPrefer =
-                                pupilsPrefer pupils a.event |> List.length
-                        in
-                        howManyPrefer > 0 && howManyPrefer <= a.event.capacity
-                    )
+            open |> List.partition (\a -> lessPupilsPreferThanCapacity pupils a.event)
 
         assignFn : Assignment.Model -> ReturnValue -> ReturnValue
         assignFn =
@@ -147,28 +138,67 @@ assignGreensStepA pupils open filled =
         r.filled
 
 
-assignGreensStepB : List Pupil.Model -> OpenAssignments -> FilledAssignments -> ReturnValue
+assignGreensStepB : RemainingPupils -> OpenAssignments -> FilledAssignments -> ReturnValue
 assignGreensStepB pupils open filled =
     let
         checkFn : Assignment.Model -> Bool
         checkFn =
-            -- TODO: Check if the assignment is empty and there are less oder equal remaining green wishes than capacity.
-            \_ -> False
+            \a -> lessPupilsPreferThanCapacity pupils a.event
     in
     if List.any checkFn open then
         assignGreensStepA pupils open filled
-
-    else if List.isEmpty open then
-        ReturnValue pupils open filled
 
     else
         assignGreensStepC pupils open filled
 
 
-assignGreensStepC : RemainingPupils -> FilledAssignments -> OpenAssignments -> ReturnValue
+assignGreensStepC : RemainingPupils -> OpenAssignments -> FilledAssignments -> ReturnValue
 assignGreensStepC pupils open filled =
-    -- TODO: Do one event and then run assignGreensPartlyA again.
-    ReturnValue pupils open filled
+    -- TODO: Do one event and then run assignGreensStepA again.
+    -- Sort pupils: First the pupils that do not have any other green wish according to open events. Shuffle them.
+    -- Then all other remaining pupils with green wish, shuffled.
+    -- Assign them, then run PartA again.
+    case open of
+        a :: remainingOpen ->
+            let
+                thereIsAnotherChance : Pupil.Model -> List Event.Model -> Bool
+                thereIsAnotherChance pupil events =
+                    pupil.choices
+                        |> List.any
+                            (\c -> c.type_ == Pupil.Green && List.member c.event events)
+
+                sortIndex : Pupil.Model -> Int
+                sortIndex =
+                    \p ->
+                        if pupilsPrefer [ p ] a.event |> List.isEmpty |> not then
+                            if thereIsAnotherChance p (remainingOpen |> List.map .event) then
+                                1
+
+                            else
+                                0
+
+                        else
+                            2
+
+                sortedPupils : List Pupil.Model
+                sortedPupils =
+                    pupils |> List.sortBy sortIndex
+            in
+            if pupilsPrefer pupils a.event |> List.isEmpty then
+                assignGreensStepA
+                    pupils
+                    remainingOpen
+                    (a :: filled)
+
+            else
+                assignGreensStepA
+                    (sortedPupils |> List.drop a.event.capacity)
+                    remainingOpen
+                    ({ a | pupils = sortedPupils |> List.take a.event.capacity } :: filled)
+
+        [] ->
+            -- Just return the input if there is no open assignment left.
+            ReturnValue pupils open filled
 
 
 
@@ -183,9 +213,19 @@ pupilsPrefer pupils event =
                 p.choices
                     |> List.any
                         (\c ->
-                            c.event == event && c.type_ == Pupil.Green
+                            c.type_ == Pupil.Green && c.event == event
                         )
             )
+
+
+lessPupilsPreferThanCapacity : RemainingPupils -> Event.Model -> Bool
+lessPupilsPreferThanCapacity pupils event =
+    let
+        howManyPrefer : Int
+        howManyPrefer =
+            pupilsPrefer pupils event |> List.length
+    in
+    howManyPrefer > 0 && howManyPrefer <= event.capacity
 
 
 
