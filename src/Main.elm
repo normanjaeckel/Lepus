@@ -67,6 +67,7 @@ finalize pupils events =
         r =
             assignGreens pupils events
     in
+    -- TODO: open assignments is empty in the result of assignGreens. Maybe change this.
     assignRest r.remainingPupils (r.open ++ r.filled)
 
 
@@ -154,10 +155,6 @@ assignGreensStepB pupils open filled =
 
 assignGreensStepC : RemainingPupils -> OpenAssignments -> FilledAssignments -> ReturnValue
 assignGreensStepC pupils open filled =
-    -- TODO: Do one event and then run assignGreensStepA again.
-    -- Sort pupils: First the pupils that do not have any other green wish according to open events. Shuffle them.
-    -- Then all other remaining pupils with green wish, shuffled.
-    -- Assign them, then run PartA again.
     case open of
         a :: remainingOpen ->
             let
@@ -185,6 +182,7 @@ assignGreensStepC pupils open filled =
                     pupils |> List.sortBy sortIndex
             in
             if pupilsPrefer pupils a.event |> List.isEmpty then
+                -- Just put the event that nobody wants to have to the "filled" list.
                 assignGreensStepA
                     pupils
                     remainingOpen
