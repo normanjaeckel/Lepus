@@ -1,10 +1,11 @@
-module Main exposing (assignGreens, main, pupilsPrefer)
+module Main exposing (assignGreens, finalize, main, pupilsPrefer)
 
 import Assignment
 import Browser
 import Event
 import Html exposing (..)
 import Pupil
+import String exposing (split)
 
 
 main : Program () Model msg
@@ -60,17 +61,6 @@ view m =
 -- LOGIC
 
 
-finalize : List Pupil.Model -> List Event.Model -> List Assignment.Model
-finalize pupils events =
-    let
-        r : ReturnValue
-        r =
-            assignGreens pupils events
-    in
-    -- TODO: open assignments is empty in the result of assignGreens. Maybe change this.
-    assignRest r.remainingPupils (r.open ++ r.filled)
-
-
 type alias RemainingPupils =
     List Pupil.Model
 
@@ -83,6 +73,17 @@ type alias FilledAssignments =
     List Assignment.Model
 
 
+finalize : RemainingPupils -> List Event.Model -> FilledAssignments
+finalize pupils events =
+    let
+        r : ReturnValue
+        r =
+            assignGreens pupils events
+    in
+    -- TODO: open assignments is empty in the result of assignGreens. Maybe change this.
+    assignRest r.remainingPupils (r.open ++ r.filled)
+
+
 type alias ReturnValue =
     { remainingPupils : RemainingPupils
     , open : OpenAssignments
@@ -93,7 +94,7 @@ type alias ReturnValue =
 {-| Assigns all pupils to the events of their choice. Returns a list of pupils
 that can not be assigned and the open and filled assignments.
 -}
-assignGreens : List Pupil.Model -> List Event.Model -> ReturnValue
+assignGreens : RemainingPupils -> List Event.Model -> ReturnValue
 assignGreens pupils events =
     assignGreensStepA pupils (Assignment.empty events) []
 
@@ -233,9 +234,87 @@ lessPupilsPreferThanCapacity pupils event =
 {-| Given a list of remaining pupils and all assignments it assigns everybody
 and tries not to assign anybody to a red flagged event.
 -}
-assignRest : RemainingPupils -> List Assignment.Model -> List Assignment.Model
-assignRest _ _ =
-    []
+assignRest : RemainingPupils -> List Assignment.Model -> FilledAssignments
+assignRest pupils assignments =
+    let
+        splitUp : ( List Assignment.Model, List Assignment.Model )
+        splitUp =
+            assignments |> List.partition (\a -> a.event.capacity > List.length a.pupils)
+
+        rv : ReturnValue
+        rv =
+            assignRestStepA
+                pupils
+                (splitUp |> Tuple.first)
+                (splitUp |> Tuple.second)
+    in
+    rv.filled
+
+
+
+-- Nimm einen Schüler, suche alle events raus, wo er kein ROT hat und
+
+
+assignRestStepA : RemainingPupils -> OpenAssignments -> FilledAssignments -> ReturnValue
+assignRestStepA pupils open filled =
+    let
+        assignFn : Pupil.Model -> ReturnValue -> ReturnValue
+        assignFn =
+            \p rv ->
+                let
+                    splitUp : ( OpenAssignments, OpenAssignments )
+                    splitUp =
+                        rv.open |> List.partition (\a -> pupilCanLiveWith p a.event)
+                in
+                case List.head (Tuple.first splitUp) of
+                    -- TODO: Sort assignables before calling head.
+                    Just a ->
+                        ReturnValue
+                            rv.remainingPupils
+                            (({ a | pupils = p :: a.pupils } :: (Tuple.first splitUp |> List.drop 1)) ++ Tuple.second splitUp)
+                            rv.filled
+
+                    Nothing ->
+                        { rv | remainingPupils = p :: rv.remainingPupils }
+
+        r : ReturnValue
+        r =
+            pupils
+                |> List.foldl
+                    assignFn
+                    (ReturnValue
+                        []
+                        open
+                        filled
+                    )
+    in
+    assignRestStepB
+        r.remainingPupils
+        r.open
+        r.filled
+
+
+assignRestStepB : RemainingPupils -> OpenAssignments -> FilledAssignments -> ReturnValue
+assignRestStepB pupils open filled =
+    ReturnValue
+        pupils
+        []
+        (open ++ filled)
+
+
+
+-- Helpers
+
+
+pupilCanLiveWith : Pupil.Model -> Event.Model -> Bool
+pupilCanLiveWith p event =
+    not <|
+        (p.choices
+            |> List.any
+                (\c ->
+                    c.type_ == Pupil.Red && c.event == event
+                )
+        )
 
 
 

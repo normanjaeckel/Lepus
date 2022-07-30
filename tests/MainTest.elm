@@ -58,7 +58,7 @@ suite =
     in
     describe "Main functions"
         [ describe "The assignGreens function"
-            [ test "assigs some pupils" <|
+            [ test "assigns some pupils" <|
                 \_ ->
                     Main.assignGreens [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ] [ e1, e2, e3, e4, e5 ]
                         |> Expect.all
@@ -89,6 +89,18 @@ suite =
                 \_ ->
                     Main.pupilsPrefer [ p2, p5 ] e1
                         |> Expect.equalLists []
+            ]
+        , describe "The finalize function"
+            [ test "assigns all pupils" <|
+                \_ ->
+                    Main.finalize [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ] [ e1, e2, e3, e4, e5 ]
+                        |> Expect.equalLists
+                            [ Assignment.Model e5 [ p10, p5 ]
+                            , Assignment.Model e4 [ p7, p9 ]
+                            , Assignment.Model e3 [ p8, p6 ]
+                            , Assignment.Model e1 [ p1, p4 ]
+                            , Assignment.Model e2 [ p2, p3 ]
+                            ]
             ]
         ]
 
