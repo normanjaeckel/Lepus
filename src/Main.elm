@@ -5,7 +5,6 @@ import Browser
 import Event
 import Html exposing (..)
 import Pupil
-import String exposing (split)
 
 
 main : Program () Model msg

@@ -53,23 +53,18 @@ suite =
         p4 =
             Pupil.Model "Kim" "1a" [ Pupil.Choice e1 Pupil.Green ]
 
-        p5 =
-            Pupil.Model "Anna" "1a" [ Pupil.Choice e4 Pupil.Green ]
-
-        p6 =
-            Pupil.Model "Maria" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
-
-        p7 =
-            Pupil.Model "Hans" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
-
-        p8 =
-            Pupil.Model "Ali" "1a" [ Pupil.Choice e3 Pupil.Green ]
-
-        p9 =
-            Pupil.Model "Kim" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
-
-        p10 =
-            Pupil.Model "Josua" "1a" []
+        -- p5 =
+        --     Pupil.Model "Anna" "1a" [ Pupil.Choice e4 Pupil.Green ]
+        -- p6 =
+        --     Pupil.Model "Maria" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+        -- p7 =
+        --     Pupil.Model "Hans" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+        -- p8 =
+        --     Pupil.Model "Ali" "1a" [ Pupil.Choice e3 Pupil.Green ]
+        -- p9 =
+        --     Pupil.Model "Kim" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+        -- p10 =
+        --     Pupil.Model "Josua" "1a" []
     in
     describe "Basic functions"
         [ test "assignPupil gives the correct result for p1" <|
