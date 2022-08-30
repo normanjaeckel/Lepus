@@ -1,5 +1,6 @@
-module Pupil exposing (Choice, ChoiceType(..), Model, greenEvents, init, redEvents, toString)
+module Pupil exposing (Choice, ChoiceType(..), Model, greenAndYellowEvents, greenEvents, init, redEvents, toVertex)
 
+import Algo
 import Event
 import Html exposing (..)
 
@@ -27,9 +28,43 @@ type ChoiceType
     | Red
 
 
-toString : Model -> String
-toString m =
+toVertex : Model -> Algo.Vertex
+toVertex m =
     m.name ++ " (" ++ m.class ++ ")"
+
+
+greenEvents : Model -> List Event.Model
+greenEvents pupil =
+    pupil.choices
+        |> List.filter
+            (\c ->
+                case c.type_ of
+                    Red ->
+                        False
+
+                    Green ->
+                        True
+            )
+        |> List.map (\c -> c.event)
+
+
+greenAndYellowEvents : List Event.Model -> Model -> List Event.Model
+greenAndYellowEvents events pupil =
+    events
+        |> List.filter
+            (\e ->
+                pupil.choices
+                    |> List.any
+                        (\c ->
+                            case c.type_ of
+                                Red ->
+                                    c.event == e
+
+                                _ ->
+                                    False
+                        )
+                    |> not
+            )
 
 
 redEvents : Model -> List Event.Model
@@ -43,20 +78,5 @@ redEvents p =
 
                     Green ->
                         False
-            )
-        |> List.map (\c -> c.event)
-
-
-greenEvents : Model -> List Event.Model
-greenEvents p =
-    p.choices
-        |> List.filter
-            (\c ->
-                case c.type_ of
-                    Red ->
-                        False
-
-                    Green ->
-                        True
             )
         |> List.map (\c -> c.event)

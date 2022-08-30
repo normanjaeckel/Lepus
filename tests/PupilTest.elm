@@ -26,12 +26,12 @@ suite =
         [ test "toString gives the correct result" <|
             \_ ->
                 p1
-                    |> Pupil.toString
+                    |> Pupil.toVertex
                     |> Expect.equal "Max (1a)"
         , fuzz Fuzz.string "toString builds the correct result with any class string" <|
             \s ->
                 Pupil.Model "Moritz" s []
-                    |> Pupil.toString
+                    |> Pupil.toVertex
                     |> Expect.equal ("Moritz (" ++ s ++ ")")
         , test "redEvents gives correct result" <|
             \_ ->

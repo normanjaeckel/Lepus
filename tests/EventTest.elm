@@ -9,14 +9,9 @@ import Test exposing (..)
 suite : Test
 suite =
     describe "Basic event functions"
-        [ test "toString gives the correct result" <|
-            \_ ->
-                Event.Model "Töpfern" 10
-                    |> Event.toString
-                    |> Expect.equal "Töpfern"
-        , fuzz Fuzz.string "toString builds the correct result with any name" <|
+        [ fuzz Fuzz.string "toVertexList builds the correct result with any name" <|
             \s ->
-                Event.Model s 10
-                    |> Event.toString
-                    |> Expect.equal s
+                Event.Model s 5
+                    |> Event.toVertexList
+                    |> Expect.equal [ s ++ "-1", s ++ "-2", s ++ "-3", s ++ "-4", s ++ "-5" ]
         ]

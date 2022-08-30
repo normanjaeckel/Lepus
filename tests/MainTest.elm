@@ -1,6 +1,7 @@
 module MainTest exposing (suite)
 
-import Assignment
+import Algo
+import Dict
 import Event
 import Expect
 import Main
@@ -51,93 +52,57 @@ suite =
             Pupil.Model "Ali" "1a" [ Pupil.Choice e3 Pupil.Green ]
 
         p9 =
-            Pupil.Model "Kim" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+            Pupil.Model "Richard" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
 
         p10 =
             Pupil.Model "Josua" "1a" []
     in
     describe "Main functions"
-        [ describe "The assignGreens function"
-            [ test "assigns some pupils" <|
-                \_ ->
-                    Main.assignGreens [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ] [ e1, e2, e3, e4, e5 ]
-                        |> Expect.all
-                            [ \r ->
-                                r.filled
-                                    |> Expect.equalLists
-                                        [ Assignment.Model e5 []
-                                        , Assignment.Model e4 [ p7, p9 ]
-                                        , Assignment.Model e3 [ p8, p6 ]
-                                        , Assignment.Model e1 [ p1, p4 ]
-                                        , Assignment.Model e2 [ p2, p3 ]
-                                        ]
-                            , \r -> r.remainingPupils |> Expect.equalLists [ p5, p10 ]
-                            , \r -> r.open |> List.length |> Expect.equal 0
-                            , \r -> r.filled |> List.length |> Expect.equal 5
-                            ]
-            ]
-        , describe "The pupilsPrefer function"
-            [ test "retrieves pupils for e1" <|
-                \_ ->
-                    Main.pupilsPrefer [ p1, p2, p3, p4, p5, p6 ] e1
-                        |> Expect.equalLists [ p1, p3, p4 ]
-            , test "retrieves pupils for e2" <|
-                \_ ->
-                    Main.pupilsPrefer [ p1, p2, p3 ] e2
-                        |> Expect.equalLists [ p2, p3 ]
-            , test "retrieves nobody for e1" <|
-                \_ ->
-                    Main.pupilsPrefer [ p2, p5 ] e1
-                        |> Expect.equalLists []
-            ]
-        , describe "The finalize function"
+        [ describe "The finalize function"
             [ test "assigns all pupils" <|
                 \_ ->
-                    Main.finalize [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ] [ e1, e2, e3, e4, e5 ]
-                        |> Expect.equalLists
-                            [ Assignment.Model e5 [ p10, p5 ]
-                            , Assignment.Model e4 [ p7, p9 ]
-                            , Assignment.Model e3 [ p8, p6 ]
-                            , Assignment.Model e1 [ p1, p4 ]
-                            , Assignment.Model e2 [ p2, p3 ]
+                    let
+                        pupils =
+                            [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ]
+                    in
+                    Main.finalize pupils [ e1, e2, e3, e4, e5 ]
+                        |> Expect.all
+                            [ Dict.toList
+                                >> Expect.equalLists
+                                    [ ( "Ali (1a)", "Theater-1" )
+                                    , ( "Anna (1a)", "Outdoor-1" )
+                                    , ( "Hans (1a)", "Outdoor-2" )
+                                    , ( "Josua (1a)", "Song des Tages-1" )
+                                    , ( "Kim (1a)", "Töpfern-1" )
+                                    , ( "Lisa (1a)", "Kochen-1" )
+                                    , ( "Maria (1a)", "Theater-2" )
+                                    , ( "Max (1a)", "Töpfern-2" )
+                                    , ( "Moritz (1a)", "Kochen-2" )
+                                    , ( "Richard (1a)", "Song des Tages-2" )
+                                    ]
+                            , Dict.keys >> List.length >> Expect.equal 10
+                            , howManyGreens pupils >> Expect.equal 8
                             ]
+
+            -- Alternative mit alter Datenstruktur:  [ Assignment.Model e5 [ p10, p5 ], Assignment.Model e4 [ p7, p9 ], Assignment.Model e3 [ p8, p6 ], Assignment.Model e1 [ p1, p4 ], Assignment.Model e2 [ p2, p3 ]]
             ]
         ]
 
 
+howManyGreens : List Pupil.Model -> Algo.Matching -> Int
+howManyGreens pupils matching =
+    pupils
+        |> List.foldl
+            (\pupil count ->
+                case Dict.get (Pupil.toVertex pupil) matching of
+                    Nothing ->
+                        count
 
--- describe "Main functions"
---     [ describe "The applyToOne function"
---         [ test "applys one pupil to empty event" <|
---             \_ ->
---                 Main.applyToOne p1 [ Main.EventWithPupils e1 [] ]
---                     |> Expect.equal [ Main.EventWithPupils e1 [ p1 ] ]
---         , test "applys one pupil to non empty events" <|
---             \_ ->
---                 Main.applyToOne p1 [ Main.EventWithPupils e1 [ p1 ] ]
---                     |> Expect.equal [ Main.EventWithPupils e1 [ p1, p1 ] ]
---         , test "applys one pupil into non empty events into the value with the minimum count" <|
---             \_ ->
---                 Main.applyToOne p1 [ Main.EventWithPupils e1 [], Main.EventWithPupils e1 [ p1 ], Main.EventWithPupils e2 [] ]
---                     |> Expect.equal [ Main.EventWithPupils e1 [ p1 ], Main.EventWithPupils e1 [ p1 ], Main.EventWithPupils e2 [] ]
---         ]
---     , describe "The applyPupils function"
---         [ test "applys one pupil to one event" <|
---             \_ ->
---                 Main.applyPupils [ e1 ] [ p1 ]
---                     |> Expect.equal [ Main.EventWithPupils e1 [ p1 ] ]
---         , test "applys two pupils to one event" <|
---             \_ ->
---                 Main.applyPupils [ e1 ] [ p1, p2 ]
---                     |> Expect.equal [ Main.EventWithPupils e1 [ p2, p1 ] ]
---         , test "applys two pupils to two events" <|
---             \_ ->
---                 Main.applyPupils [ e1, e2 ] [ p1, p2 ]
---                     |> Expect.equal [ Main.EventWithPupils e1 [ p1 ], Main.EventWithPupils e2 [ p2 ] ]
---         , test "applys five pupils to two events and considers the red choice of p1" <|
---             \_ ->
---                 Main.applyPupils [ e1, e2 ] [ p1, p2, p3, p4, p5 ]
---                     |> Expect.equal [ Main.EventWithPupils e1 [ p5, p3, p1 ], Main.EventWithPupils e2 [ p4, p2 ] ]
---         ]
---     ]
--- Pupil.Choice e1 Pupil.Red
+                    Just event ->
+                        if pupil |> Pupil.greenEvents |> List.foldl Event.toVertexListReducer [] |> List.member event then
+                            count + 1
+
+                        else
+                            count
+            )
+            0

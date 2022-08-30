@@ -130,7 +130,7 @@ suite =
     describe "Main functions"
         [ test "Test run for graph 1" <|
             \_ ->
-                Algo.run graph1
+                Algo.run graph1 Dict.empty
                     |> Expect.equal
                         (Dict.fromList
                             [ ( "P1", "B" )
@@ -141,7 +141,7 @@ suite =
                         )
         , test "Test run for graph 2" <|
             \_ ->
-                Algo.run graph2
+                Algo.run graph2 Dict.empty
                     |> Expect.equal
                         (Dict.fromList
                             [ ( "P1", "Q3" )
@@ -168,7 +168,7 @@ suite =
                         )
         , test "Test run for graph 3" <|
             \_ ->
-                Algo.run graph3
+                Algo.run graph3 Dict.empty
                     |> Expect.all
                         [ Dict.toList >> List.length >> Expect.equal 80
                         , invertDict >> Dict.toList >> List.length >> Expect.equal 80

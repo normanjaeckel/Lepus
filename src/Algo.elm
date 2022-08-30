@@ -1,4 +1,4 @@
-module Algo exposing (Graph, Matching, run)
+module Algo exposing (Graph, Matching, Vertex, run)
 
 import Dict
 import List
@@ -32,15 +32,19 @@ type alias IntermediateResult =
     }
 
 
-run : Graph -> Matching
-run graph =
-    let
-        emptyMatching : Matching
-        emptyMatching =
-            Dict.empty
-    in
+run : Graph -> Matching -> Matching
+run graph initialMatching =
     graph
         |> Dict.keys
+        |> List.filter
+            (\vertex ->
+                case Dict.get vertex initialMatching of
+                    Nothing ->
+                        True
+
+                    Just _ ->
+                        False
+            )
         |> List.foldl
             (\vertex matching ->
                 case find graph matching (extend graph [] [ vertex ] []) of
@@ -50,7 +54,7 @@ run graph =
                     Just path ->
                         matching |> apply path
             )
-            emptyMatching
+            (initialMatching |> reverseMatching)
         |> reverseMatching
 
 
