@@ -96,7 +96,7 @@ suite =
                             [ Dict.toList
                                 >> Expect.equalLists
                                     [ ( "Ali (1a)", "Theater-1" )
-                                    , ( "Anna (1a)", "Song des Tages-1" )
+                                    , ( "Anna (1a)", "Song des Tages-2" )
                                     , ( "Hans (1a)", "Outdoor-2" )
                                     , ( "Josua (1a)", "Outdoor-1" )
                                     , ( "Kim (1a)", "Töpfern-1" )
@@ -104,7 +104,7 @@ suite =
                                     , ( "Maria (1a)", "Theater-2" )
                                     , ( "Max (1a)", "Töpfern-2" )
                                     , ( "Moritz (1a)", "Kochen-2" )
-                                    , ( "Richard (1a)", "Song des Tages-2" )
+                                    , ( "Richard (1a)", "Song des Tages-1" )
                                     ]
 
                             -- [ ( "Ali (1a)", "Theater-1" )
@@ -120,6 +120,32 @@ suite =
                             -- ]
                             , Dict.keys >> List.length >> Expect.equal 10
                             , howManyGreens pupils >> Expect.equal 7
+                            ]
+            , test "assign pupils in mini example" <|
+                \_ ->
+                    let
+                        i1 =
+                            Event.Model "1" 1
+
+                        i2 =
+                            Event.Model "2" 1
+
+                        i3 =
+                            Event.Model "3" 1
+
+                        j1 =
+                            Pupil.Model "A" "" [ Pupil.Choice i1 Pupil.Green ]
+
+                        j2 =
+                            Pupil.Model "B" "" []
+
+                        j3 =
+                            Pupil.Model "C" "" [ Pupil.Choice i3 Pupil.Red ]
+                    in
+                    Main.finalize [ j1, j2, j3 ] [ i3, i2, i1 ]
+                        |> Expect.all
+                            [ howManyGreens [ j1, j2, j3 ] >> Expect.equal 1
+                            , Dict.keys >> List.length >> Expect.equal 3
                             ]
             ]
         ]

@@ -1,4 +1,4 @@
-module Pupil exposing (Choice, ChoiceType(..), Model, greenAndYellowEvents, greenEvents, init, redEvents, toVertex)
+module Pupil exposing (Choice, ChoiceType(..), Model, greenAndYellowEvents, greenEvents, init, redEvents, toVertex, yellowEvents)
 
 import Algo
 import Event
@@ -48,8 +48,23 @@ greenEvents pupil =
         |> List.map (\c -> c.event)
 
 
+yellowEvents : List Event.Model -> Model -> List Event.Model
+yellowEvents events pupil =
+    events
+        |> List.filter
+            (\e ->
+                pupil.choices
+                    |> List.any
+                        (\c ->
+                            c.event == e
+                        )
+                    |> not
+            )
+
+
 greenAndYellowEvents : List Event.Model -> Model -> List Event.Model
 greenAndYellowEvents events pupil =
+    -- TODO: Use greenEvents and yellowEvents in combination
     events
         |> List.filter
             (\e ->

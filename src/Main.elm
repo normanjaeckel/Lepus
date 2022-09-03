@@ -68,13 +68,16 @@ matchingToHtml _ =
 
 finalize : List Pupil.Model -> List Event.Model -> Algo.Matching
 finalize pupils events =
-    Dict.empty
-        |> Algo.run (toGraphFromGreen pupils)
-        |> Algo.run (toGraphFromGreenAndYellow pupils events)
+    let
+        step1 : Algo.Matching
+        step1 =
+            Dict.empty |> Algo.run (toGraphFromGreen pupils)
 
-
-
---|> Algo.run (toGraphFromYellow pupils)
+        step2 : Algo.Matching
+        step2 =
+            Dict.empty |> Algo.run (toGraphFromYellowWithoutMatched pupils events step1)
+    in
+    Dict.union step1 step2 |> Algo.run (toGraphFromGreenAndYellow pupils events)
 
 
 toGraphFromGreen : List Pupil.Model -> Algo.Graph
@@ -93,6 +96,39 @@ toGraphFromGreen pupils =
                         (pupil |> Pupil.greenEvents |> List.foldl Event.toVertexListReducer [])
     in
     pupils
+        |> List.foldl fn emptyGraph
+
+
+toGraphFromYellowWithoutMatched : List Pupil.Model -> List Event.Model -> Algo.Matching -> Algo.Graph
+toGraphFromYellowWithoutMatched pupils events matching =
+    let
+        onlyRemaining : Pupil.Model -> Bool
+        onlyRemaining =
+            \pupil ->
+                Dict.member (pupil |> Pupil.toVertex) matching |> not
+
+        onlyUnmatchedVertices : Algo.Vertex -> Bool
+        onlyUnmatchedVertices =
+            \vertex -> matching |> Dict.values |> List.member vertex |> not
+
+        emptyGraph : Algo.Graph
+        emptyGraph =
+            Dict.empty
+
+        fn : Pupil.Model -> Algo.Graph -> Algo.Graph
+        fn =
+            \pupil graph ->
+                graph
+                    |> Dict.insert
+                        (pupil |> Pupil.toVertex)
+                        (pupil
+                            |> Pupil.yellowEvents events
+                            |> List.foldl Event.toVertexListReducer []
+                            |> List.filter onlyUnmatchedVertices
+                        )
+    in
+    pupils
+        |> List.filter onlyRemaining
         |> List.foldl fn emptyGraph
 
 
