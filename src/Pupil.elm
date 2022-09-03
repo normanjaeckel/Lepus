@@ -64,22 +64,7 @@ yellowEvents events pupil =
 
 greenAndYellowEvents : List Event.Model -> Model -> List Event.Model
 greenAndYellowEvents events pupil =
-    -- TODO: Use greenEvents and yellowEvents in combination
-    events
-        |> List.filter
-            (\e ->
-                pupil.choices
-                    |> List.any
-                        (\c ->
-                            case c.type_ of
-                                Red ->
-                                    c.event == e
-
-                                _ ->
-                                    False
-                        )
-                    |> not
-            )
+    greenEvents pupil ++ yellowEvents events pupil
 
 
 redEvents : Model -> List Event.Model

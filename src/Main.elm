@@ -76,8 +76,12 @@ finalize pupils events =
         step2 : Algo.Matching
         step2 =
             Dict.empty |> Algo.run (toGraphFromYellowWithoutMatched pupils events step1)
+
+        step3 : Algo.Matching -> Algo.Matching
+        step3 =
+            Algo.run (toGraphFromGreenAndYellow pupils events)
     in
-    Dict.union step1 step2 |> Algo.run (toGraphFromGreenAndYellow pupils events)
+    Dict.union step1 step2 |> step3
 
 
 toGraphFromGreen : List Pupil.Model -> Algo.Graph
