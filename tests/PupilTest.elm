@@ -10,17 +10,17 @@ import Test exposing (..)
 suite : Test
 suite =
     let
-        e1 : Event.Model
+        e1 : Event.Obj
         e1 =
-            Event.Model "Kochen" 2
+            Event.Obj "Kochen" 2
 
-        p1 : Pupil.Model
+        p1 : Pupil.Obj
         p1 =
-            Pupil.Model "Max" "1a" []
+            Pupil.Obj "Max" "1a" []
 
-        p2 : Pupil.Model
+        p2 : Pupil.Obj
         p2 =
-            Pupil.Model "Kim" "1a" [ Pupil.Choice e1 Pupil.Red ]
+            Pupil.Obj "Kim" "1a" [ Pupil.Choice e1 Pupil.Red ]
     in
     describe "Basic pupil functions"
         [ test "toString gives the correct result" <|
@@ -30,7 +30,7 @@ suite =
                     |> Expect.equal "Max (1a)"
         , fuzz Fuzz.string "toString builds the correct result with any class string" <|
             \s ->
-                Pupil.Model "Moritz" s []
+                Pupil.Obj "Moritz" s []
                     |> Pupil.toVertex
                     |> Expect.equal ("Moritz (" ++ s ++ ")")
         , test "redEvents gives correct result" <|

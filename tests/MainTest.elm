@@ -13,49 +13,49 @@ suite : Test
 suite =
     let
         e1 =
-            Event.Model "Töpfern" 2
+            Event.Obj "Töpfern" 2
 
         e2 =
-            Event.Model "Kochen" 2
+            Event.Obj "Kochen" 2
 
         e3 =
-            Event.Model "Theater" 2
+            Event.Obj "Theater" 2
 
         e4 =
-            Event.Model "Outdoor" 2
+            Event.Obj "Outdoor" 2
 
         e5 =
-            Event.Model "Song des Tages" 2
+            Event.Obj "Song des Tages" 2
 
         p1 =
-            Pupil.Model "Max" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e1 Pupil.Green ]
+            Pupil.Obj "Max" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e1 Pupil.Green ]
 
         p2 =
-            Pupil.Model "Moritz" "1a" [ Pupil.Choice e2 Pupil.Green ]
+            Pupil.Obj "Moritz" "1a" [ Pupil.Choice e2 Pupil.Green ]
 
         p3 =
-            Pupil.Model "Lisa" "1a" [ Pupil.Choice e1 Pupil.Green, Pupil.Choice e2 Pupil.Green ]
+            Pupil.Obj "Lisa" "1a" [ Pupil.Choice e1 Pupil.Green, Pupil.Choice e2 Pupil.Green ]
 
         p4 =
-            Pupil.Model "Kim" "1a" [ Pupil.Choice e1 Pupil.Green ]
+            Pupil.Obj "Kim" "1a" [ Pupil.Choice e1 Pupil.Green ]
 
         p5 =
-            Pupil.Model "Anna" "1a" [ Pupil.Choice e4 Pupil.Green ]
+            Pupil.Obj "Anna" "1a" [ Pupil.Choice e4 Pupil.Green ]
 
         p6 =
-            Pupil.Model "Maria" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+            Pupil.Obj "Maria" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
 
         p7 =
-            Pupil.Model "Hans" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+            Pupil.Obj "Hans" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
 
         p8 =
-            Pupil.Model "Ali" "1a" [ Pupil.Choice e3 Pupil.Green ]
+            Pupil.Obj "Ali" "1a" [ Pupil.Choice e3 Pupil.Green ]
 
         p9 =
-            Pupil.Model "Richard" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+            Pupil.Obj "Richard" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
 
         p10 =
-            Pupil.Model "Josua" "1a" []
+            Pupil.Obj "Josua" "1a" []
     in
     describe "Main functions"
         [ describe "The finalize function"
@@ -125,22 +125,22 @@ suite =
                 \_ ->
                     let
                         i1 =
-                            Event.Model "1" 1
+                            Event.Obj "1" 1
 
                         i2 =
-                            Event.Model "2" 1
+                            Event.Obj "2" 1
 
                         i3 =
-                            Event.Model "3" 1
+                            Event.Obj "3" 1
 
                         j1 =
-                            Pupil.Model "A" "" [ Pupil.Choice i1 Pupil.Green ]
+                            Pupil.Obj "A" "" [ Pupil.Choice i1 Pupil.Green ]
 
                         j2 =
-                            Pupil.Model "B" "" []
+                            Pupil.Obj "B" "" []
 
                         j3 =
-                            Pupil.Model "C" "" [ Pupil.Choice i3 Pupil.Red ]
+                            Pupil.Obj "C" "" [ Pupil.Choice i3 Pupil.Red ]
                     in
                     Main.finalize [ j1, j2, j3 ] [ i3, i2, i1 ]
                         |> Expect.all
@@ -151,7 +151,7 @@ suite =
         ]
 
 
-howManyGreens : List Pupil.Model -> Algo.Matching -> Int
+howManyGreens : List Pupil.Obj -> Algo.Matching -> Int
 howManyGreens pupils matching =
     pupils
         |> List.foldl
