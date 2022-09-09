@@ -3,7 +3,7 @@ module Event exposing (Model, Msg, Obj, init, toVertexList, toVertexListReducer,
 import Algo exposing (Vertex)
 import Html exposing (..)
 import Html.Attributes exposing (for, id, type_, value)
-import Html.Events exposing (onInput, onSubmit)
+import Html.Events exposing (onClick, onInput, onSubmit)
 
 
 
@@ -58,6 +58,7 @@ toVertexListReducer event list =
 type Msg
     = FormDataMsg FormDataInput
     | Save
+    | Delete Obj
 
 
 type FormDataInput
@@ -73,6 +74,9 @@ update msg model =
 
         Save ->
             { model | formData = Obj "" 0, events = model.events ++ [ model.formData ] }
+
+        Delete obj ->
+            { model | events = model.events |> List.filter ((/=) obj) }
 
 
 updateFormdata : FormDataInput -> Obj -> Obj
@@ -95,7 +99,7 @@ view model =
         [ h2 [] [ text "Gruppen" ]
         , div []
             [ h3 [] [ text "Alle Gruppen" ]
-            , allEvents model
+            , allEvents model.events
             ]
         , div []
             [ h3 [] [ text "Neue Gruppe hinzufügen" ]
@@ -122,15 +126,18 @@ view model =
         ]
 
 
-allEvents : Model -> Html Msg
-allEvents model =
-    if List.isEmpty model.events then
+allEvents : List Obj -> Html Msg
+allEvents events =
+    if List.isEmpty events then
         p [] [ text "Noch keine Gruppen angelegt" ]
 
     else
-        ol
-            []
-            (model.events
-                |> List.map
-                    (\event -> li [] [ text <| event.name ++ " (" ++ String.fromInt event.capacity ++ " Plätze)" ])
-            )
+        ol [] (events |> List.map oneEventLi)
+
+
+oneEventLi : Obj -> Html Msg
+oneEventLi event =
+    li []
+        [ text <| event.name ++ " (" ++ String.fromInt event.capacity ++ " Plätze)"
+        , button [ type_ "button", onClick <| Delete event ] [ text "Löschen" ]
+        ]

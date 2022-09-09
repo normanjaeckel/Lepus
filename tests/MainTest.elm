@@ -28,34 +28,34 @@ suite =
             Event.Obj "Song des Tages" 2
 
         p1 =
-            Pupil.Obj "Max" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e1 Pupil.Green ]
+            Pupil.Obj "Max" "1a" [] |> setupPupil [ e3, e1 ] [ e5, e4, e3 ] []
 
         p2 =
-            Pupil.Obj "Moritz" "1a" [ Pupil.Choice e2 Pupil.Green ]
+            Pupil.Obj "Moritz" "1a" [] |> setupPupil [ e2 ] [ e5, e4, e3, e1 ] []
 
         p3 =
-            Pupil.Obj "Lisa" "1a" [ Pupil.Choice e1 Pupil.Green, Pupil.Choice e2 Pupil.Green ]
+            Pupil.Obj "Lisa" "1a" [] |> setupPupil [ e1, e2 ] [ e5, e4, e3 ] []
 
         p4 =
-            Pupil.Obj "Kim" "1a" [ Pupil.Choice e1 Pupil.Green ]
+            Pupil.Obj "Kim" "1a" [] |> setupPupil [ e1 ] [ e5, e4, e3, e2 ] []
 
         p5 =
-            Pupil.Obj "Anna" "1a" [ Pupil.Choice e4 Pupil.Green ]
+            Pupil.Obj "Anna" "1a" [] |> setupPupil [ e4 ] [ e5, e3, e2, e1 ] []
 
         p6 =
-            Pupil.Obj "Maria" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+            Pupil.Obj "Maria" "1a" [] |> setupPupil [ e3, e4 ] [ e5, e2, e1 ] []
 
         p7 =
-            Pupil.Obj "Hans" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+            Pupil.Obj "Hans" "1a" [] |> setupPupil [ e3, e4 ] [ e5, e2, e1 ] []
 
         p8 =
-            Pupil.Obj "Ali" "1a" [ Pupil.Choice e3 Pupil.Green ]
+            Pupil.Obj "Ali" "1a" [] |> setupPupil [ e3 ] [ e5, e4, e2, e1 ] []
 
         p9 =
-            Pupil.Obj "Richard" "1a" [ Pupil.Choice e3 Pupil.Green, Pupil.Choice e4 Pupil.Green ]
+            Pupil.Obj "Richard" "1a" [] |> setupPupil [ e3, e4 ] [ e5, e2, e1 ] []
 
         p10 =
-            Pupil.Obj "Josua" "1a" []
+            Pupil.Obj "Josua" "1a" [] |> setupPupil [] [ e5, e4, e4, e2, e1 ] []
     in
     describe "Main functions"
         [ describe "The finalize function"
@@ -65,7 +65,7 @@ suite =
                         pupils =
                             [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ]
                     in
-                    Main.finalize pupils [ e1, e2, e3, e4, e5 ]
+                    Main.finalize pupils
                         |> Expect.all
                             [ Dict.toList
                                 >> Expect.equalLists
@@ -89,9 +89,9 @@ suite =
                 \_ ->
                     let
                         pupils =
-                            [ p1, p2, p3, p4, p5, p6, p7, p8, p9, { p10 | choices = [ Pupil.Choice e5 Pupil.Red ] } ]
+                            [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 |> setupPupil [] [ e1, e2, e3, e4 ] [ e5 ] ]
                     in
-                    Main.finalize pupils [ e1, e2, e3, e4, e5 ]
+                    Main.finalize pupils
                         |> Expect.all
                             [ Dict.toList
                                 >> Expect.equalLists
@@ -134,21 +134,36 @@ suite =
                             Event.Obj "3" 1
 
                         j1 =
-                            Pupil.Obj "A" "" [ Pupil.Choice i1 Pupil.Green ]
+                            Pupil.Obj "A" "" [] |> setupPupil [ i1 ] [ i2, i3 ] []
 
                         j2 =
-                            Pupil.Obj "B" "" []
+                            Pupil.Obj "B" "" [] |> setupPupil [] [ i1, i2, i3 ] []
 
                         j3 =
-                            Pupil.Obj "C" "" [ Pupil.Choice i3 Pupil.Red ]
+                            Pupil.Obj "C" "" [] |> setupPupil [] [ i1, i2 ] [ i3 ]
                     in
-                    Main.finalize [ j1, j2, j3 ] [ i3, i2, i1 ]
+                    Main.finalize [ j1, j2, j3 ]
                         |> Expect.all
                             [ howManyGreens [ j1, j2, j3 ] >> Expect.equal 1
                             , Dict.keys >> List.length >> Expect.equal 3
                             ]
             ]
         ]
+
+
+setupPupil : List Event.Obj -> List Event.Obj -> List Event.Obj -> Pupil.Obj -> Pupil.Obj
+setupPupil green yellow red pupil =
+    let
+        g =
+            green |> List.map (\e -> Pupil.Choice e Pupil.Green)
+
+        y =
+            yellow |> List.map (\e -> Pupil.Choice e Pupil.Yellow)
+
+        r =
+            red |> List.map (\e -> Pupil.Choice e Pupil.Red)
+    in
+    { pupil | choices = g ++ y ++ r }
 
 
 howManyGreens : List Pupil.Obj -> Algo.Matching -> Int
@@ -161,7 +176,7 @@ howManyGreens pupils matching =
                         count
 
                     Just event ->
-                        if pupil |> Pupil.greenEvents |> List.foldl Event.toVertexListReducer [] |> List.member event then
+                        if pupil |> Pupil.eventGroup Pupil.Green |> List.foldl Event.toVertexListReducer [] |> List.member event then
                             count + 1
 
                         else

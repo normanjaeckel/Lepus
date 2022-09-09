@@ -35,5 +35,5 @@ suite =
                     |> Expect.equal ("Moritz (" ++ s ++ ")")
         , test "redEvents gives correct result" <|
             \_ ->
-                Pupil.redEvents p2 |> Expect.equal [ e1 ]
+                Pupil.eventGroup Pupil.Red p2 |> Expect.equal [ e1 ]
         ]

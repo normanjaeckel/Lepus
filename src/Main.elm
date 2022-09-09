@@ -5,6 +5,7 @@ import Browser
 import Dict
 import Event
 import Html exposing (..)
+import Html.Attributes
 import Pupil
 
 
@@ -39,18 +40,22 @@ init =
 
 
 type Msg
-    = NewEventMsg Event.Msg
-    | NewPupilMsg Pupil.Msg
+    = EventMsg Event.Msg
+    | PupilMsg Pupil.Msg
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        NewEventMsg innerMsg ->
-            { model | events = Event.update innerMsg model.events }
+        EventMsg innerMsg ->
+            let
+                eventsModel =
+                    Event.update innerMsg model.events
+            in
+            { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils }
 
-        NewPupilMsg innerMsg ->
-            { model | pupils = Pupil.update innerMsg model.pupils }
+        PupilMsg innerMsg ->
+            { model | pupils = Pupil.update innerMsg model.pupils model.events.events }
 
 
 
@@ -60,19 +65,46 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ readme
-        , Event.view model.events |> map NewEventMsg
-        , Pupil.view model.pupils model.events.events |> map NewPupilMsg
-
-        --, result model
+        [ node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
+        , readme
+        , Event.view model.events |> map EventMsg
+        , Pupil.view model.pupils |> map PupilMsg
+        , result model
         ]
 
 
 readme : Html Msg
 readme =
     div []
-        [ h1 [] [ text "Überschrift hier" ]
-        , p [] [ text "Beschreibung hier" ]
+        [ h1 [] [ text "Projektgruppenverteilung" ]
+        , p [] [ text "..." ]
+        ]
+
+
+result : Model -> Html Msg
+result model =
+    let
+        ( matched, unmatched ) =
+            matchedAndUnmatchedPupils model.pupils.pupils
+    in
+    div []
+        [ h2 [] [ text "Ergebnis" ]
+        , div []
+            [ h3 [] [ text "Zugeteilte Schüler/Schülerinnen" ]
+            , dl []
+                (matched
+                    |> Dict.toList
+                    |> List.map
+                        (\( a, b ) -> div [] [ dt [] [ text a ], dd [] [ text b ] ])
+                )
+            ]
+        , div []
+            [ h3 [] [ text "Schüler/Schülerinnen ohne Platz" ]
+            , ul []
+                (unmatched
+                    |> List.map (\v -> li [] [ text v ])
+                )
+            ]
         ]
 
 
@@ -80,8 +112,21 @@ readme =
 -- LOGIC
 
 
-finalize : List Pupil.Obj -> List Event.Obj -> Algo.Matching
-finalize pupils events =
+matchedAndUnmatchedPupils : List Pupil.Obj -> ( Algo.Matching, List Algo.Vertex )
+matchedAndUnmatchedPupils pupils =
+    let
+        matched =
+            finalize pupils
+    in
+    ( matched
+    , pupils
+        |> List.map Pupil.toVertex
+        |> List.filter (\v -> not <| List.member v (Dict.keys matched))
+    )
+
+
+finalize : List Pupil.Obj -> Algo.Matching
+finalize pupils =
     let
         step1 : Algo.Matching
         step1 =
@@ -89,11 +134,11 @@ finalize pupils events =
 
         step2 : Algo.Matching
         step2 =
-            Dict.empty |> Algo.run (toGraphFromYellowWithoutMatched pupils events step1)
+            Dict.empty |> Algo.run (toGraphFromYellowWithoutMatched pupils step1)
 
         step3 : Algo.Matching -> Algo.Matching
         step3 =
-            Algo.run (toGraphFromGreenAndYellow pupils events)
+            Algo.run (toGraphFromGreenAndYellow pupils)
     in
     Dict.union step1 step2 |> step3
 
@@ -111,14 +156,14 @@ toGraphFromGreen pupils =
                 graph
                     |> Dict.insert
                         (pupil |> Pupil.toVertex)
-                        (pupil |> Pupil.greenEvents |> List.foldl Event.toVertexListReducer [])
+                        (pupil |> Pupil.eventGroup Pupil.Green |> List.foldl Event.toVertexListReducer [])
     in
     pupils
         |> List.foldl fn emptyGraph
 
 
-toGraphFromYellowWithoutMatched : List Pupil.Obj -> List Event.Obj -> Algo.Matching -> Algo.Graph
-toGraphFromYellowWithoutMatched pupils events matching =
+toGraphFromYellowWithoutMatched : List Pupil.Obj -> Algo.Matching -> Algo.Graph
+toGraphFromYellowWithoutMatched pupils matching =
     let
         onlyRemaining : Pupil.Obj -> Bool
         onlyRemaining =
@@ -140,7 +185,7 @@ toGraphFromYellowWithoutMatched pupils events matching =
                     |> Dict.insert
                         (pupil |> Pupil.toVertex)
                         (pupil
-                            |> Pupil.yellowEvents events
+                            |> Pupil.eventGroup Pupil.Yellow
                             |> List.foldl Event.toVertexListReducer []
                             |> List.filter onlyUnmatchedVertices
                         )
@@ -150,8 +195,8 @@ toGraphFromYellowWithoutMatched pupils events matching =
         |> List.foldl fn emptyGraph
 
 
-toGraphFromGreenAndYellow : List Pupil.Obj -> List Event.Obj -> Algo.Graph
-toGraphFromGreenAndYellow pupils events =
+toGraphFromGreenAndYellow : List Pupil.Obj -> Algo.Graph
+toGraphFromGreenAndYellow pupils =
     let
         emptyGraph : Algo.Graph
         emptyGraph =
@@ -160,10 +205,15 @@ toGraphFromGreenAndYellow pupils events =
         fn : Pupil.Obj -> Algo.Graph -> Algo.Graph
         fn =
             \pupil graph ->
+                let
+                    events : List Event.Obj
+                    events =
+                        (pupil |> Pupil.eventGroup Pupil.Green) ++ (pupil |> Pupil.eventGroup Pupil.Yellow)
+                in
                 graph
                     |> Dict.insert
                         (pupil |> Pupil.toVertex)
-                        (pupil |> Pupil.greenAndYellowEvents events |> List.foldl Event.toVertexListReducer [])
+                        (events |> List.foldl Event.toVertexListReducer [])
     in
     pupils
         |> List.foldl fn emptyGraph
