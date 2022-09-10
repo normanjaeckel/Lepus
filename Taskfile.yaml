@@ -12,13 +12,14 @@ tasks:
       - elm make --output=assets/elm.js --optimize src/Main.elm
     sources:
       - src/**/*.elm
-    # generates:
-    #   - assets/elm.js
+    generates:
+      - assets/elm.js
 
   dev-server:
-    desc:
+    desc: Starts a Python server for development purposes
+    deps:
+      - build
     cmds:
       - task: build
       - python -m http.server --bind 127.0.0.1 8000
-    deps:
-      - build
+
