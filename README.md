@@ -1,6 +1,6 @@
 # Lepus
 
-## What is it?
+## Summary
 
 Lepus is a small tool to match pupils to events/groups according to their
 preferences (green, yellow, red).

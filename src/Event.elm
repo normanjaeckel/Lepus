@@ -1,9 +1,9 @@
 module Event exposing (Model, Msg, Obj, init, toVertexList, toVertexListReducer, update, view)
 
 import Algo exposing (Vertex)
-import Helpers exposing (classes, svgIconXLg)
+import Helpers exposing (classes, isValidNameOrClass, svgIconXLg)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, hidden, href, placeholder, title, type_, value)
+import Html.Attributes exposing (attribute, class, hidden, href, placeholder, required, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 
 
@@ -79,7 +79,11 @@ update msg model =
             { model | formData = updateFormdata data model.formData }
 
         Save ->
-            { model | formData = emptyFormData, events = model.events ++ [ model.formData ] }
+            if isValidNameOrClass model.formData.name && model.formData.capacity > 0 then
+                { model | formData = emptyFormData, events = model.events ++ [ model.formData ] }
+
+            else
+                model
 
         Delete obj ->
             { model | events = model.events |> List.filter ((/=) obj) }
@@ -101,23 +105,24 @@ updateFormdata msg formData =
 
 view : Model -> Html Msg
 view model =
-    div [ class "mb-3" ]
+    div [ class "mb-5" ]
         [ h2 [] [ text "Projektgruppen" ]
-        , form [ onSubmit Save ]
+        , form [ class "mb-3", onSubmit Save ]
             [ h3 [ hidden True ] [ text "Neue Gruppe hinzufügen" ]
-            , div [ class "row" ]
-                [ div [ class "col" ]
+            , div [ classes "row g-3" ]
+                [ div [ class "col-md-3" ]
                     [ input
                         [ class "form-control"
                         , type_ "text"
                         , placeholder "Name"
                         , attribute "aria-label" "Name"
+                        , required True
                         , onInput (Name >> FormDataMsg)
                         , value model.formData.name
                         ]
                         []
                     ]
-                , div [ class "col" ]
+                , div [ class "col-md-3" ]
                     [ input
                         [ class "form-control"
                         , type_ "number"
@@ -129,7 +134,7 @@ view model =
                         []
                     , div [ class "form-text" ] [ text "Anzahl der Plätze" ]
                     ]
-                , div [ class "col" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Hinzufügen" ] ]
+                , div [ class "col-md-3" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Hinzufügen" ] ]
                 ]
             ]
         , div []
@@ -145,12 +150,15 @@ allEvents events =
         p [ hidden True ] [ text "Noch keine Gruppen angelegt" ]
 
     else
-        ol [] (events |> List.map oneEventLi)
+        ol [ classes "list-group list-group-flush list-group-numbered" ] (events |> List.map oneEventLi)
 
 
 oneEventLi : Obj -> Html Msg
 oneEventLi event =
-    li [ class "mb-3" ]
-        [ span [ class "me-3" ] [ text <| event.name ++ " (" ++ String.fromInt event.capacity ++ " Plätze)" ]
+    li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
+        [ div [ class "ms-2 me-auto" ]
+            [ text event.name
+            , span [ classes "ms-2 badge bg-primary rounded-pill", title "Anzahl der Plätze", attribute "aria-label" "Anzahl der Plätze" ] [ text <| String.fromInt event.capacity ]
+            ]
         , a [ class "link-danger", title "Löschen", href "#", attribute "aria-label" "Löschen", onClick <| Delete event ] [ svgIconXLg ]
         ]

@@ -16,7 +16,7 @@ tasks:
       - assets/elm.js
 
   dev-server:
-    desc: Starts a Python server for development purposes
+    desc: Starts a small Python server for development purposes
     deps:
       - build
     cmds:

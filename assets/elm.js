@@ -519,11 +519,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ai.N === region.as.N)
+	if (region.ai.O === region.as.O)
 	{
-		return 'on line ' + region.ai.N;
+		return 'on line ' + region.ai.O;
 	}
-	return 'on lines ' + region.ai.N + ' through ' + region.as.N;
+	return 'on lines ' + region.ai.O + ' through ' + region.as.O;
 }
 
 
@@ -2719,7 +2719,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		x: func(record.x),
+		y: func(record.y),
 		aj: record.aj,
 		ag: record.ag
 	}
@@ -2989,7 +2989,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.x;
+		var message = !tag ? value : tag < 3 ? value.a : value.y;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aj;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -4452,25 +4452,25 @@ var $elm$core$Basics$GT = 2;
 var $elm$core$Basics$LT = 0;
 var $author$project$Event$Model = F2(
 	function (events, formData) {
-		return {I: events, A: formData};
+		return {I: events, s: formData};
 	});
 var $author$project$Event$Obj = F2(
 	function (name, capacity) {
-		return {F: capacity, P: name};
+		return {B: capacity, J: name};
 	});
 var $author$project$Event$emptyFormData = A2($author$project$Event$Obj, '', 1);
 var $author$project$Event$init = A2($author$project$Event$Model, _List_Nil, $author$project$Event$emptyFormData);
 var $author$project$Pupil$Model = F2(
 	function (pupils, formData) {
-		return {A: formData, t: pupils};
+		return {s: formData, u: pupils};
 	});
 var $author$project$Pupil$FormData = F4(
 	function (name, _class, multiClass, multiNames) {
-		return {w: _class, O: multiClass, X: multiNames, P: name};
+		return {x: _class, P: multiClass, X: multiNames, J: name};
 	});
 var $author$project$Pupil$emptyFormData = A4($author$project$Pupil$FormData, '', '', '', '');
 var $author$project$Pupil$init = A2($author$project$Pupil$Model, _List_Nil, $author$project$Pupil$emptyFormData);
-var $author$project$Main$init = {I: $author$project$Event$init, t: $author$project$Pupil$init};
+var $author$project$Main$init = {I: $author$project$Event$init, u: $author$project$Pupil$init};
 var $elm$core$Result$Err = function (a) {
 	return {$: 1, a: a};
 };
@@ -5207,18 +5207,22 @@ var $elm$core$List$filter = F2(
 			list);
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$core$String$trim = _String_trim;
+var $author$project$Helpers$isValidNameOrClass = function (name) {
+	return $elm$core$String$trim(name) !== '';
+};
 var $author$project$Event$updateFormdata = F2(
 	function (msg, formData) {
 		if (!msg.$) {
 			var name = msg.a;
 			return _Utils_update(
 				formData,
-				{P: name});
+				{J: name});
 		} else {
 			var capacity = msg.a;
 			return _Utils_update(
 				formData,
-				{F: capacity});
+				{B: capacity});
 		}
 	});
 var $author$project$Event$update = F2(
@@ -5229,18 +5233,18 @@ var $author$project$Event$update = F2(
 				return _Utils_update(
 					model,
 					{
-						A: A2($author$project$Event$updateFormdata, data, model.A)
+						s: A2($author$project$Event$updateFormdata, data, model.s)
 					});
 			case 1:
-				return _Utils_update(
+				return ($author$project$Helpers$isValidNameOrClass(model.s.J) && (model.s.B > 0)) ? _Utils_update(
 					model,
 					{
 						I: _Utils_ap(
 							model.I,
 							_List_fromArray(
-								[model.A])),
-						A: $author$project$Event$emptyFormData
-					});
+								[model.s])),
+						s: $author$project$Event$emptyFormData
+					}) : model;
 			default:
 				var obj = msg.a;
 				return _Utils_update(
@@ -5255,7 +5259,7 @@ var $author$project$Event$update = F2(
 	});
 var $author$project$Pupil$Choice = F2(
 	function (event, type_) {
-		return {M: event, aV: type_};
+		return {N: event, aV: type_};
 	});
 var $author$project$Pupil$changeChoice = F4(
 	function (pupils, pupil, event, newChoiceType) {
@@ -5268,7 +5272,7 @@ var $author$project$Pupil$changeChoice = F4(
 						G: A2(
 							$elm$core$List$map,
 							function (c) {
-								return _Utils_eq(c.M, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
+								return _Utils_eq(c.N, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
 							},
 							p.G)
 					}) : p;
@@ -5277,7 +5281,7 @@ var $author$project$Pupil$changeChoice = F4(
 	});
 var $author$project$Pupil$Obj = F3(
 	function (name, _class, choices) {
-		return {G: choices, w: _class, P: name};
+		return {G: choices, x: _class, J: name};
 	});
 var $author$project$Pupil$Yellow = 1;
 var $elm$core$List$isEmpty = function (xs) {
@@ -5286,10 +5290,6 @@ var $elm$core$List$isEmpty = function (xs) {
 	} else {
 		return false;
 	}
-};
-var $elm$core$String$trim = _String_trim;
-var $author$project$Pupil$isValidNameOrClass = function (name) {
-	return $elm$core$String$trim(name) !== '';
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Pupil$saveMulti = F2(
@@ -5306,34 +5306,34 @@ var $author$project$Pupil$saveMulti = F2(
 				return A3(
 					$author$project$Pupil$Obj,
 					$elm$core$String$trim(n),
-					$elm$core$String$trim(model.A.O),
+					$elm$core$String$trim(model.s.P),
 					yellowEvents);
 			},
 			A2(
 				$elm$core$List$filter,
-				$author$project$Pupil$isValidNameOrClass,
-				A2($elm$core$String$split, ',', model.A.X)));
-		return (!($author$project$Pupil$isValidNameOrClass(model.A.O) || $elm$core$List$isEmpty(newPupils))) ? model : _Utils_update(
+				$author$project$Helpers$isValidNameOrClass,
+				A2($elm$core$String$split, ',', model.s.X)));
+		return (!($author$project$Helpers$isValidNameOrClass(model.s.P) || $elm$core$List$isEmpty(newPupils))) ? model : _Utils_update(
 			model,
 			{
-				A: $author$project$Pupil$emptyFormData,
-				t: _Utils_ap(model.t, newPupils)
+				s: $author$project$Pupil$emptyFormData,
+				u: _Utils_ap(model.u, newPupils)
 			});
 	});
 var $author$project$Pupil$saveSingle = F2(
 	function (model, events) {
-		return ($author$project$Pupil$isValidNameOrClass(model.A.P) && $author$project$Pupil$isValidNameOrClass(model.A.w)) ? _Utils_update(
+		return ($author$project$Helpers$isValidNameOrClass(model.s.J) && $author$project$Helpers$isValidNameOrClass(model.s.x)) ? _Utils_update(
 			model,
 			{
-				A: $author$project$Pupil$emptyFormData,
-				t: _Utils_ap(
-					model.t,
+				s: $author$project$Pupil$emptyFormData,
+				u: _Utils_ap(
+					model.u,
 					_List_fromArray(
 						[
 							A3(
 							$author$project$Pupil$Obj,
-							$elm$core$String$trim(model.A.P),
-							$elm$core$String$trim(model.A.w),
+							$elm$core$String$trim(model.s.J),
+							$elm$core$String$trim(model.s.x),
 							A2(
 								$elm$core$List$map,
 								function (e) {
@@ -5350,17 +5350,17 @@ var $author$project$Pupil$updateFormdata = F2(
 				var name = msg.a;
 				return _Utils_update(
 					formData,
-					{P: name});
+					{J: name});
 			case 1:
 				var _class = msg.a;
 				return _Utils_update(
 					formData,
-					{w: _class});
+					{x: _class});
 			case 2:
 				var _class = msg.a;
 				return _Utils_update(
 					formData,
-					{O: _class});
+					{P: _class});
 			default:
 				var names = msg.a;
 				return _Utils_update(
@@ -5376,7 +5376,7 @@ var $author$project$Pupil$update = F3(
 				return _Utils_update(
 					model,
 					{
-						A: A2($author$project$Pupil$updateFormdata, data, model.A)
+						s: A2($author$project$Pupil$updateFormdata, data, model.s)
 					});
 			case 1:
 				return A2($author$project$Pupil$saveSingle, model, events);
@@ -5387,10 +5387,10 @@ var $author$project$Pupil$update = F3(
 				return _Utils_update(
 					model,
 					{
-						t: A2(
+						u: A2(
 							$elm$core$List$filter,
 							$elm$core$Basics$neq(pupil),
-							model.t)
+							model.u)
 					});
 			default:
 				var pupil = msg.a;
@@ -5399,7 +5399,7 @@ var $author$project$Pupil$update = F3(
 				return _Utils_update(
 					model,
 					{
-						t: A4($author$project$Pupil$changeChoice, model.t, pupil, event, choice)
+						u: A4($author$project$Pupil$changeChoice, model.u, pupil, event, choice)
 					});
 		}
 	});
@@ -5436,7 +5436,7 @@ var $elm$core$List$member = F2(
 var $author$project$Pupil$updateEvents = F2(
 	function (events, model) {
 		var fn2 = function (c) {
-			return A2($elm$core$List$member, c.M, events);
+			return A2($elm$core$List$member, c.N, events);
 		};
 		var fn1 = F2(
 			function (e, cl) {
@@ -5446,7 +5446,7 @@ var $author$project$Pupil$updateEvents = F2(
 					A2(
 						$elm$core$List$map,
 						function ($) {
-							return $.M;
+							return $.N;
 						},
 						cl)) ? cl : A2(
 					$elm$core$List$cons,
@@ -5456,7 +5456,7 @@ var $author$project$Pupil$updateEvents = F2(
 		return _Utils_update(
 			model,
 			{
-				t: A2(
+				u: A2(
 					$elm$core$List$map,
 					function (p) {
 						return _Utils_update(
@@ -5468,7 +5468,7 @@ var $author$project$Pupil$updateEvents = F2(
 									A3($elm$core$List$foldl, fn1, p.G, events))
 							});
 					},
-					model.t)
+					model.u)
 			});
 	});
 var $author$project$Main$update = F2(
@@ -5480,14 +5480,14 @@ var $author$project$Main$update = F2(
 				model,
 				{
 					I: eventsModel,
-					t: A2($author$project$Pupil$updateEvents, eventsModel.I, model.t)
+					u: A2($author$project$Pupil$updateEvents, eventsModel.I, model.u)
 				});
 		} else {
 			var innerMsg = msg.a;
 			return _Utils_update(
 				model,
 				{
-					t: A3($author$project$Pupil$update, innerMsg, model.t, model.I.I)
+					u: A3($author$project$Pupil$update, innerMsg, model.u, model.I.I)
 				});
 		}
 	});
@@ -5541,7 +5541,7 @@ var $author$project$Main$readme = A2(
 	$elm$html$Html$div,
 	_List_fromArray(
 		[
-			$elm$html$Html$Attributes$class('mb-3')
+			$elm$html$Html$Attributes$class('mb-5')
 		]),
 	_List_fromArray(
 		[
@@ -5916,7 +5916,7 @@ var $author$project$Pupil$eventGroup = F2(
 		return A2(
 			$elm$core$List$map,
 			function (c) {
-				return c.M;
+				return c.N;
 			},
 			A2(
 				$elm$core$List$filter,
@@ -5926,7 +5926,7 @@ var $author$project$Pupil$eventGroup = F2(
 				pupil.G));
 	});
 var $author$project$Pupil$toVertex = function (m) {
-	return m.P + (' (' + (m.w + ')'));
+	return m.J + (' (' + (m.x + ')'));
 };
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
@@ -5963,8 +5963,8 @@ var $author$project$Event$toVertexList = function (m) {
 	return A3(
 		$elm$core$List$foldl,
 		fn,
-		_Utils_Tuple2(m.F + 1, _List_Nil),
-		A2($elm$core$List$repeat, m.F, m.P)).b;
+		_Utils_Tuple2(m.B + 1, _List_Nil),
+		A2($elm$core$List$repeat, m.B, m.J)).b;
 };
 var $author$project$Event$toVertexListReducer = F2(
 	function (event, list) {
@@ -6117,7 +6117,7 @@ var $author$project$Main$matchedAndUnmatchedPupils = function (pupils) {
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$result = function (model) {
-	var _v0 = $author$project$Main$matchedAndUnmatchedPupils(model.t.t);
+	var _v0 = $author$project$Main$matchedAndUnmatchedPupils(model.u.u);
 	var matched = _v0.a;
 	var unmatched = _v0.b;
 	return A2(
@@ -6297,20 +6297,32 @@ var $author$project$Event$oneEventLi = function (event) {
 		$elm$html$Html$li,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('mb-3')
+				$author$project$Helpers$classes('list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5')
 			]),
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$span,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('me-3')
+						$elm$html$Html$Attributes$class('ms-2 me-auto')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(
-						event.P + (' (' + ($elm$core$String$fromInt(event.F) + ' Plätze)')))
+						$elm$html$Html$text(event.J),
+						A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$author$project$Helpers$classes('ms-2 badge bg-primary rounded-pill'),
+								$elm$html$Html$Attributes$title('Anzahl der Plätze'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Anzahl der Plätze')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromInt(event.B))
+							]))
 					])),
 				A2(
 				$elm$html$Html$a,
@@ -6339,7 +6351,10 @@ var $author$project$Event$allEvents = function (events) {
 				$elm$html$Html$text('Noch keine Gruppen angelegt')
 			])) : A2(
 		$elm$html$Html$ol,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$author$project$Helpers$classes('list-group list-group-flush list-group-numbered')
+			]),
 		A2($elm$core$List$map, $author$project$Event$oneEventLi, events));
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
@@ -6407,6 +6422,7 @@ var $elm$html$Html$Events$onSubmit = function (msg) {
 			$elm$json$Json$Decode$succeed(msg)));
 };
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Event$view = function (model) {
@@ -6414,7 +6430,7 @@ var $author$project$Event$view = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('mb-3')
+				$elm$html$Html$Attributes$class('mb-5')
 			]),
 		_List_fromArray(
 			[
@@ -6429,6 +6445,7 @@ var $author$project$Event$view = function (model) {
 				$elm$html$Html$form,
 				_List_fromArray(
 					[
+						$elm$html$Html$Attributes$class('mb-3'),
 						$elm$html$Html$Events$onSubmit($author$project$Event$Save)
 					]),
 				_List_fromArray(
@@ -6447,7 +6464,7 @@ var $author$project$Event$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('row')
+								$author$project$Helpers$classes('row g-3')
 							]),
 						_List_fromArray(
 							[
@@ -6455,7 +6472,7 @@ var $author$project$Event$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('col')
+										$elm$html$Html$Attributes$class('col-md-3')
 									]),
 								_List_fromArray(
 									[
@@ -6467,9 +6484,10 @@ var $author$project$Event$view = function (model) {
 												$elm$html$Html$Attributes$type_('text'),
 												$elm$html$Html$Attributes$placeholder('Name'),
 												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Name'),
+												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
 												A2($elm$core$Basics$composeR, $author$project$Event$Name, $author$project$Event$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.A.P)
+												$elm$html$Html$Attributes$value(model.s.J)
 											]),
 										_List_Nil)
 									])),
@@ -6477,7 +6495,7 @@ var $author$project$Event$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('col')
+										$elm$html$Html$Attributes$class('col-md-3')
 									]),
 								_List_fromArray(
 									[
@@ -6498,7 +6516,7 @@ var $author$project$Event$view = function (model) {
 														$elm$core$Maybe$withDefault(0),
 														A2($elm$core$Basics$composeR, $author$project$Event$Capacity, $author$project$Event$FormDataMsg)))),
 												$elm$html$Html$Attributes$value(
-												$elm$core$String$fromInt(model.A.F))
+												$elm$core$String$fromInt(model.s.B))
 											]),
 										_List_Nil),
 										A2(
@@ -6516,7 +6534,7 @@ var $author$project$Event$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('col')
+										$elm$html$Html$Attributes$class('col-md-3')
 									]),
 								_List_fromArray(
 									[
@@ -6578,6 +6596,51 @@ var $author$project$Pupil$ChangeChoice = F3(
 	function (a, b, c) {
 		return {$: 4, a: a, b: b, c: c};
 	});
+var $elm$svg$Svg$Attributes$fillRule = _VirtualDom_attribute('fill-rule');
+var $author$project$Helpers$svgIconArrowDown = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$width('16'),
+			$elm$svg$Svg$Attributes$height('16'),
+			$elm$svg$Svg$Attributes$fill('currentColor'),
+			$elm$svg$Svg$Attributes$class('bi'),
+			$elm$svg$Svg$Attributes$class('bi-arrow-down'),
+			$elm$svg$Svg$Attributes$viewBox('0 0 16 16')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$fillRule('evenodd'),
+					$elm$svg$Svg$Attributes$d('M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z')
+				]),
+			_List_Nil)
+		]));
+var $author$project$Helpers$svgIconArrowUp = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$width('16'),
+			$elm$svg$Svg$Attributes$height('16'),
+			$elm$svg$Svg$Attributes$fill('currentColor'),
+			$elm$svg$Svg$Attributes$class('bi'),
+			$elm$svg$Svg$Attributes$class('bi-arrow-up'),
+			$elm$svg$Svg$Attributes$viewBox('0 0 16 16')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$fillRule('evenodd'),
+					$elm$svg$Svg$Attributes$d('M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z')
+				]),
+			_List_Nil)
+		]));
 var $author$project$Pupil$oneEventLi = F3(
 	function (choice, pupil, event) {
 		var buttons = function () {
@@ -6589,13 +6652,14 @@ var $author$project$Pupil$oneEventLi = F3(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
+									$elm$html$Html$Attributes$class('btn btn-outline-warning'),
+									$elm$html$Html$Attributes$title('zu Gelb'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Gelb'),
 									$elm$html$Html$Events$onClick(
 									A3($author$project$Pupil$ChangeChoice, pupil, event, 1))
 								]),
 							_List_fromArray(
-								[
-									$elm$html$Html$text('zu Gelb')
-								]))
+								[$author$project$Helpers$svgIconArrowDown]))
 						]);
 				case 1:
 					return _List_fromArray(
@@ -6604,24 +6668,26 @@ var $author$project$Pupil$oneEventLi = F3(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
+									$elm$html$Html$Attributes$class('btn btn-outline-success'),
+									$elm$html$Html$Attributes$title('zu Grün'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Grün'),
 									$elm$html$Html$Events$onClick(
 									A3($author$project$Pupil$ChangeChoice, pupil, event, 0))
 								]),
 							_List_fromArray(
-								[
-									$elm$html$Html$text('zu Grün')
-								])),
+								[$author$project$Helpers$svgIconArrowUp])),
 							A2(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
+									$elm$html$Html$Attributes$class('btn btn-outline-danger ms-1'),
+									$elm$html$Html$Attributes$title('zu Rot'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Rot'),
 									$elm$html$Html$Events$onClick(
 									A3($author$project$Pupil$ChangeChoice, pupil, event, 2))
 								]),
 							_List_fromArray(
-								[
-									$elm$html$Html$text('zu Rot')
-								]))
+								[$author$project$Helpers$svgIconArrowDown]))
 						]);
 				default:
 					return _List_fromArray(
@@ -6630,110 +6696,143 @@ var $author$project$Pupil$oneEventLi = F3(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
+									$elm$html$Html$Attributes$class('btn btn-outline-warning'),
+									$elm$html$Html$Attributes$title('zu Gelb'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Gelb'),
 									$elm$html$Html$Events$onClick(
 									A3($author$project$Pupil$ChangeChoice, pupil, event, 1))
 								]),
 							_List_fromArray(
-								[
-									$elm$html$Html$text('zu Gelb')
-								]))
+								[$author$project$Helpers$svgIconArrowUp]))
 						]);
 			}
 		}();
 		return A2(
 			$elm$html$Html$li,
-			_List_Nil,
-			A2(
-				$elm$core$List$cons,
-				$elm$html$Html$text(event.P),
-				buttons));
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('list-group-item d-flex justify-content-between align-items-start')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(event.J),
+					A2($elm$html$Html$span, _List_Nil, buttons)
+				]));
 	});
 var $author$project$Pupil$eventList = F2(
 	function (choice, pupil) {
 		var events = A2($author$project$Pupil$eventGroup, choice, pupil);
 		return $elm$core$List$isEmpty(events) ? A2(
-			$elm$html$Html$div,
-			_List_Nil,
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('ms-3')
+				]),
 			_List_fromArray(
 				[
 					$elm$html$Html$text('keine')
 				])) : A2(
 			$elm$html$Html$ul,
-			_List_Nil,
+			_List_fromArray(
+				[
+					$author$project$Helpers$classes('list-group list-group-flush ')
+				]),
 			A2(
 				$elm$core$List$map,
 				A2($author$project$Pupil$oneEventLi, choice, pupil),
 				events));
 	});
-var $elm$html$Html$h4 = _VirtualDom_node('h4');
-var $elm$html$Html$h5 = _VirtualDom_node('h5');
 var $author$project$Pupil$onePupilLi = function (pupil) {
-	return A2(
-		$elm$html$Html$li,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$h4,
-				_List_Nil,
+	var innerLi = F2(
+		function (txt, ct) {
+			return A2(
+				$elm$html$Html$li,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(pupil.P + (' (Klasse ' + (pupil.w + ')'))),
+						$elm$html$Html$Attributes$class('list-group-item d-flex justify-content-between align-items-start')
+					]),
+				_List_fromArray(
+					[
 						A2(
-						$elm$html$Html$button,
+						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$type_('button'),
-								$elm$html$Html$Events$onClick(
-								$author$project$Pupil$Delete(pupil))
+								$elm$html$Html$Attributes$class('row container-fluid')
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Löschen')
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col-2')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(txt)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col-10')
+									]),
+								_List_fromArray(
+									[
+										A2($author$project$Pupil$eventList, ct, pupil)
+									]))
+							]))
+					]));
+		});
+	return A2(
+		$elm$html$Html$li,
+		_List_fromArray(
+			[
+				$author$project$Helpers$classes('list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('ms-2 w-100')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(pupil.J + (' (Klasse ' + (pupil.x + ')')))
+							])),
+						A2(
+						$elm$html$Html$ul,
+						_List_fromArray(
+							[
+								$author$project$Helpers$classes('list-group list-group-flush')
+							]),
+						_List_fromArray(
+							[
+								A2(innerLi, 'Grün', 0),
+								A2(innerLi, 'Gelb', 1),
+								A2(innerLi, 'Rot', 2)
 							]))
 					])),
 				A2(
-				$elm$html$Html$div,
-				_List_Nil,
+				$elm$html$Html$a,
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$h5,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Grün')
-							])),
-						A2($author$project$Pupil$eventList, 0, pupil)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
+						$elm$html$Html$Attributes$class('link-danger'),
+						$elm$html$Html$Attributes$title('Löschen'),
+						$elm$html$Html$Attributes$href('#'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Löschen'),
+						$elm$html$Html$Events$onClick(
+						$author$project$Pupil$Delete(pupil))
+					]),
 				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h5,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Gelb')
-							])),
-						A2($author$project$Pupil$eventList, 1, pupil)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h5,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Rot')
-							])),
-						A2($author$project$Pupil$eventList, 2, pupil)
-					]))
+					[$author$project$Helpers$svgIconXLg]))
 			]));
 };
 var $author$project$Pupil$allPupils = function (pupils) {
@@ -6748,10 +6847,12 @@ var $author$project$Pupil$allPupils = function (pupils) {
 				$elm$html$Html$text('Noch keine Schüler oder Schülerinnen angelegt')
 			])) : A2(
 		$elm$html$Html$ol,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$author$project$Helpers$classes('list-group list-group-flush list-group-numbered')
+			]),
 		A2($elm$core$List$map, $author$project$Pupil$onePupilLi, pupils));
 };
-var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
 var $elm$html$Html$Attributes$rows = function (n) {
 	return A2(
 		_VirtualDom_attribute,
@@ -6764,7 +6865,7 @@ var $author$project$Pupil$view = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('mb-3')
+				$elm$html$Html$Attributes$class('mb-5')
 			]),
 		_List_fromArray(
 			[
@@ -6779,7 +6880,7 @@ var $author$project$Pupil$view = function (model) {
 				$elm$html$Html$form,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('mb-2'),
+						$elm$html$Html$Attributes$class('mb-3'),
 						$elm$html$Html$Events$onSubmit($author$project$Pupil$Save)
 					]),
 				_List_fromArray(
@@ -6798,7 +6899,7 @@ var $author$project$Pupil$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('row')
+								$elm$html$Html$Attributes$class('row g-3')
 							]),
 						_List_fromArray(
 							[
@@ -6806,7 +6907,7 @@ var $author$project$Pupil$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('col')
+										$elm$html$Html$Attributes$class('col-md-3')
 									]),
 								_List_fromArray(
 									[
@@ -6821,7 +6922,7 @@ var $author$project$Pupil$view = function (model) {
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
 												A2($elm$core$Basics$composeR, $author$project$Pupil$Name, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.A.P)
+												$elm$html$Html$Attributes$value(model.s.J)
 											]),
 										_List_Nil)
 									])),
@@ -6829,7 +6930,7 @@ var $author$project$Pupil$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('col')
+										$elm$html$Html$Attributes$class('col-md-3')
 									]),
 								_List_fromArray(
 									[
@@ -6844,7 +6945,7 @@ var $author$project$Pupil$view = function (model) {
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
 												A2($elm$core$Basics$composeR, $author$project$Pupil$Class, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.A.w)
+												$elm$html$Html$Attributes$value(model.s.x)
 											]),
 										_List_Nil)
 									])),
@@ -6852,7 +6953,7 @@ var $author$project$Pupil$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('col')
+										$elm$html$Html$Attributes$class('col-md-3')
 									]),
 								_List_fromArray(
 									[
@@ -6874,6 +6975,7 @@ var $author$project$Pupil$view = function (model) {
 				$elm$html$Html$form,
 				_List_fromArray(
 					[
+						$elm$html$Html$Attributes$class('mb-3'),
 						$elm$html$Html$Events$onSubmit($author$project$Pupil$MultiSave)
 					]),
 				_List_fromArray(
@@ -6892,7 +6994,7 @@ var $author$project$Pupil$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('row')
+								$elm$html$Html$Attributes$class('row g-3')
 							]),
 						_List_fromArray(
 							[
@@ -6900,7 +7002,7 @@ var $author$project$Pupil$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('col')
+										$elm$html$Html$Attributes$class('col-md-3')
 									]),
 								_List_fromArray(
 									[
@@ -6915,7 +7017,7 @@ var $author$project$Pupil$view = function (model) {
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
 												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiClass, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.A.O)
+												$elm$html$Html$Attributes$value(model.s.P)
 											]),
 										_List_Nil)
 									])),
@@ -6923,7 +7025,7 @@ var $author$project$Pupil$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('col')
+										$elm$html$Html$Attributes$class('col-md-3')
 									]),
 								_List_fromArray(
 									[
@@ -6938,7 +7040,7 @@ var $author$project$Pupil$view = function (model) {
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
 												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiNames, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.A.X)
+												$elm$html$Html$Attributes$value(model.s.X)
 											]),
 										_List_Nil)
 									])),
@@ -6946,7 +7048,7 @@ var $author$project$Pupil$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('col')
+										$elm$html$Html$Attributes$class('col-md-3')
 									]),
 								_List_fromArray(
 									[
@@ -6979,7 +7081,7 @@ var $author$project$Pupil$view = function (model) {
 							[
 								$elm$html$Html$text('Alle Schüler/Schülerinnen')
 							])),
-						$author$project$Pupil$allPupils(model.t)
+						$author$project$Pupil$allPupils(model.u)
 					]))
 			]));
 };
@@ -7005,7 +7107,7 @@ var $author$project$Main$view = function (model) {
 						A2(
 						$elm$html$Html$map,
 						$author$project$Main$PupilMsg,
-						$author$project$Pupil$view(model.t)),
+						$author$project$Pupil$view(model.u)),
 						$author$project$Main$result(model)
 					]))
 			]));

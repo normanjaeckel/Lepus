@@ -2,9 +2,9 @@ module Pupil exposing (Choice, ChoiceType(..), Model, Msg, Obj, eventGroup, init
 
 import Algo
 import Event
-import Helpers exposing (classes)
+import Helpers exposing (classes, isValidNameOrClass, svgIconArrowDown, svgIconArrowUp, svgIconXLg)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, hidden, placeholder, required, rows, type_, value)
+import Html.Attributes exposing (attribute, class, hidden, href, placeholder, required, rows, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 
 
@@ -34,11 +34,6 @@ init =
 emptyFormData : FormData
 emptyFormData =
     FormData "" "" "" ""
-
-
-isValidNameOrClass : String -> Bool
-isValidNameOrClass name =
-    String.trim name /= ""
 
 
 type alias Obj =
@@ -221,12 +216,12 @@ updateEvents events model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "mb-3" ]
+    div [ class "mb-5" ]
         [ h2 [] [ text "Schüler/Schülerinnen" ]
-        , form [ class "mb-2", onSubmit Save ]
+        , form [ class "mb-3", onSubmit Save ]
             [ h3 [ hidden True ] [ text "Neuen Schüler oder neue Schülerin hinzufügen" ]
-            , div [ class "row" ]
-                [ div [ class "col" ]
+            , div [ class "row g-3" ]
+                [ div [ class "col-md-3" ]
                     [ input
                         [ class "form-control"
                         , type_ "text"
@@ -238,7 +233,7 @@ view model =
                         ]
                         []
                     ]
-                , div [ class "col" ]
+                , div [ class "col-md-3" ]
                     [ input
                         [ class "form-control"
                         , type_ "text"
@@ -250,13 +245,13 @@ view model =
                         ]
                         []
                     ]
-                , div [ class "col" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Eine/n Hinzufügen" ] ]
+                , div [ class "col-md-3" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Eine/n Hinzufügen" ] ]
                 ]
             ]
-        , form [ onSubmit MultiSave ]
+        , form [ class "mb-3", onSubmit MultiSave ]
             [ h3 [ hidden True ] [ text "Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen" ]
-            , div [ class "row" ]
-                [ div [ class "col" ]
+            , div [ class "row g-3" ]
+                [ div [ class "col-md-3" ]
                     [ input
                         [ class "form-control"
                         , type_ "text"
@@ -268,7 +263,7 @@ view model =
                         ]
                         []
                     ]
-                , div [ class "col" ]
+                , div [ class "col-md-3" ]
                     [ textarea
                         [ class "form-control"
                         , rows 1
@@ -280,7 +275,7 @@ view model =
                         ]
                         []
                     ]
-                , div [ class "col" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Mehrere Hinzufügen" ] ]
+                , div [ class "col-md-3" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Mehrere Hinzufügen" ] ]
                 ]
             ]
         , div []
@@ -296,28 +291,29 @@ allPupils pupils =
         p [ hidden True ] [ text "Noch keine Schüler oder Schülerinnen angelegt" ]
 
     else
-        ol [] (pupils |> List.map onePupilLi)
+        ol [ classes "list-group list-group-flush list-group-numbered" ] (pupils |> List.map onePupilLi)
 
 
 onePupilLi : Obj -> Html Msg
 onePupilLi pupil =
-    li []
-        [ h4 []
-            [ text <| pupil.name ++ " (Klasse " ++ pupil.class ++ ")"
-            , button [ type_ "button", onClick <| Delete pupil ] [ text "Löschen" ]
+    let
+        innerLi : String -> ChoiceType -> Html Msg
+        innerLi =
+            \txt ct ->
+                li [ class "list-group-item d-flex justify-content-between align-items-start" ]
+                    [ div [ class "row container-fluid" ]
+                        [ div [ class "col-2" ] [ text txt ]
+                        , div [ class "col-10" ] [ pupil |> eventList ct ]
+                        ]
+                    ]
+    in
+    li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
+        [ div [ class "ms-2 w-100" ]
+            [ div [] [ text <| pupil.name ++ " (Klasse " ++ pupil.class ++ ")" ]
+            , ul [ classes "list-group list-group-flush" ]
+                [ innerLi "Grün" Green, innerLi "Gelb" Yellow, innerLi "Rot" Red ]
             ]
-        , div []
-            [ h5 [] [ text "Grün" ]
-            , pupil |> eventList Green
-            ]
-        , div []
-            [ h5 [] [ text "Gelb" ]
-            , pupil |> eventList Yellow
-            ]
-        , div []
-            [ h5 [] [ text "Rot" ]
-            , pupil |> eventList Red
-            ]
+        , a [ class "link-danger", title "Löschen", href "#", attribute "aria-label" "Löschen", onClick <| Delete pupil ] [ svgIconXLg ]
         ]
 
 
@@ -329,10 +325,10 @@ eventList choice pupil =
             pupil |> eventGroup choice
     in
     if List.isEmpty events then
-        div [] [ text "keine" ]
+        span [ class "ms-3" ] [ text "keine" ]
 
     else
-        ul [] (events |> List.map (oneEventLi choice pupil))
+        ul [ classes "list-group list-group-flush " ] (events |> List.map (oneEventLi choice pupil))
 
 
 oneEventLi : ChoiceType -> Obj -> Event.Obj -> Html Msg
@@ -342,14 +338,40 @@ oneEventLi choice pupil event =
         buttons =
             case choice of
                 Green ->
-                    [ button [ onClick <| ChangeChoice pupil event Yellow ] [ text "zu Gelb" ] ]
+                    [ button
+                        [ class "btn btn-outline-warning"
+                        , title "zu Gelb"
+                        , attribute "aria-label" "zu Gelb"
+                        , onClick <| ChangeChoice pupil event Yellow
+                        ]
+                        [ svgIconArrowDown ]
+                    ]
 
                 Yellow ->
-                    [ button [ onClick <| ChangeChoice pupil event Green ] [ text "zu Grün" ]
-                    , button [ onClick <| ChangeChoice pupil event Red ] [ text "zu Rot" ]
+                    [ button
+                        [ class "btn btn-outline-success"
+                        , title "zu Grün"
+                        , attribute "aria-label" "zu Grün"
+                        , onClick <| ChangeChoice pupil event Green
+                        ]
+                        [ svgIconArrowUp ]
+                    , button
+                        [ class "btn btn-outline-danger ms-1"
+                        , title "zu Rot"
+                        , attribute "aria-label" "zu Rot"
+                        , onClick <| ChangeChoice pupil event Red
+                        ]
+                        [ svgIconArrowDown ]
                     ]
 
                 Red ->
-                    [ button [ onClick <| ChangeChoice pupil event Yellow ] [ text "zu Gelb" ] ]
+                    [ button
+                        [ class "btn btn-outline-warning"
+                        , title "zu Gelb"
+                        , attribute "aria-label" "zu Gelb"
+                        , onClick <| ChangeChoice pupil event Yellow
+                        ]
+                        [ svgIconArrowUp ]
+                    ]
     in
-    li [] (text event.name :: buttons)
+    li [ class "list-group-item d-flex justify-content-between align-items-start" ] [ text event.name, span [] buttons ]
