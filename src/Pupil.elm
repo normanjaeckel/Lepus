@@ -2,8 +2,9 @@ module Pupil exposing (Choice, ChoiceType(..), Model, Msg, Obj, eventGroup, init
 
 import Algo
 import Event
+import Helpers exposing (classes)
 import Html exposing (..)
-import Html.Attributes exposing (for, id, rows, type_, value)
+import Html.Attributes exposing (attribute, class, hidden, placeholder, required, rows, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 
 
@@ -72,55 +73,6 @@ eventGroup choice pupil =
 
 
 
--- greenEvents : Obj -> List Event.Obj
--- greenEvents pupil =
---     pupil.choices
---         |> List.filter
---             (\c ->
---                 case c.type_ of
---                     Green ->
---                         True
---                     _ ->
---                         False
---             )
---         |> List.map (\c -> c.event)
--- yellowEvents : Obj -> List Event.Obj
--- yellowEvents pupil =
---     pupil.choices
---         |> List.filter
---             (\c ->
---                 case c.type_ of
---                     Yellow ->
---                         True
---                     _ ->
---                         False
---             )
---         |> List.map (\c -> c.event)
--- -- events
--- --     |> List.filter
--- --         (\e ->
--- --             pupil.choices
--- --                 |> List.any
--- --                     (\c ->
--- --                         c.event == e
--- --                     )
--- --                 |> not
--- --         )
--- greenAndYellowEvents : Obj -> List Event.Obj
--- greenAndYellowEvents pupil =
---     greenEvents pupil ++ yellowEvents pupil
--- redEvents : Obj -> List Event.Obj
--- redEvents p =
---     p.choices
---         |> List.filter
---             (\c ->
---                 case c.type_ of
---                     Red ->
---                         True
---                     _ ->
---                         False
---             )
---         |> List.map (\c -> c.event)
 -- UPDATE
 
 
@@ -129,6 +81,7 @@ type Msg
     | Save
     | MultiSave
     | Delete Obj
+    | ChangeChoice Obj Event.Obj ChoiceType
 
 
 type FormDataInput
@@ -150,8 +103,11 @@ update msg model events =
         MultiSave ->
             saveMulti model events
 
-        Delete obj ->
-            { model | pupils = model.pupils |> List.filter ((/=) obj) }
+        Delete pupil ->
+            { model | pupils = model.pupils |> List.filter ((/=) pupil) }
+
+        ChangeChoice pupil event choice ->
+            { model | pupils = changeChoice model.pupils pupil event choice }
 
 
 updateFormdata : FormDataInput -> FormData -> FormData
@@ -212,6 +168,30 @@ saveMulti model events =
         { model | formData = emptyFormData, pupils = model.pupils ++ newPupils }
 
 
+changeChoice : List Obj -> Obj -> Event.Obj -> ChoiceType -> List Obj
+changeChoice pupils pupil event newChoiceType =
+    pupils
+        |> List.map
+            (\p ->
+                if p == pupil then
+                    { p
+                        | choices =
+                            p.choices
+                                |> List.map
+                                    (\c ->
+                                        if c.event == event then
+                                            Choice event newChoiceType
+
+                                        else
+                                            c
+                                    )
+                    }
+
+                else
+                    p
+            )
+
+
 updateEvents : List Event.Obj -> Model -> Model
 updateEvents events model =
     let
@@ -241,55 +221,71 @@ updateEvents events model =
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ class "mb-3" ]
         [ h2 [] [ text "Schüler/Schülerinnen" ]
+        , form [ class "mb-2", onSubmit Save ]
+            [ h3 [ hidden True ] [ text "Neuen Schüler oder neue Schülerin hinzufügen" ]
+            , div [ class "row" ]
+                [ div [ class "col" ]
+                    [ input
+                        [ class "form-control"
+                        , type_ "text"
+                        , placeholder "Name"
+                        , attribute "aria-label" "Name"
+                        , required True
+                        , onInput (Name >> FormDataMsg)
+                        , value model.formData.name
+                        ]
+                        []
+                    ]
+                , div [ class "col" ]
+                    [ input
+                        [ class "form-control"
+                        , type_ "text"
+                        , placeholder "Klasse"
+                        , attribute "aria-label" "Klasse"
+                        , required True
+                        , onInput (Class >> FormDataMsg)
+                        , value model.formData.class
+                        ]
+                        []
+                    ]
+                , div [ class "col" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Eine/n Hinzufügen" ] ]
+                ]
+            ]
+        , form [ onSubmit MultiSave ]
+            [ h3 [ hidden True ] [ text "Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen" ]
+            , div [ class "row" ]
+                [ div [ class "col" ]
+                    [ input
+                        [ class "form-control"
+                        , type_ "text"
+                        , placeholder "Klasse"
+                        , attribute "aria-label" "Klasse"
+                        , required True
+                        , onInput (MultiClass >> FormDataMsg)
+                        , value model.formData.multiClass
+                        ]
+                        []
+                    ]
+                , div [ class "col" ]
+                    [ textarea
+                        [ class "form-control"
+                        , rows 1
+                        , placeholder "Namen (mit Komma getrennt)"
+                        , attribute "aria-label" "Namen (mit Komma getrennt)"
+                        , required True
+                        , onInput (MultiNames >> FormDataMsg)
+                        , value model.formData.multiNames
+                        ]
+                        []
+                    ]
+                , div [ class "col" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Mehrere Hinzufügen" ] ]
+                ]
+            ]
         , div []
-            [ h3 [] [ text "Alle Schüler/Schülerinnen" ]
+            [ h3 [ hidden True ] [ text "Alle Schüler/Schülerinnen" ]
             , allPupils model.pupils
-            ]
-        , div []
-            [ h3 [] [ text "Neuen Schüler oder neue Schülerin hinzufügen" ]
-            , form [ onSubmit Save ]
-                [ label [ for "newPupilName" ] [ text "Name" ]
-                , input
-                    [ id "newPupilName"
-                    , type_ "text"
-                    , onInput (Name >> FormDataMsg)
-                    , value model.formData.name
-                    ]
-                    []
-                , label [ for "newPupilClass" ] [ text "Klasse" ]
-                , input
-                    [ id "newPupilClass"
-                    , type_ "text"
-                    , onInput (Class >> FormDataMsg)
-                    , value model.formData.class
-                    ]
-                    []
-                , button [ type_ "submit" ] [ text "Speichern" ]
-                ]
-            ]
-        , div []
-            [ h3 [] [ text "Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen" ]
-            , form [ onSubmit MultiSave ]
-                [ label [ for "newPupilMultiClass" ] [ text "Klasse" ]
-                , input
-                    [ id "newPupilMultiClass"
-                    , type_ "text"
-                    , onInput (MultiClass >> FormDataMsg)
-                    , value model.formData.multiClass
-                    ]
-                    []
-                , label [ for "newPupilMultiName" ] [ text "Namen (mit Komma getrennt)" ]
-                , textarea
-                    [ rows 5
-                    , id "newPupilMultiName"
-                    , onInput (MultiNames >> FormDataMsg)
-                    , value model.formData.multiNames
-                    ]
-                    []
-                , button [ type_ "submit" ] [ text "Speichern" ]
-                ]
             ]
         ]
 
@@ -297,7 +293,7 @@ view model =
 allPupils : List Obj -> Html Msg
 allPupils pupils =
     if List.isEmpty pupils then
-        p [] [ text "Noch keine Schüler oder Schülerinnen angelegt" ]
+        p [ hidden True ] [ text "Noch keine Schüler oder Schülerinnen angelegt" ]
 
     else
         ol [] (pupils |> List.map onePupilLi)
@@ -336,22 +332,24 @@ eventList choice pupil =
         div [] [ text "keine" ]
 
     else
-        ul [] (events |> List.map (oneEventLi choice))
+        ul [] (events |> List.map (oneEventLi choice pupil))
 
 
-oneEventLi : ChoiceType -> Event.Obj -> Html Msg
-oneEventLi choice event =
+oneEventLi : ChoiceType -> Obj -> Event.Obj -> Html Msg
+oneEventLi choice pupil event =
     let
-        buttons : List (Html msg)
+        buttons : List (Html Msg)
         buttons =
             case choice of
                 Green ->
-                    [ button [] [ text "zu Gelb" ] ]
+                    [ button [ onClick <| ChangeChoice pupil event Yellow ] [ text "zu Gelb" ] ]
 
                 Yellow ->
-                    [ button [] [ text "zu Grün" ], button [] [ text "zu Rot" ] ]
+                    [ button [ onClick <| ChangeChoice pupil event Green ] [ text "zu Grün" ]
+                    , button [ onClick <| ChangeChoice pupil event Red ] [ text "zu Rot" ]
+                    ]
 
                 Red ->
-                    [ button [] [ text "zu Gelb" ] ]
+                    [ button [ onClick <| ChangeChoice pupil event Yellow ] [ text "zu Gelb" ] ]
     in
     li [] (text event.name :: buttons)

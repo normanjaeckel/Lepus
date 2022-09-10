@@ -4,8 +4,9 @@ import Algo
 import Browser
 import Dict
 import Event
+import Helpers exposing (classes)
 import Html exposing (..)
-import Html.Attributes
+import Html.Attributes exposing (class)
 import Pupil
 
 
@@ -64,20 +65,21 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ node "link" [ Html.Attributes.rel "stylesheet", Html.Attributes.href "style.css" ] []
-        , readme
-        , Event.view model.events |> map EventMsg
-        , Pupil.view model.pupils |> map PupilMsg
-        , result model
+    div [ classes "container p-3 py-md-5" ]
+        [ main_ []
+            [ readme
+            , Event.view model.events |> map EventMsg
+            , Pupil.view model.pupils |> map PupilMsg
+            , result model
+            ]
         ]
 
 
 readme : Html Msg
 readme =
-    div []
+    div [ class "mb-3" ]
         [ h1 [] [ text "Projektgruppenverteilung" ]
-        , p [] [ text "..." ]
+        , p [ classes "fs-5 col-md-8" ] [ text "Dieses Tool speichert die Eingaben im Local Storage des Browsers. Es werden keine eigegebenen Daten über das Internet gesendet." ]
         ]
 
 

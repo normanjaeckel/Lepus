@@ -519,11 +519,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.aa.G === region.al.G)
+	if (region.ai.N === region.as.N)
 	{
-		return 'on line ' + region.aa.G;
+		return 'on line ' + region.ai.N;
 	}
-	return 'on lines ' + region.aa.G + ' through ' + region.al.G;
+	return 'on lines ' + region.ai.N + ' through ' + region.as.N;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bb,
-		impl.bv,
-		impl.bq,
+		impl.be,
+		impl.by,
+		impl.bu,
 		function() { return function() {} }
 	);
 });
@@ -2719,9 +2719,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		v: func(record.v),
-		ab: record.ab,
-		Z: record.Z
+		x: func(record.x),
+		aj: record.aj,
+		ag: record.ag
 	}
 });
 
@@ -2989,11 +2989,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.v;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ab;
+		var message = !tag ? value : tag < 3 ? value.a : value.x;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aj;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.Z) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ag) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bb,
-		impl.bv,
-		impl.bq,
+		impl.be,
+		impl.by,
+		impl.bu,
 		function(sendToApp, initialModel) {
-			var view = impl.bw;
+			var view = impl.bz;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bb,
-		impl.bv,
-		impl.bq,
+		impl.be,
+		impl.by,
+		impl.bu,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl._ && impl._(sendToApp)
-			var view = impl.bw;
+			var divertHrefToApp = impl.ah && impl.ah(sendToApp)
+			var view = impl.bz;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aY);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.a1);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.bt) && (_VirtualDom_doc.title = title = doc.bt);
+				(title !== doc.bx) && (_VirtualDom_doc.title = title = doc.bx);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.bl;
-	var onUrlRequest = impl.bm;
+	var onUrlChange = impl.bo;
+	var onUrlRequest = impl.bp;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		_: function(sendToApp)
+		ah: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aE === next.aE
-							&& curr.ar === next.ar
-							&& curr.aB.a === next.aB.a
+							&& curr.aJ === next.aJ
+							&& curr.ax === next.ax
+							&& curr.aG.a === next.aG.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		bb: function(flags)
+		be: function(flags)
 		{
-			return A3(impl.bb, flags, _Browser_getUrl(), key);
+			return A3(impl.be, flags, _Browser_getUrl(), key);
 		},
-		bw: impl.bw,
-		bv: impl.bv,
-		bq: impl.bq
+		bz: impl.bz,
+		by: impl.by,
+		bu: impl.bu
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { a9: 'hidden', a$: 'visibilitychange' }
+		? { bc: 'hidden', a3: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { a9: 'mozHidden', a$: 'mozvisibilitychange' }
+		? { bc: 'mozHidden', a3: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { a9: 'msHidden', a$: 'msvisibilitychange' }
+		? { bc: 'msHidden', a3: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { a9: 'webkitHidden', a$: 'webkitvisibilitychange' }
-		: { a9: 'hidden', a$: 'visibilitychange' };
+		? { bc: 'webkitHidden', a3: 'webkitvisibilitychange' }
+		: { bc: 'hidden', a3: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aL: _Browser_getScene(),
-		aR: {
-			aT: _Browser_window.pageXOffset,
-			aU: _Browser_window.pageYOffset,
-			aS: _Browser_doc.documentElement.clientWidth,
-			aq: _Browser_doc.documentElement.clientHeight
+		aP: _Browser_getScene(),
+		aW: {
+			aY: _Browser_window.pageXOffset,
+			aZ: _Browser_window.pageYOffset,
+			aX: _Browser_doc.documentElement.clientWidth,
+			aw: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aS: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		aq: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aX: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		aw: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aL: {
-				aS: node.scrollWidth,
-				aq: node.scrollHeight
+			aP: {
+				aX: node.scrollWidth,
+				aw: node.scrollHeight
 			},
-			aR: {
-				aT: node.scrollLeft,
-				aU: node.scrollTop,
-				aS: node.clientWidth,
-				aq: node.clientHeight
+			aW: {
+				aY: node.scrollLeft,
+				aZ: node.scrollTop,
+				aX: node.clientWidth,
+				aw: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aL: _Browser_getScene(),
-			aR: {
-				aT: x,
-				aU: y,
-				aS: _Browser_doc.documentElement.clientWidth,
-				aq: _Browser_doc.documentElement.clientHeight
+			aP: _Browser_getScene(),
+			aW: {
+				aY: x,
+				aZ: y,
+				aX: _Browser_doc.documentElement.clientWidth,
+				aw: _Browser_doc.documentElement.clientHeight
 			},
-			a4: {
-				aT: x + rect.left,
-				aU: y + rect.top,
-				aS: rect.width,
-				aq: rect.height
+			a7: {
+				aY: x + rect.left,
+				aZ: y + rect.top,
+				aX: rect.width,
+				aw: rect.height
 			}
 		};
 	});
@@ -4450,9 +4450,27 @@ var $elm$core$Set$toList = function (_v0) {
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$GT = 2;
 var $elm$core$Basics$LT = 0;
-var $author$project$Event$init = _List_Nil;
-var $author$project$Pupil$init = _List_Nil;
-var $author$project$Main$init = {U: $author$project$Event$init, aF: $author$project$Pupil$init};
+var $author$project$Event$Model = F2(
+	function (events, formData) {
+		return {I: events, A: formData};
+	});
+var $author$project$Event$Obj = F2(
+	function (name, capacity) {
+		return {F: capacity, P: name};
+	});
+var $author$project$Event$emptyFormData = A2($author$project$Event$Obj, '', 1);
+var $author$project$Event$init = A2($author$project$Event$Model, _List_Nil, $author$project$Event$emptyFormData);
+var $author$project$Pupil$Model = F2(
+	function (pupils, formData) {
+		return {A: formData, t: pupils};
+	});
+var $author$project$Pupil$FormData = F4(
+	function (name, _class, multiClass, multiNames) {
+		return {w: _class, O: multiClass, X: multiNames, P: name};
+	});
+var $author$project$Pupil$emptyFormData = A4($author$project$Pupil$FormData, '', '', '', '');
+var $author$project$Pupil$init = A2($author$project$Pupil$Model, _List_Nil, $author$project$Pupil$emptyFormData);
+var $author$project$Main$init = {I: $author$project$Event$init, t: $author$project$Pupil$init};
 var $elm$core$Result$Err = function (a) {
 	return {$: 1, a: a};
 };
@@ -4877,7 +4895,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {an: fragment, ar: host, az: path, aB: port_, aE: protocol, aG: query};
+		return {at: fragment, ax: host, aE: path, aG: port_, aJ: protocol, aK: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5162,29 +5180,228 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $elm$browser$Browser$sandbox = function (impl) {
 	return _Browser_element(
 		{
-			bb: function (_v0) {
-				return _Utils_Tuple2(impl.bb, $elm$core$Platform$Cmd$none);
+			be: function (_v0) {
+				return _Utils_Tuple2(impl.be, $elm$core$Platform$Cmd$none);
 			},
-			bq: function (_v1) {
+			bu: function (_v1) {
 				return $elm$core$Platform$Sub$none;
 			},
-			bv: F2(
+			by: F2(
 				function (msg, model) {
 					return _Utils_Tuple2(
-						A2(impl.bv, msg, model),
+						A2(impl.by, msg, model),
 						$elm$core$Platform$Cmd$none);
 				}),
-			bw: impl.bw
+			bz: impl.bz
 		});
 };
-var $author$project$Main$update = F2(
-	function (_v0, m) {
-		return m;
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
 	});
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Main$ReturnValue = F3(
-	function (remainingPupils, open, filled) {
-		return {O: filled, Q: open, J: remainingPupils};
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Event$updateFormdata = F2(
+	function (msg, formData) {
+		if (!msg.$) {
+			var name = msg.a;
+			return _Utils_update(
+				formData,
+				{P: name});
+		} else {
+			var capacity = msg.a;
+			return _Utils_update(
+				formData,
+				{F: capacity});
+		}
+	});
+var $author$project$Event$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 0:
+				var data = msg.a;
+				return _Utils_update(
+					model,
+					{
+						A: A2($author$project$Event$updateFormdata, data, model.A)
+					});
+			case 1:
+				return _Utils_update(
+					model,
+					{
+						I: _Utils_ap(
+							model.I,
+							_List_fromArray(
+								[model.A])),
+						A: $author$project$Event$emptyFormData
+					});
+			default:
+				var obj = msg.a;
+				return _Utils_update(
+					model,
+					{
+						I: A2(
+							$elm$core$List$filter,
+							$elm$core$Basics$neq(obj),
+							model.I)
+					});
+		}
+	});
+var $author$project$Pupil$Choice = F2(
+	function (event, type_) {
+		return {M: event, aV: type_};
+	});
+var $author$project$Pupil$changeChoice = F4(
+	function (pupils, pupil, event, newChoiceType) {
+		return A2(
+			$elm$core$List$map,
+			function (p) {
+				return _Utils_eq(p, pupil) ? _Utils_update(
+					p,
+					{
+						G: A2(
+							$elm$core$List$map,
+							function (c) {
+								return _Utils_eq(c.M, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
+							},
+							p.G)
+					}) : p;
+			},
+			pupils);
+	});
+var $author$project$Pupil$Obj = F3(
+	function (name, _class, choices) {
+		return {G: choices, w: _class, P: name};
+	});
+var $author$project$Pupil$Yellow = 1;
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$core$String$trim = _String_trim;
+var $author$project$Pupil$isValidNameOrClass = function (name) {
+	return $elm$core$String$trim(name) !== '';
+};
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Pupil$saveMulti = F2(
+	function (model, events) {
+		var yellowEvents = A2(
+			$elm$core$List$map,
+			function (e) {
+				return A2($author$project$Pupil$Choice, e, 1);
+			},
+			events);
+		var newPupils = A2(
+			$elm$core$List$map,
+			function (n) {
+				return A3(
+					$author$project$Pupil$Obj,
+					$elm$core$String$trim(n),
+					$elm$core$String$trim(model.A.O),
+					yellowEvents);
+			},
+			A2(
+				$elm$core$List$filter,
+				$author$project$Pupil$isValidNameOrClass,
+				A2($elm$core$String$split, ',', model.A.X)));
+		return (!($author$project$Pupil$isValidNameOrClass(model.A.O) || $elm$core$List$isEmpty(newPupils))) ? model : _Utils_update(
+			model,
+			{
+				A: $author$project$Pupil$emptyFormData,
+				t: _Utils_ap(model.t, newPupils)
+			});
+	});
+var $author$project$Pupil$saveSingle = F2(
+	function (model, events) {
+		return ($author$project$Pupil$isValidNameOrClass(model.A.P) && $author$project$Pupil$isValidNameOrClass(model.A.w)) ? _Utils_update(
+			model,
+			{
+				A: $author$project$Pupil$emptyFormData,
+				t: _Utils_ap(
+					model.t,
+					_List_fromArray(
+						[
+							A3(
+							$author$project$Pupil$Obj,
+							$elm$core$String$trim(model.A.P),
+							$elm$core$String$trim(model.A.w),
+							A2(
+								$elm$core$List$map,
+								function (e) {
+									return A2($author$project$Pupil$Choice, e, 1);
+								},
+								events))
+						]))
+			}) : model;
+	});
+var $author$project$Pupil$updateFormdata = F2(
+	function (msg, formData) {
+		switch (msg.$) {
+			case 0:
+				var name = msg.a;
+				return _Utils_update(
+					formData,
+					{P: name});
+			case 1:
+				var _class = msg.a;
+				return _Utils_update(
+					formData,
+					{w: _class});
+			case 2:
+				var _class = msg.a;
+				return _Utils_update(
+					formData,
+					{O: _class});
+			default:
+				var names = msg.a;
+				return _Utils_update(
+					formData,
+					{X: names});
+		}
+	});
+var $author$project$Pupil$update = F3(
+	function (msg, model, events) {
+		switch (msg.$) {
+			case 0:
+				var data = msg.a;
+				return _Utils_update(
+					model,
+					{
+						A: A2($author$project$Pupil$updateFormdata, data, model.A)
+					});
+			case 1:
+				return A2($author$project$Pupil$saveSingle, model, events);
+			case 2:
+				return A2($author$project$Pupil$saveMulti, model, events);
+			case 3:
+				var pupil = msg.a;
+				return _Utils_update(
+					model,
+					{
+						t: A2(
+							$elm$core$List$filter,
+							$elm$core$Basics$neq(pupil),
+							model.t)
+					});
+			default:
+				var pupil = msg.a;
+				var event = msg.b;
+				var choice = msg.c;
+				return _Utils_update(
+					model,
+					{
+						t: A4($author$project$Pupil$changeChoice, model.t, pupil, event, choice)
+					});
+		}
 	});
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
@@ -5207,28 +5424,6 @@ var $elm$core$List$any = F2(
 			}
 		}
 	});
-var $author$project$Main$assignGreensStepC = F3(
-	function (pupils, open, filled) {
-		return A3($author$project$Main$ReturnValue, pupils, open, filled);
-	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
 var $elm$core$List$member = F2(
 	function (x, xs) {
 		return A2(
@@ -5238,178 +5433,1584 @@ var $elm$core$List$member = F2(
 			},
 			xs);
 	});
-var $elm$core$Basics$not = _Basics_not;
-var $elm$core$List$partition = F2(
-	function (pred, list) {
-		var step = F2(
-			function (x, _v0) {
-				var trues = _v0.a;
-				var falses = _v0.b;
-				return pred(x) ? _Utils_Tuple2(
-					A2($elm$core$List$cons, x, trues),
-					falses) : _Utils_Tuple2(
-					trues,
-					A2($elm$core$List$cons, x, falses));
-			});
-		return A3(
-			$elm$core$List$foldr,
-			step,
-			_Utils_Tuple2(_List_Nil, _List_Nil),
-			list);
-	});
-var $author$project$Pupil$Green = 0;
-var $author$project$Main$pupilsPrefer = F2(
-	function (pupils, event) {
-		return A2(
-			$elm$core$List$filter,
-			function (p) {
+var $author$project$Pupil$updateEvents = F2(
+	function (events, model) {
+		var fn2 = function (c) {
+			return A2($elm$core$List$member, c.M, events);
+		};
+		var fn1 = F2(
+			function (e, cl) {
 				return A2(
-					$elm$core$List$any,
-					function (c) {
-						return _Utils_eq(c.am, event) && (!c.bu);
+					$elm$core$List$member,
+					e,
+					A2(
+						$elm$core$List$map,
+						function ($) {
+							return $.M;
+						},
+						cl)) ? cl : A2(
+					$elm$core$List$cons,
+					A2($author$project$Pupil$Choice, e, 1),
+					cl);
+			});
+		return _Utils_update(
+			model,
+			{
+				t: A2(
+					$elm$core$List$map,
+					function (p) {
+						return _Utils_update(
+							p,
+							{
+								G: A2(
+									$elm$core$List$filter,
+									fn2,
+									A3($elm$core$List$foldl, fn1, p.G, events))
+							});
 					},
-					p.a1);
-			},
-			pupils);
+					model.t)
+			});
 	});
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		if (!msg.$) {
+			var innerMsg = msg.a;
+			var eventsModel = A2($author$project$Event$update, innerMsg, model.I);
+			return _Utils_update(
+				model,
+				{
+					I: eventsModel,
+					t: A2($author$project$Pupil$updateEvents, eventsModel.I, model.t)
+				});
+		} else {
+			var innerMsg = msg.a;
+			return _Utils_update(
+				model,
+				{
+					t: A3($author$project$Pupil$update, innerMsg, model.t, model.I.I)
+				});
+		}
+	});
+var $author$project$Main$EventMsg = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$Main$PupilMsg = function (a) {
+	return {$: 1, a: a};
+};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
-var $author$project$Main$assignGreensStepA = F3(
-	function (pupils, open, filled) {
-		var splitUp = A2(
-			$elm$core$List$partition,
-			function (a) {
-				var howManyPrefer = $elm$core$List$length(
-					A2($author$project$Main$pupilsPrefer, pupils, a.am));
-				return (howManyPrefer > 0) && (_Utils_cmp(howManyPrefer, a.am.a_) < 1);
-			},
-			open);
-		var assignFn = F2(
-			function (a, rv) {
-				var pref = A2($author$project$Main$pupilsPrefer, rv.J, a.am);
-				return A3(
-					$author$project$Main$ReturnValue,
-					A2(
-						$elm$core$List$filter,
-						function (p) {
-							return !A2($elm$core$List$member, p, pref);
-						},
-						rv.J),
-					rv.Q,
-					A2(
-						$elm$core$List$cons,
-						_Utils_update(
-							a,
-							{aF: pref}),
-						rv.O));
-			});
-		var r = A3(
-			$elm$core$List$foldl,
-			assignFn,
-			A3($author$project$Main$ReturnValue, pupils, splitUp.b, filled),
-			splitUp.a);
-		return A3($author$project$Main$assignGreensStepB, r.J, r.Q, r.O);
-	});
-var $author$project$Main$assignGreensStepB = F3(
-	function (pupils, open, filled) {
-		var checkFn = function (_v0) {
-			return false;
-		};
-		return A2($elm$core$List$any, checkFn, open) ? A3($author$project$Main$assignGreensStepA, pupils, open, filled) : ($elm$core$List$isEmpty(open) ? A3($author$project$Main$ReturnValue, pupils, open, filled) : A3($author$project$Main$assignGreensStepC, pupils, open, filled));
-	});
-var $author$project$Assignment$Model = F2(
-	function (event, pupils) {
-		return {am: event, aF: pupils};
-	});
-var $author$project$Assignment$empty = function (events) {
-	return A2(
-		$elm$core$List$map,
-		function (e) {
-			return A2($author$project$Assignment$Model, e, _List_Nil);
-		},
-		events);
+var $elm$html$Html$Attributes$classList = function (classes) {
+	return $elm$html$Html$Attributes$class(
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$first,
+				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
 };
-var $author$project$Main$assignGreens = F2(
-	function (pupils, events) {
-		return A3(
-			$author$project$Main$assignGreensStepA,
-			pupils,
-			$author$project$Assignment$empty(events),
-			_List_Nil);
-	});
-var $author$project$Main$assignRest = F2(
-	function (_v0, _v1) {
-		return _List_Nil;
-	});
-var $author$project$Main$finalize = F2(
-	function (pupils, events) {
-		var r = A2($author$project$Main$assignGreens, pupils, events);
-		return A2(
-			$author$project$Main$assignRest,
-			r.J,
-			_Utils_ap(r.Q, r.O));
-	});
-var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $elm$html$Html$li = _VirtualDom_node('li');
-var $elm$html$Html$ol = _VirtualDom_node('ol');
+var $author$project$Helpers$classes = function (s) {
+	var cl = A2(
+		$elm$core$List$map,
+		function (c) {
+			return _Utils_Tuple2(c, true);
+		},
+		A2($elm$core$String$split, ' ', s));
+	return $elm$html$Html$Attributes$classList(cl);
+};
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$main_ = _VirtualDom_node('main');
+var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Event$toString = function (m) {
-	return m.aw;
+var $author$project$Main$readme = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('mb-3')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$h1,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Projektgruppenverteilung')
+				])),
+			A2(
+			$elm$html$Html$p,
+			_List_fromArray(
+				[
+					$author$project$Helpers$classes('fs-5 col-md-8')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Dieses Tool speichert die Eingaben im Local Storage des Browsers. Es werden keine eigegebenen Daten über das Internet gesendet.')
+				]))
+		]));
+var $elm$html$Html$dd = _VirtualDom_node('dd');
+var $elm$html$Html$dl = _VirtualDom_node('dl');
+var $elm$html$Html$dt = _VirtualDom_node('dt');
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$html$Html$li = _VirtualDom_node('li');
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Dict$Black = 1;
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: -1, a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = 0;
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === -1) && (!right.a)) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === -1) && (!left.a)) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					0,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === -1) && (!left.a)) && (left.d.$ === -1)) && (!left.d.a)) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					0,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === -2) {
+			return A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1) {
+				case 0:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 1:
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === -1) && (!_v0.a)) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $author$project$Algo$apply = F2(
+	function (path, matching) {
+		if (path.b && path.b.b) {
+			var first = path.a;
+			var _v1 = path.b;
+			var second = _v1.a;
+			var rest = _v1.b;
+			return A2(
+				$author$project$Algo$apply,
+				rest,
+				A3($elm$core$Dict$insert, first, second, matching));
+		} else {
+			return matching;
+		}
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === -2) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1) {
+					case 0:
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 1:
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
 };
-var $author$project$Pupil$toString = function (m) {
-	return m.aw + (' (' + (m.ai + ')'));
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Algo$headOf = function (path) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		'',
+		$elm$core$List$head(path));
 };
-var $author$project$Assignment$toHtml = function (m) {
+var $author$project$Algo$extend = F4(
+	function (graph, old, path, _new) {
+		return A2(
+			$elm$core$List$append,
+			_new,
+			A2(
+				$elm$core$List$map,
+				function (e) {
+					return A2($elm$core$List$cons, e, path);
+				},
+				A2(
+					$elm$core$List$filter,
+					function (e) {
+						return !A2(
+							$elm$core$List$any,
+							function (p) {
+								return A2($elm$core$List$member, e, p);
+							},
+							old);
+					},
+					A2(
+						$elm$core$Maybe$withDefault,
+						_List_Nil,
+						A2(
+							$elm$core$Dict$get,
+							$author$project$Algo$headOf(path),
+							graph)))));
+	});
+var $author$project$Algo$IntermediateResult = F2(
+	function (paths, free) {
+		return {aa: free, af: paths};
+	});
+var $author$project$Algo$update = F2(
+	function (matching, paths) {
+		if (!paths.b) {
+			return A2($author$project$Algo$IntermediateResult, _List_Nil, $elm$core$Maybe$Nothing);
+		} else {
+			var one = paths.a;
+			var rest = paths.b;
+			var _v1 = A2(
+				$elm$core$Dict$get,
+				$author$project$Algo$headOf(one),
+				matching);
+			if (_v1.$ === 1) {
+				return A2(
+					$author$project$Algo$IntermediateResult,
+					_List_Nil,
+					$elm$core$Maybe$Just(one));
+			} else {
+				var vertex = _v1.a;
+				var res = A2($author$project$Algo$update, matching, rest);
+				var _v2 = res.aa;
+				if (!_v2.$) {
+					var path = _v2.a;
+					return A2(
+						$author$project$Algo$IntermediateResult,
+						_List_Nil,
+						$elm$core$Maybe$Just(path));
+				} else {
+					return A2(
+						$author$project$Algo$IntermediateResult,
+						A2(
+							$elm$core$List$cons,
+							A2($elm$core$List$cons, vertex, one),
+							res.af),
+						$elm$core$Maybe$Nothing);
+				}
+			}
+		}
+	});
+var $author$project$Algo$find = F3(
+	function (graph, matching, paths) {
+		if ($elm$core$List$isEmpty(paths)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var res = A2($author$project$Algo$update, matching, paths);
+			var _v0 = res.aa;
+			if (!_v0.$) {
+				var path = _v0.a;
+				return $elm$core$Maybe$Just(path);
+			} else {
+				return A3(
+					$author$project$Algo$find,
+					graph,
+					matching,
+					A3(
+						$elm$core$List$foldl,
+						A2($author$project$Algo$extend, graph, paths),
+						_List_Nil,
+						res.af));
+			}
+		}
+	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $author$project$Algo$reverseMatching = function (matching) {
+	return $elm$core$Dict$fromList(
+		A2(
+			$elm$core$List$map,
+			function (t) {
+				return _Utils_Tuple2(t.b, t.a);
+			},
+			$elm$core$Dict$toList(matching)));
+};
+var $author$project$Algo$run = F2(
+	function (graph, initialMatching) {
+		return $author$project$Algo$reverseMatching(
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (vertex, matching) {
+						var _v1 = A3(
+							$author$project$Algo$find,
+							graph,
+							matching,
+							A4(
+								$author$project$Algo$extend,
+								graph,
+								_List_Nil,
+								_List_fromArray(
+									[vertex]),
+								_List_Nil));
+						if (_v1.$ === 1) {
+							return matching;
+						} else {
+							var path = _v1.a;
+							return A2($author$project$Algo$apply, path, matching);
+						}
+					}),
+				$author$project$Algo$reverseMatching(initialMatching),
+				A2(
+					$elm$core$List$filter,
+					function (vertex) {
+						var _v0 = A2($elm$core$Dict$get, vertex, initialMatching);
+						if (_v0.$ === 1) {
+							return true;
+						} else {
+							return false;
+						}
+					},
+					$elm$core$Dict$keys(graph))));
+	});
+var $author$project$Pupil$Green = 0;
+var $author$project$Pupil$eventGroup = F2(
+	function (choice, pupil) {
+		return A2(
+			$elm$core$List$map,
+			function (c) {
+				return c.M;
+			},
+			A2(
+				$elm$core$List$filter,
+				function (c) {
+					return _Utils_eq(c.aV, choice);
+				},
+				pupil.G));
+	});
+var $author$project$Pupil$toVertex = function (m) {
+	return m.P + (' (' + (m.w + ')'));
+};
+var $elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
+			} else {
+				var $temp$result = A2($elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
+			}
+		}
+	});
+var $elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
+var $author$project$Event$toVertexList = function (m) {
+	var fn = F2(
+		function (e, t) {
+			var newIndex = t.a - 1;
+			return _Utils_Tuple2(
+				newIndex,
+				A2(
+					$elm$core$List$cons,
+					e + ('-' + $elm$core$String$fromInt(newIndex)),
+					t.b));
+		});
+	return A3(
+		$elm$core$List$foldl,
+		fn,
+		_Utils_Tuple2(m.F + 1, _List_Nil),
+		A2($elm$core$List$repeat, m.F, m.P)).b;
+};
+var $author$project$Event$toVertexListReducer = F2(
+	function (event, list) {
+		return _Utils_ap(
+			$author$project$Event$toVertexList(event),
+			list);
+	});
+var $author$project$Main$toGraphFromGreen = function (pupils) {
+	var fn = F2(
+		function (pupil, graph) {
+			return A3(
+				$elm$core$Dict$insert,
+				$author$project$Pupil$toVertex(pupil),
+				A3(
+					$elm$core$List$foldl,
+					$author$project$Event$toVertexListReducer,
+					_List_Nil,
+					A2($author$project$Pupil$eventGroup, 0, pupil)),
+				graph);
+		});
+	var emptyGraph = $elm$core$Dict$empty;
+	return A3($elm$core$List$foldl, fn, emptyGraph, pupils);
+};
+var $author$project$Main$toGraphFromGreenAndYellow = function (pupils) {
+	var fn = F2(
+		function (pupil, graph) {
+			var events = _Utils_ap(
+				A2($author$project$Pupil$eventGroup, 0, pupil),
+				A2($author$project$Pupil$eventGroup, 1, pupil));
+			return A3(
+				$elm$core$Dict$insert,
+				$author$project$Pupil$toVertex(pupil),
+				A3($elm$core$List$foldl, $author$project$Event$toVertexListReducer, _List_Nil, events),
+				graph);
+		});
+	var emptyGraph = $elm$core$Dict$empty;
+	return A3($elm$core$List$foldl, fn, emptyGraph, pupils);
+};
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (!_v0.$) {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$Dict$values = function (dict) {
+	return A3(
+		$elm$core$Dict$foldr,
+		F3(
+			function (key, value, valueList) {
+				return A2($elm$core$List$cons, value, valueList);
+			}),
+		_List_Nil,
+		dict);
+};
+var $author$project$Main$toGraphFromYellowWithoutMatched = F2(
+	function (pupils, matching) {
+		var onlyUnmatchedVertices = function (vertex) {
+			return !A2(
+				$elm$core$List$member,
+				vertex,
+				$elm$core$Dict$values(matching));
+		};
+		var onlyRemaining = function (pupil) {
+			return !A2(
+				$elm$core$Dict$member,
+				$author$project$Pupil$toVertex(pupil),
+				matching);
+		};
+		var fn = F2(
+			function (pupil, graph) {
+				return A3(
+					$elm$core$Dict$insert,
+					$author$project$Pupil$toVertex(pupil),
+					A2(
+						$elm$core$List$filter,
+						onlyUnmatchedVertices,
+						A3(
+							$elm$core$List$foldl,
+							$author$project$Event$toVertexListReducer,
+							_List_Nil,
+							A2($author$project$Pupil$eventGroup, 1, pupil))),
+					graph);
+			});
+		var emptyGraph = $elm$core$Dict$empty;
+		return A3(
+			$elm$core$List$foldl,
+			fn,
+			emptyGraph,
+			A2($elm$core$List$filter, onlyRemaining, pupils));
+	});
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === -2) {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $author$project$Main$finalize = function (pupils) {
+	var step3 = $author$project$Algo$run(
+		$author$project$Main$toGraphFromGreenAndYellow(pupils));
+	var step1 = A2(
+		$author$project$Algo$run,
+		$author$project$Main$toGraphFromGreen(pupils),
+		$elm$core$Dict$empty);
+	var step2 = A2(
+		$author$project$Algo$run,
+		A2($author$project$Main$toGraphFromYellowWithoutMatched, pupils, step1),
+		$elm$core$Dict$empty);
+	return step3(
+		A2($elm$core$Dict$union, step1, step2));
+};
+var $author$project$Main$matchedAndUnmatchedPupils = function (pupils) {
+	var matched = $author$project$Main$finalize(pupils);
+	return _Utils_Tuple2(
+		matched,
+		A2(
+			$elm$core$List$filter,
+			function (v) {
+				return !A2(
+					$elm$core$List$member,
+					v,
+					$elm$core$Dict$keys(matched));
+			},
+			A2($elm$core$List$map, $author$project$Pupil$toVertex, pupils)));
+};
+var $elm$html$Html$ul = _VirtualDom_node('ul');
+var $author$project$Main$result = function (model) {
+	var _v0 = $author$project$Main$matchedAndUnmatchedPupils(model.t.t);
+	var matched = _v0.a;
+	var unmatched = _v0.b;
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$h3,
+				$elm$html$Html$h2,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(
-						$author$project$Event$toString(m.am))
+						$elm$html$Html$text('Ergebnis')
 					])),
 				A2(
-				$elm$html$Html$ol,
+				$elm$html$Html$div,
 				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Zugeteilte Schüler/Schülerinnen')
+							])),
+						A2(
+						$elm$html$Html$dl,
+						_List_Nil,
+						A2(
+							$elm$core$List$map,
+							function (_v1) {
+								var a = _v1.a;
+								var b = _v1.b;
+								return A2(
+									$elm$html$Html$div,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$dt,
+											_List_Nil,
+											_List_fromArray(
+												[
+													$elm$html$Html$text(a)
+												])),
+											A2(
+											$elm$html$Html$dd,
+											_List_Nil,
+											_List_fromArray(
+												[
+													$elm$html$Html$text(b)
+												]))
+										]));
+							},
+							$elm$core$Dict$toList(matched)))
+					])),
 				A2(
-					$elm$core$List$map,
-					function (p) {
-						return A2(
-							$elm$html$Html$li,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text(
-									$author$project$Pupil$toString(p))
-								]));
-					},
-					m.aF))
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Schüler/Schülerinnen ohne Platz')
+							])),
+						A2(
+						$elm$html$Html$ul,
+						_List_Nil,
+						A2(
+							$elm$core$List$map,
+							function (v) {
+								return A2(
+									$elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(v)
+										]));
+							},
+							unmatched))
+					]))
 			]));
 };
-var $author$project$Main$view = function (m) {
+var $author$project$Event$Capacity = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Event$FormDataMsg = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$Event$Name = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$Event$Save = {$: 1};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$hidden = $elm$html$Html$Attributes$boolProperty('hidden');
+var $elm$html$Html$ol = _VirtualDom_node('ol');
+var $author$project$Event$Delete = function (a) {
+	return {$: 2, a: a};
+};
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $author$project$Helpers$svgIconXLg = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$width('16'),
+			$elm$svg$Svg$Attributes$height('16'),
+			$elm$svg$Svg$Attributes$fill('currentColor'),
+			$elm$svg$Svg$Attributes$class('bi'),
+			$elm$svg$Svg$Attributes$class('bi-x-lg'),
+			$elm$svg$Svg$Attributes$viewBox('0 0 16 16')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$d('M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z')
+				]),
+			_List_Nil)
+		]));
+var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
+var $author$project$Event$oneEventLi = function (event) {
+	return A2(
+		$elm$html$Html$li,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('mb-3')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('me-3')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						event.P + (' (' + ($elm$core$String$fromInt(event.F) + ' Plätze)')))
+					])),
+				A2(
+				$elm$html$Html$a,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('link-danger'),
+						$elm$html$Html$Attributes$title('Löschen'),
+						$elm$html$Html$Attributes$href('#'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Löschen'),
+						$elm$html$Html$Events$onClick(
+						$author$project$Event$Delete(event))
+					]),
+				_List_fromArray(
+					[$author$project$Helpers$svgIconXLg]))
+			]));
+};
+var $author$project$Event$allEvents = function (events) {
+	return $elm$core$List$isEmpty(events) ? A2(
+		$elm$html$Html$p,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$hidden(true)
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text('Noch keine Gruppen angelegt')
+			])) : A2(
+		$elm$html$Html$ol,
+		_List_Nil,
+		A2($elm$core$List$map, $author$project$Event$oneEventLi, events));
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$html$Html$form = _VirtualDom_node('form');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$min = $elm$html$Html$Attributes$stringProperty('min');
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 1, a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
+	return _Utils_Tuple2(msg, true);
+};
+var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 2, a: a};
+};
+var $elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var $elm$html$Html$Events$onSubmit = function (msg) {
+	return A2(
+		$elm$html$Html$Events$preventDefaultOn,
+		'submit',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysPreventDefault,
+			$elm$json$Json$Decode$succeed(msg)));
+};
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Event$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('mb-3')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Projektgruppen')
+					])),
+				A2(
+				$elm$html$Html$form,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onSubmit($author$project$Event$Save)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$hidden(true)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Neue Gruppe hinzufügen')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('row')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('form-control'),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('Name'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Name'),
+												$elm$html$Html$Events$onInput(
+												A2($elm$core$Basics$composeR, $author$project$Event$Name, $author$project$Event$FormDataMsg)),
+												$elm$html$Html$Attributes$value(model.A.P)
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('form-control'),
+												$elm$html$Html$Attributes$type_('number'),
+												$elm$html$Html$Attributes$min('1'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Anzahl der Plätze'),
+												$elm$html$Html$Events$onInput(
+												A2(
+													$elm$core$Basics$composeR,
+													$elm$core$String$toInt,
+													A2(
+														$elm$core$Basics$composeR,
+														$elm$core$Maybe$withDefault(0),
+														A2($elm$core$Basics$composeR, $author$project$Event$Capacity, $author$project$Event$FormDataMsg)))),
+												$elm$html$Html$Attributes$value(
+												$elm$core$String$fromInt(model.A.F))
+											]),
+										_List_Nil),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('form-text')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Anzahl der Plätze')
+											]))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$author$project$Helpers$classes('btn btn-primary'),
+												$elm$html$Html$Attributes$type_('submit')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Hinzufügen')
+											]))
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$hidden(true)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Alle Gruppen')
+							])),
+						$author$project$Event$allEvents(model.I)
+					]))
+			]));
+};
+var $author$project$Pupil$Class = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Pupil$FormDataMsg = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$Pupil$MultiClass = function (a) {
+	return {$: 2, a: a};
+};
+var $author$project$Pupil$MultiNames = function (a) {
+	return {$: 3, a: a};
+};
+var $author$project$Pupil$MultiSave = {$: 2};
+var $author$project$Pupil$Name = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$Pupil$Save = {$: 1};
+var $author$project$Pupil$Delete = function (a) {
+	return {$: 3, a: a};
+};
+var $author$project$Pupil$Red = 2;
+var $author$project$Pupil$ChangeChoice = F3(
+	function (a, b, c) {
+		return {$: 4, a: a, b: b, c: c};
+	});
+var $author$project$Pupil$oneEventLi = F3(
+	function (choice, pupil, event) {
+		var buttons = function () {
+			switch (choice) {
+				case 0:
+					return _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(
+									A3($author$project$Pupil$ChangeChoice, pupil, event, 1))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('zu Gelb')
+								]))
+						]);
+				case 1:
+					return _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(
+									A3($author$project$Pupil$ChangeChoice, pupil, event, 0))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('zu Grün')
+								])),
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(
+									A3($author$project$Pupil$ChangeChoice, pupil, event, 2))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('zu Rot')
+								]))
+						]);
+				default:
+					return _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(
+									A3($author$project$Pupil$ChangeChoice, pupil, event, 1))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('zu Gelb')
+								]))
+						]);
+			}
+		}();
+		return A2(
+			$elm$html$Html$li,
+			_List_Nil,
+			A2(
+				$elm$core$List$cons,
+				$elm$html$Html$text(event.P),
+				buttons));
+	});
+var $author$project$Pupil$eventList = F2(
+	function (choice, pupil) {
+		var events = A2($author$project$Pupil$eventGroup, choice, pupil);
+		return $elm$core$List$isEmpty(events) ? A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('keine')
+				])) : A2(
+			$elm$html$Html$ul,
+			_List_Nil,
+			A2(
+				$elm$core$List$map,
+				A2($author$project$Pupil$oneEventLi, choice, pupil),
+				events));
+	});
+var $elm$html$Html$h4 = _VirtualDom_node('h4');
+var $elm$html$Html$h5 = _VirtualDom_node('h5');
+var $author$project$Pupil$onePupilLi = function (pupil) {
+	return A2(
+		$elm$html$Html$li,
 		_List_Nil,
 		_List_fromArray(
 			[
 				A2(
+				$elm$html$Html$h4,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(pupil.P + (' (Klasse ' + (pupil.w + ')'))),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('button'),
+								$elm$html$Html$Events$onClick(
+								$author$project$Pupil$Delete(pupil))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Löschen')
+							]))
+					])),
+				A2(
 				$elm$html$Html$div,
 				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h5,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Grün')
+							])),
+						A2($author$project$Pupil$eventList, 0, pupil)
+					])),
 				A2(
-					$elm$core$List$map,
-					$author$project$Assignment$toHtml,
-					A2($author$project$Main$finalize, m.aF, m.U)))
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h5,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Gelb')
+							])),
+						A2($author$project$Pupil$eventList, 1, pupil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h5,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Rot')
+							])),
+						A2($author$project$Pupil$eventList, 2, pupil)
+					]))
+			]));
+};
+var $author$project$Pupil$allPupils = function (pupils) {
+	return $elm$core$List$isEmpty(pupils) ? A2(
+		$elm$html$Html$p,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$hidden(true)
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text('Noch keine Schüler oder Schülerinnen angelegt')
+			])) : A2(
+		$elm$html$Html$ol,
+		_List_Nil,
+		A2($elm$core$List$map, $author$project$Pupil$onePupilLi, pupils));
+};
+var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
+var $elm$html$Html$Attributes$rows = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'rows',
+		$elm$core$String$fromInt(n));
+};
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
+var $author$project$Pupil$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('mb-3')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Schüler/Schülerinnen')
+					])),
+				A2(
+				$elm$html$Html$form,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mb-2'),
+						$elm$html$Html$Events$onSubmit($author$project$Pupil$Save)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$hidden(true)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Neuen Schüler oder neue Schülerin hinzufügen')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('row')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('form-control'),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('Name'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Name'),
+												$elm$html$Html$Attributes$required(true),
+												$elm$html$Html$Events$onInput(
+												A2($elm$core$Basics$composeR, $author$project$Pupil$Name, $author$project$Pupil$FormDataMsg)),
+												$elm$html$Html$Attributes$value(model.A.P)
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('form-control'),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('Klasse'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Klasse'),
+												$elm$html$Html$Attributes$required(true),
+												$elm$html$Html$Events$onInput(
+												A2($elm$core$Basics$composeR, $author$project$Pupil$Class, $author$project$Pupil$FormDataMsg)),
+												$elm$html$Html$Attributes$value(model.A.w)
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$author$project$Helpers$classes('btn btn-primary'),
+												$elm$html$Html$Attributes$type_('submit')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Eine/n Hinzufügen')
+											]))
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$form,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onSubmit($author$project$Pupil$MultiSave)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$hidden(true)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('row')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('form-control'),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('Klasse'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Klasse'),
+												$elm$html$Html$Attributes$required(true),
+												$elm$html$Html$Events$onInput(
+												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiClass, $author$project$Pupil$FormDataMsg)),
+												$elm$html$Html$Attributes$value(model.A.O)
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$textarea,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('form-control'),
+												$elm$html$Html$Attributes$rows(1),
+												$elm$html$Html$Attributes$placeholder('Namen (mit Komma getrennt)'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Komma getrennt)'),
+												$elm$html$Html$Attributes$required(true),
+												$elm$html$Html$Events$onInput(
+												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiNames, $author$project$Pupil$FormDataMsg)),
+												$elm$html$Html$Attributes$value(model.A.X)
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('col')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$author$project$Helpers$classes('btn btn-primary'),
+												$elm$html$Html$Attributes$type_('submit')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Mehrere Hinzufügen')
+											]))
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$hidden(true)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Alle Schüler/Schülerinnen')
+							])),
+						$author$project$Pupil$allPupils(model.t)
+					]))
+			]));
+};
+var $author$project$Main$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$author$project$Helpers$classes('container p-3 py-md-5')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$main_,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$author$project$Main$readme,
+						A2(
+						$elm$html$Html$map,
+						$author$project$Main$EventMsg,
+						$author$project$Event$view(model.I)),
+						A2(
+						$elm$html$Html$map,
+						$author$project$Main$PupilMsg,
+						$author$project$Pupil$view(model.t)),
+						$author$project$Main$result(model)
+					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
-	{bb: $author$project$Main$init, bv: $author$project$Main$update, bw: $author$project$Main$view});
+	{be: $author$project$Main$init, by: $author$project$Main$update, bz: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

@@ -1,8 +1,9 @@
 module Event exposing (Model, Msg, Obj, init, toVertexList, toVertexListReducer, update, view)
 
 import Algo exposing (Vertex)
+import Helpers exposing (classes, svgIconXLg)
 import Html exposing (..)
-import Html.Attributes exposing (for, id, type_, value)
+import Html.Attributes exposing (attribute, class, hidden, href, placeholder, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 
 
@@ -18,7 +19,12 @@ type alias Model =
 
 init : Model
 init =
-    Model [] (Obj "" 0)
+    Model [] emptyFormData
+
+
+emptyFormData : Obj
+emptyFormData =
+    Obj "" 1
 
 
 type alias Obj =
@@ -73,7 +79,7 @@ update msg model =
             { model | formData = updateFormdata data model.formData }
 
         Save ->
-            { model | formData = Obj "" 0, events = model.events ++ [ model.formData ] }
+            { model | formData = emptyFormData, events = model.events ++ [ model.formData ] }
 
         Delete obj ->
             { model | events = model.events |> List.filter ((/=) obj) }
@@ -95,33 +101,40 @@ updateFormdata msg formData =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ h2 [] [ text "Gruppen" ]
-        , div []
-            [ h3 [] [ text "Alle Gruppen" ]
-            , allEvents model.events
+    div [ class "mb-3" ]
+        [ h2 [] [ text "Projektgruppen" ]
+        , form [ onSubmit Save ]
+            [ h3 [ hidden True ] [ text "Neue Gruppe hinzufügen" ]
+            , div [ class "row" ]
+                [ div [ class "col" ]
+                    [ input
+                        [ class "form-control"
+                        , type_ "text"
+                        , placeholder "Name"
+                        , attribute "aria-label" "Name"
+                        , onInput (Name >> FormDataMsg)
+                        , value model.formData.name
+                        ]
+                        []
+                    ]
+                , div [ class "col" ]
+                    [ input
+                        [ class "form-control"
+                        , type_ "number"
+                        , Html.Attributes.min "1"
+                        , attribute "aria-label" "Anzahl der Plätze"
+                        , onInput (String.toInt >> Maybe.withDefault 0 >> Capacity >> FormDataMsg)
+                        , value (model.formData.capacity |> String.fromInt)
+                        ]
+                        []
+                    , div [ class "form-text" ] [ text "Anzahl der Plätze" ]
+                    ]
+                , div [ class "col" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Hinzufügen" ] ]
+                ]
             ]
         , div []
-            [ h3 [] [ text "Neue Gruppe hinzufügen" ]
-            , form [ onSubmit Save ]
-                [ label [ for "newEventName" ] [ text "Name" ]
-                , input
-                    [ id "newEventName"
-                    , type_ "text"
-                    , onInput (Name >> FormDataMsg)
-                    , value model.formData.name
-                    ]
-                    []
-                , label [ for "newEventCapacity" ] [ text "Anzahl der Plätze" ]
-                , input
-                    [ id "newEventCapacity"
-                    , type_ "number"
-                    , onInput (String.toInt >> Maybe.withDefault 0 >> Capacity >> FormDataMsg)
-                    , value (model.formData.capacity |> String.fromInt)
-                    ]
-                    []
-                , button [ type_ "submit" ] [ text "Speichern" ]
-                ]
+            [ h3 [ hidden True ] [ text "Alle Gruppen" ]
+            , allEvents model.events
             ]
         ]
 
@@ -129,7 +142,7 @@ view model =
 allEvents : List Obj -> Html Msg
 allEvents events =
     if List.isEmpty events then
-        p [] [ text "Noch keine Gruppen angelegt" ]
+        p [ hidden True ] [ text "Noch keine Gruppen angelegt" ]
 
     else
         ol [] (events |> List.map oneEventLi)
@@ -137,7 +150,7 @@ allEvents events =
 
 oneEventLi : Obj -> Html Msg
 oneEventLi event =
-    li []
-        [ text <| event.name ++ " (" ++ String.fromInt event.capacity ++ " Plätze)"
-        , button [ type_ "button", onClick <| Delete event ] [ text "Löschen" ]
+    li [ class "mb-3" ]
+        [ span [ class "me-3" ] [ text <| event.name ++ " (" ++ String.fromInt event.capacity ++ " Plätze)" ]
+        , a [ class "link-danger", title "Löschen", href "#", attribute "aria-label" "Löschen", onClick <| Delete event ] [ svgIconXLg ]
         ]
