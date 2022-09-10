@@ -156,7 +156,7 @@ allEvents events =
 oneEventLi : Obj -> Html Msg
 oneEventLi event =
     li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
-        [ div [ class "ms-2 me-auto" ]
+        [ div [ classes "ms-2 me-auto" ]
             [ text event.name
             , span [ classes "ms-2 badge bg-primary rounded-pill", title "Anzahl der Plätze", attribute "aria-label" "Anzahl der Plätze" ] [ text <| String.fromInt event.capacity ]
             ]

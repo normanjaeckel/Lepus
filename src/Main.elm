@@ -6,7 +6,7 @@ import Dict
 import Event
 import Helpers exposing (classes)
 import Html exposing (..)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, scope)
 import Pupil
 
 
@@ -91,20 +91,25 @@ result model =
     in
     div []
         [ h2 [] [ text "Ergebnis" ]
-        , div []
-            [ h3 [] [ text "Zugeteilte Schüler/Schülerinnen" ]
-            , dl []
-                (matched
-                    |> Dict.toList
-                    |> List.map
-                        (\( a, b ) -> div [] [ dt [] [ text a ], dd [] [ text b ] ])
-                )
+        , p [] [ text "Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert." ]
+        , div [ class "col-md-8" ]
+            [ h3 []
+                [ text "Zugeteilte Schüler/Schülerinnen" ]
+            , table
+                [ class "table" ]
+                [ thead [] [ tr [] [ th [ scope "col" ] [ text "Name" ], th [ scope "col" ] [ text "Gruppe" ] ] ]
+                , tbody []
+                    (matched
+                        |> Dict.toList
+                        |> List.map (\( a, b ) -> tr [] [ td [] [ text a ], td [] [ text b ] ])
+                    )
+                ]
             ]
-        , div []
+        , div [ class "col-md-8" ]
             [ h3 [] [ text "Schüler/Schülerinnen ohne Platz" ]
-            , ul []
+            , ol [ classes "list-group list-group-flush list-group-numbered" ]
                 (unmatched
-                    |> List.map (\v -> li [] [ text v ])
+                    |> List.map (\v -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text v ] ])
                 )
             ]
         ]

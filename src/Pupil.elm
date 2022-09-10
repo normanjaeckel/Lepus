@@ -220,7 +220,7 @@ view model =
         [ h2 [] [ text "Schüler/Schülerinnen" ]
         , form [ class "mb-3", onSubmit Save ]
             [ h3 [ hidden True ] [ text "Neuen Schüler oder neue Schülerin hinzufügen" ]
-            , div [ class "row g-3" ]
+            , div [ classes "row g-3" ]
                 [ div [ class "col-md-3" ]
                     [ input
                         [ class "form-control"
@@ -250,7 +250,7 @@ view model =
             ]
         , form [ class "mb-3", onSubmit MultiSave ]
             [ h3 [ hidden True ] [ text "Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen" ]
-            , div [ class "row g-3" ]
+            , div [ classes "row g-3" ]
                 [ div [ class "col-md-3" ]
                     [ textarea
                         [ class "form-control"
@@ -313,15 +313,15 @@ onePupilLi pupil =
                             Red ->
                                 span [ classes "badge text-bg-danger" ] [ text "Rot" ]
                 in
-                li [ class "list-group-item d-flex justify-content-between align-items-start" ]
-                    [ div [ class "row container-fluid" ]
+                li [ classes "list-group-item d-flex justify-content-between align-items-start" ]
+                    [ div [ classes "row container-fluid" ]
                         [ div [ class "col-2" ] [ s ]
                         , div [ class "col-10" ] [ pupil |> eventList ct ]
                         ]
                     ]
     in
     li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
-        [ div [ class "ms-2 w-100" ]
+        [ div [ classes "ms-2 w-100" ]
             [ div [] [ text <| pupil.name ++ " (Klasse " ++ pupil.class ++ ")" ]
             , ul [ classes "list-group list-group-flush" ]
                 [ innerLi Green, innerLi Yellow, innerLi Red ]
@@ -352,7 +352,7 @@ oneEventLi choice pupil event =
             case choice of
                 Green ->
                     [ button
-                        [ class "btn btn-outline-warning"
+                        [ classes "btn btn-outline-warning"
                         , title "zu Gelb"
                         , attribute "aria-label" "zu Gelb"
                         , onClick <| ChangeChoice pupil event Yellow
@@ -362,14 +362,14 @@ oneEventLi choice pupil event =
 
                 Yellow ->
                     [ button
-                        [ class "btn btn-outline-success"
+                        [ classes "btn btn-outline-success"
                         , title "zu Grün"
                         , attribute "aria-label" "zu Grün"
                         , onClick <| ChangeChoice pupil event Green
                         ]
                         [ svgIconArrowUp ]
                     , button
-                        [ class "btn btn-outline-danger ms-1"
+                        [ classes "btn btn-outline-danger ms-1"
                         , title "zu Rot"
                         , attribute "aria-label" "zu Rot"
                         , onClick <| ChangeChoice pupil event Red
@@ -379,7 +379,7 @@ oneEventLi choice pupil event =
 
                 Red ->
                     [ button
-                        [ class "btn btn-outline-warning"
+                        [ classes "btn btn-outline-warning"
                         , title "zu Gelb"
                         , attribute "aria-label" "zu Gelb"
                         , onClick <| ChangeChoice pupil event Yellow
@@ -387,4 +387,4 @@ oneEventLi choice pupil event =
                         [ svgIconArrowUp ]
                     ]
     in
-    li [ class "list-group-item d-flex justify-content-between align-items-start" ] [ text event.name, span [] buttons ]
+    li [ classes "list-group-item d-flex justify-content-between align-items-start" ] [ text event.name, span [] buttons ]

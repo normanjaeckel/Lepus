@@ -5563,9 +5563,6 @@ var $author$project$Main$readme = A2(
 					$elm$html$Html$text('Dieses Tool speichert die Eingaben im Local Storage des Browsers. Es werden keine eigegebenen Daten über das Internet gesendet.')
 				]))
 		]));
-var $elm$html$Html$dd = _VirtualDom_node('dd');
-var $elm$html$Html$dl = _VirtualDom_node('dl');
-var $elm$html$Html$dt = _VirtualDom_node('dt');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $elm$html$Html$li = _VirtualDom_node('li');
@@ -6115,7 +6112,15 @@ var $author$project$Main$matchedAndUnmatchedPupils = function (pupils) {
 			},
 			A2($elm$core$List$map, $author$project$Pupil$toVertex, pupils)));
 };
-var $elm$html$Html$ul = _VirtualDom_node('ul');
+var $elm$html$Html$ol = _VirtualDom_node('ol');
+var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$html$Html$table = _VirtualDom_node('table');
+var $elm$html$Html$tbody = _VirtualDom_node('tbody');
+var $elm$html$Html$td = _VirtualDom_node('td');
+var $elm$html$Html$th = _VirtualDom_node('th');
+var $elm$html$Html$thead = _VirtualDom_node('thead');
+var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Main$result = function (model) {
 	var _v0 = $author$project$Main$matchedAndUnmatchedPupils(model.u.u);
 	var matched = _v0.a;
@@ -6133,8 +6138,18 @@ var $author$project$Main$result = function (model) {
 						$elm$html$Html$text('Ergebnis')
 					])),
 				A2(
-				$elm$html$Html$div,
+				$elm$html$Html$p,
 				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert.')
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('col-md-8')
+					]),
 				_List_fromArray(
 					[
 						A2(
@@ -6145,39 +6160,83 @@ var $author$project$Main$result = function (model) {
 								$elm$html$Html$text('Zugeteilte Schüler/Schülerinnen')
 							])),
 						A2(
-						$elm$html$Html$dl,
-						_List_Nil,
-						A2(
-							$elm$core$List$map,
-							function (_v1) {
-								var a = _v1.a;
-								var b = _v1.b;
-								return A2(
-									$elm$html$Html$div,
-									_List_Nil,
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$dt,
+						$elm$html$Html$table,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('table')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$thead,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$tr,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$th,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$scope('col')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Name')
+													])),
+												A2(
+												$elm$html$Html$th,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$scope('col')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Gruppe')
+													]))
+											]))
+									])),
+								A2(
+								$elm$html$Html$tbody,
+								_List_Nil,
+								A2(
+									$elm$core$List$map,
+									function (_v1) {
+										var a = _v1.a;
+										var b = _v1.b;
+										return A2(
+											$elm$html$Html$tr,
 											_List_Nil,
 											_List_fromArray(
 												[
-													$elm$html$Html$text(a)
-												])),
-											A2(
-											$elm$html$Html$dd,
-											_List_Nil,
-											_List_fromArray(
-												[
-													$elm$html$Html$text(b)
-												]))
-										]));
-							},
-							$elm$core$Dict$toList(matched)))
+													A2(
+													$elm$html$Html$td,
+													_List_Nil,
+													_List_fromArray(
+														[
+															$elm$html$Html$text(a)
+														])),
+													A2(
+													$elm$html$Html$td,
+													_List_Nil,
+													_List_fromArray(
+														[
+															$elm$html$Html$text(b)
+														]))
+												]));
+									},
+									$elm$core$Dict$toList(matched)))
+							]))
 					])),
 				A2(
 				$elm$html$Html$div,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('col-md-8')
+					]),
 				_List_fromArray(
 					[
 						A2(
@@ -6188,17 +6247,32 @@ var $author$project$Main$result = function (model) {
 								$elm$html$Html$text('Schüler/Schülerinnen ohne Platz')
 							])),
 						A2(
-						$elm$html$Html$ul,
-						_List_Nil,
+						$elm$html$Html$ol,
+						_List_fromArray(
+							[
+								$author$project$Helpers$classes('list-group list-group-flush list-group-numbered')
+							]),
 						A2(
 							$elm$core$List$map,
 							function (v) {
 								return A2(
 									$elm$html$Html$li,
-									_List_Nil,
 									_List_fromArray(
 										[
-											$elm$html$Html$text(v)
+											$elm$html$Html$Attributes$class('list-group-item')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$span,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('ms-2')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(v)
+												]))
 										]));
 							},
 							unmatched))
@@ -6224,7 +6298,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$hidden = $elm$html$Html$Attributes$boolProperty('hidden');
-var $elm$html$Html$ol = _VirtualDom_node('ol');
 var $author$project$Event$Delete = function (a) {
 	return {$: 2, a: a};
 };
@@ -6260,7 +6333,6 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -6305,7 +6377,7 @@ var $author$project$Event$oneEventLi = function (event) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('ms-2 me-auto')
+						$author$project$Helpers$classes('ms-2 me-auto')
 					]),
 				_List_fromArray(
 					[
@@ -6652,7 +6724,7 @@ var $author$project$Pupil$oneEventLi = F3(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('btn btn-outline-warning'),
+									$author$project$Helpers$classes('btn btn-outline-warning'),
 									$elm$html$Html$Attributes$title('zu Gelb'),
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Gelb'),
 									$elm$html$Html$Events$onClick(
@@ -6668,7 +6740,7 @@ var $author$project$Pupil$oneEventLi = F3(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('btn btn-outline-success'),
+									$author$project$Helpers$classes('btn btn-outline-success'),
 									$elm$html$Html$Attributes$title('zu Grün'),
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Grün'),
 									$elm$html$Html$Events$onClick(
@@ -6680,7 +6752,7 @@ var $author$project$Pupil$oneEventLi = F3(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('btn btn-outline-danger ms-1'),
+									$author$project$Helpers$classes('btn btn-outline-danger ms-1'),
 									$elm$html$Html$Attributes$title('zu Rot'),
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Rot'),
 									$elm$html$Html$Events$onClick(
@@ -6696,7 +6768,7 @@ var $author$project$Pupil$oneEventLi = F3(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('btn btn-outline-warning'),
+									$author$project$Helpers$classes('btn btn-outline-warning'),
 									$elm$html$Html$Attributes$title('zu Gelb'),
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Gelb'),
 									$elm$html$Html$Events$onClick(
@@ -6711,7 +6783,7 @@ var $author$project$Pupil$oneEventLi = F3(
 			$elm$html$Html$li,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('list-group-item d-flex justify-content-between align-items-start')
+					$author$project$Helpers$classes('list-group-item d-flex justify-content-between align-items-start')
 				]),
 			_List_fromArray(
 				[
@@ -6719,6 +6791,7 @@ var $author$project$Pupil$oneEventLi = F3(
 					A2($elm$html$Html$span, _List_Nil, buttons)
 				]));
 	});
+var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Pupil$eventList = F2(
 	function (choice, pupil) {
 		var events = A2($author$project$Pupil$eventGroup, choice, pupil);
@@ -6785,7 +6858,7 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 			$elm$html$Html$li,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('list-group-item d-flex justify-content-between align-items-start')
+					$author$project$Helpers$classes('list-group-item d-flex justify-content-between align-items-start')
 				]),
 			_List_fromArray(
 				[
@@ -6793,7 +6866,7 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('row container-fluid')
+							$author$project$Helpers$classes('row container-fluid')
 						]),
 					_List_fromArray(
 						[
@@ -6830,7 +6903,7 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('ms-2 w-100')
+						$author$project$Helpers$classes('ms-2 w-100')
 					]),
 				_List_fromArray(
 					[
@@ -6933,7 +7006,7 @@ var $author$project$Pupil$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('row g-3')
+								$author$project$Helpers$classes('row g-3')
 							]),
 						_List_fromArray(
 							[
@@ -7028,7 +7101,7 @@ var $author$project$Pupil$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('row g-3')
+								$author$project$Helpers$classes('row g-3')
 							]),
 						_List_fromArray(
 							[
