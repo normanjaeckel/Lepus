@@ -5357,15 +5357,15 @@ var $author$project$Pupil$updateFormdata = F2(
 					formData,
 					{x: _class});
 			case 2:
-				var _class = msg.a;
-				return _Utils_update(
-					formData,
-					{P: _class});
-			default:
 				var names = msg.a;
 				return _Utils_update(
 					formData,
 					{X: names});
+			default:
+				var _class = msg.a;
+				return _Utils_update(
+					formData,
+					{P: _class});
 		}
 	});
 var $author$project$Pupil$update = F3(
@@ -6578,10 +6578,10 @@ var $author$project$Pupil$FormDataMsg = function (a) {
 	return {$: 0, a: a};
 };
 var $author$project$Pupil$MultiClass = function (a) {
-	return {$: 2, a: a};
+	return {$: 3, a: a};
 };
 var $author$project$Pupil$MultiNames = function (a) {
-	return {$: 3, a: a};
+	return {$: 2, a: a};
 };
 var $author$project$Pupil$MultiSave = {$: 2};
 var $author$project$Pupil$Name = function (a) {
@@ -6730,7 +6730,7 @@ var $author$project$Pupil$eventList = F2(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text('keine')
+					$elm$html$Html$text('–')
 				])) : A2(
 			$elm$html$Html$ul,
 			_List_fromArray(
@@ -6743,47 +6743,81 @@ var $author$project$Pupil$eventList = F2(
 				events));
 	});
 var $author$project$Pupil$onePupilLi = function (pupil) {
-	var innerLi = F2(
-		function (txt, ct) {
-			return A2(
-				$elm$html$Html$li,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('list-group-item d-flex justify-content-between align-items-start')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
+	var innerLi = function (ct) {
+		var s = function () {
+			switch (ct) {
+				case 0:
+					return A2(
+						$elm$html$Html$span,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('row container-fluid')
+								$author$project$Helpers$classes('badge text-bg-success')
 							]),
 						_List_fromArray(
 							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-2')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(txt)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-10')
-									]),
-								_List_fromArray(
-									[
-										A2($author$project$Pupil$eventList, ct, pupil)
-									]))
-							]))
-					]));
-		});
+								$elm$html$Html$text('Grün')
+							]));
+				case 1:
+					return A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$author$project$Helpers$classes('badge text-bg-warning')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Gelb')
+							]));
+				default:
+					return A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$author$project$Helpers$classes('badge text-bg-danger')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Rot')
+							]));
+			}
+		}();
+		return A2(
+			$elm$html$Html$li,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('list-group-item d-flex justify-content-between align-items-start')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('row container-fluid')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('col-2')
+								]),
+							_List_fromArray(
+								[s])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('col-10')
+								]),
+							_List_fromArray(
+								[
+									A2($author$project$Pupil$eventList, ct, pupil)
+								]))
+						]))
+				]));
+	};
 	return A2(
 		$elm$html$Html$li,
 		_List_fromArray(
@@ -6815,9 +6849,9 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 							]),
 						_List_fromArray(
 							[
-								A2(innerLi, 'Grün', 0),
-								A2(innerLi, 'Gelb', 1),
-								A2(innerLi, 'Rot', 2)
+								innerLi(0),
+								innerLi(1),
+								innerLi(2)
 							]))
 					])),
 				A2(
@@ -7007,17 +7041,17 @@ var $author$project$Pupil$view = function (model) {
 								_List_fromArray(
 									[
 										A2(
-										$elm$html$Html$input,
+										$elm$html$Html$textarea,
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class('form-control'),
-												$elm$html$Html$Attributes$type_('text'),
-												$elm$html$Html$Attributes$placeholder('Klasse'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Klasse'),
+												$elm$html$Html$Attributes$rows(1),
+												$elm$html$Html$Attributes$placeholder('Namen (mit Komma getrennt)'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Komma getrennt)'),
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
-												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiClass, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.s.P)
+												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiNames, $author$project$Pupil$FormDataMsg)),
+												$elm$html$Html$Attributes$value(model.s.X)
 											]),
 										_List_Nil)
 									])),
@@ -7030,17 +7064,17 @@ var $author$project$Pupil$view = function (model) {
 								_List_fromArray(
 									[
 										A2(
-										$elm$html$Html$textarea,
+										$elm$html$Html$input,
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class('form-control'),
-												$elm$html$Html$Attributes$rows(1),
-												$elm$html$Html$Attributes$placeholder('Namen (mit Komma getrennt)'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Komma getrennt)'),
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$placeholder('Klasse'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Klasse'),
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
-												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiNames, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.s.X)
+												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiClass, $author$project$Pupil$FormDataMsg)),
+												$elm$html$Html$Attributes$value(model.s.P)
 											]),
 										_List_Nil)
 									])),

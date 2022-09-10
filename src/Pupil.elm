@@ -82,8 +82,8 @@ type Msg
 type FormDataInput
     = Name String
     | Class String
-    | MultiClass String
     | MultiNames String
+    | MultiClass String
 
 
 update : Msg -> Model -> List Event.Obj -> Model
@@ -114,11 +114,11 @@ updateFormdata msg formData =
         Class class ->
             { formData | class = class }
 
-        MultiClass class ->
-            { formData | multiClass = class }
-
         MultiNames names ->
             { formData | multiNames = names }
+
+        MultiClass class ->
+            { formData | multiClass = class }
 
 
 saveSingle : Model -> List Event.Obj -> Model
@@ -252,18 +252,6 @@ view model =
             [ h3 [ hidden True ] [ text "Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen" ]
             , div [ class "row g-3" ]
                 [ div [ class "col-md-3" ]
-                    [ input
-                        [ class "form-control"
-                        , type_ "text"
-                        , placeholder "Klasse"
-                        , attribute "aria-label" "Klasse"
-                        , required True
-                        , onInput (MultiClass >> FormDataMsg)
-                        , value model.formData.multiClass
-                        ]
-                        []
-                    ]
-                , div [ class "col-md-3" ]
                     [ textarea
                         [ class "form-control"
                         , rows 1
@@ -272,6 +260,18 @@ view model =
                         , required True
                         , onInput (MultiNames >> FormDataMsg)
                         , value model.formData.multiNames
+                        ]
+                        []
+                    ]
+                , div [ class "col-md-3" ]
+                    [ input
+                        [ class "form-control"
+                        , type_ "text"
+                        , placeholder "Klasse"
+                        , attribute "aria-label" "Klasse"
+                        , required True
+                        , onInput (MultiClass >> FormDataMsg)
+                        , value model.formData.multiClass
                         ]
                         []
                     ]
@@ -297,12 +297,25 @@ allPupils pupils =
 onePupilLi : Obj -> Html Msg
 onePupilLi pupil =
     let
-        innerLi : String -> ChoiceType -> Html Msg
+        innerLi : ChoiceType -> Html Msg
         innerLi =
-            \txt ct ->
+            \ct ->
+                let
+                    s : Html Msg
+                    s =
+                        case ct of
+                            Green ->
+                                span [ classes "badge text-bg-success" ] [ text "Grün" ]
+
+                            Yellow ->
+                                span [ classes "badge text-bg-warning" ] [ text "Gelb" ]
+
+                            Red ->
+                                span [ classes "badge text-bg-danger" ] [ text "Rot" ]
+                in
                 li [ class "list-group-item d-flex justify-content-between align-items-start" ]
                     [ div [ class "row container-fluid" ]
-                        [ div [ class "col-2" ] [ text txt ]
+                        [ div [ class "col-2" ] [ s ]
                         , div [ class "col-10" ] [ pupil |> eventList ct ]
                         ]
                     ]
@@ -311,7 +324,7 @@ onePupilLi pupil =
         [ div [ class "ms-2 w-100" ]
             [ div [] [ text <| pupil.name ++ " (Klasse " ++ pupil.class ++ ")" ]
             , ul [ classes "list-group list-group-flush" ]
-                [ innerLi "Grün" Green, innerLi "Gelb" Yellow, innerLi "Rot" Red ]
+                [ innerLi Green, innerLi Yellow, innerLi Red ]
             ]
         , a [ class "link-danger", title "Löschen", href "#", attribute "aria-label" "Löschen", onClick <| Delete pupil ] [ svgIconXLg ]
         ]
@@ -325,7 +338,7 @@ eventList choice pupil =
             pupil |> eventGroup choice
     in
     if List.isEmpty events then
-        span [ class "ms-3" ] [ text "keine" ]
+        span [ class "ms-3" ] [ text "–" ]
 
     else
         ul [ classes "list-group list-group-flush " ] (events |> List.map (oneEventLi choice pupil))
