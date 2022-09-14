@@ -519,11 +519,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ai.O === region.as.O)
+	if (region.ai.P === region.as.P)
 	{
-		return 'on line ' + region.ai.O;
+		return 'on line ' + region.ai.P;
 	}
-	return 'on lines ' + region.ai.O + ' through ' + region.as.O;
+	return 'on lines ' + region.ai.P + ' through ' + region.as.P;
 }
 
 
@@ -2719,7 +2719,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		y: func(record.y),
+		z: func(record.z),
 		aj: record.aj,
 		ag: record.ag
 	}
@@ -2989,7 +2989,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.y;
+		var message = !tag ? value : tag < 3 ? value.a : value.z;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aj;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -4450,27 +4450,28 @@ var $elm$core$Set$toList = function (_v0) {
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$GT = 2;
 var $elm$core$Basics$LT = 0;
-var $author$project$Event$Model = F2(
-	function (events, formData) {
-		return {I: events, s: formData};
+var $elm$core$Basics$False = 1;
+var $author$project$Event$Model = F3(
+	function (events, formData, formInvalid) {
+		return {C: events, s: formData, K: formInvalid};
 	});
 var $author$project$Event$Obj = F2(
 	function (name, capacity) {
-		return {B: capacity, J: name};
+		return {x: capacity, E: name};
 	});
 var $author$project$Event$emptyFormData = A2($author$project$Event$Obj, '', 1);
-var $author$project$Event$init = A2($author$project$Event$Model, _List_Nil, $author$project$Event$emptyFormData);
-var $author$project$Pupil$Model = F2(
-	function (pupils, formData) {
-		return {s: formData, u: pupils};
+var $author$project$Event$init = A3($author$project$Event$Model, _List_Nil, $author$project$Event$emptyFormData, false);
+var $author$project$Pupil$Model = F3(
+	function (pupils, formData, formInvalid) {
+		return {s: formData, K: formInvalid, u: pupils};
 	});
-var $author$project$Pupil$FormData = F4(
-	function (name, _class, multiClass, multiNames) {
-		return {x: _class, P: multiClass, X: multiNames, J: name};
+var $author$project$Pupil$FormData = F2(
+	function (names, _class) {
+		return {y: _class, X: names};
 	});
-var $author$project$Pupil$emptyFormData = A4($author$project$Pupil$FormData, '', '', '', '');
-var $author$project$Pupil$init = A2($author$project$Pupil$Model, _List_Nil, $author$project$Pupil$emptyFormData);
-var $author$project$Main$init = {I: $author$project$Event$init, u: $author$project$Pupil$init};
+var $author$project$Pupil$emptyFormData = A2($author$project$Pupil$FormData, '', '');
+var $author$project$Pupil$init = A3($author$project$Pupil$Model, _List_Nil, $author$project$Pupil$emptyFormData, false);
+var $author$project$Main$init = {C: $author$project$Event$init, u: $author$project$Pupil$init};
 var $elm$core$Result$Err = function (a) {
 	return {$: 1, a: a};
 };
@@ -4492,7 +4493,6 @@ var $elm$core$Result$Ok = function (a) {
 var $elm$json$Json$Decode$OneOf = function (a) {
 	return {$: 2, a: a};
 };
-var $elm$core$Basics$False = 1;
 var $elm$core$Basics$add = _Basics_add;
 var $elm$core$Maybe$Just = function (a) {
 	return {$: 0, a: a};
@@ -5207,200 +5207,18 @@ var $elm$core$List$filter = F2(
 			list);
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
-var $elm$core$String$trim = _String_trim;
-var $author$project$Helpers$isValidNameOrClass = function (name) {
-	return $elm$core$String$trim(name) !== '';
-};
 var $author$project$Event$updateFormdata = F2(
 	function (msg, formData) {
 		if (!msg.$) {
 			var name = msg.a;
 			return _Utils_update(
 				formData,
-				{J: name});
+				{E: name});
 		} else {
 			var capacity = msg.a;
 			return _Utils_update(
 				formData,
-				{B: capacity});
-		}
-	});
-var $author$project$Event$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 0:
-				var data = msg.a;
-				return _Utils_update(
-					model,
-					{
-						s: A2($author$project$Event$updateFormdata, data, model.s)
-					});
-			case 1:
-				return ($author$project$Helpers$isValidNameOrClass(model.s.J) && (model.s.B > 0)) ? _Utils_update(
-					model,
-					{
-						I: _Utils_ap(
-							model.I,
-							_List_fromArray(
-								[model.s])),
-						s: $author$project$Event$emptyFormData
-					}) : model;
-			default:
-				var obj = msg.a;
-				return _Utils_update(
-					model,
-					{
-						I: A2(
-							$elm$core$List$filter,
-							$elm$core$Basics$neq(obj),
-							model.I)
-					});
-		}
-	});
-var $author$project$Pupil$Choice = F2(
-	function (event, type_) {
-		return {N: event, aV: type_};
-	});
-var $author$project$Pupil$changeChoice = F4(
-	function (pupils, pupil, event, newChoiceType) {
-		return A2(
-			$elm$core$List$map,
-			function (p) {
-				return _Utils_eq(p, pupil) ? _Utils_update(
-					p,
-					{
-						G: A2(
-							$elm$core$List$map,
-							function (c) {
-								return _Utils_eq(c.N, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
-							},
-							p.G)
-					}) : p;
-			},
-			pupils);
-	});
-var $author$project$Pupil$Obj = F3(
-	function (name, _class, choices) {
-		return {G: choices, x: _class, J: name};
-	});
-var $author$project$Pupil$Yellow = 1;
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $elm$core$Basics$not = _Basics_not;
-var $author$project$Pupil$saveMulti = F2(
-	function (model, events) {
-		var yellowEvents = A2(
-			$elm$core$List$map,
-			function (e) {
-				return A2($author$project$Pupil$Choice, e, 1);
-			},
-			events);
-		var newPupils = A2(
-			$elm$core$List$map,
-			function (n) {
-				return A3(
-					$author$project$Pupil$Obj,
-					$elm$core$String$trim(n),
-					$elm$core$String$trim(model.s.P),
-					yellowEvents);
-			},
-			A2(
-				$elm$core$List$filter,
-				$author$project$Helpers$isValidNameOrClass,
-				A2($elm$core$String$split, ',', model.s.X)));
-		return (!($author$project$Helpers$isValidNameOrClass(model.s.P) || $elm$core$List$isEmpty(newPupils))) ? model : _Utils_update(
-			model,
-			{
-				s: $author$project$Pupil$emptyFormData,
-				u: _Utils_ap(model.u, newPupils)
-			});
-	});
-var $author$project$Pupil$saveSingle = F2(
-	function (model, events) {
-		return ($author$project$Helpers$isValidNameOrClass(model.s.J) && $author$project$Helpers$isValidNameOrClass(model.s.x)) ? _Utils_update(
-			model,
-			{
-				s: $author$project$Pupil$emptyFormData,
-				u: _Utils_ap(
-					model.u,
-					_List_fromArray(
-						[
-							A3(
-							$author$project$Pupil$Obj,
-							$elm$core$String$trim(model.s.J),
-							$elm$core$String$trim(model.s.x),
-							A2(
-								$elm$core$List$map,
-								function (e) {
-									return A2($author$project$Pupil$Choice, e, 1);
-								},
-								events))
-						]))
-			}) : model;
-	});
-var $author$project$Pupil$updateFormdata = F2(
-	function (msg, formData) {
-		switch (msg.$) {
-			case 0:
-				var name = msg.a;
-				return _Utils_update(
-					formData,
-					{J: name});
-			case 1:
-				var _class = msg.a;
-				return _Utils_update(
-					formData,
-					{x: _class});
-			case 2:
-				var names = msg.a;
-				return _Utils_update(
-					formData,
-					{X: names});
-			default:
-				var _class = msg.a;
-				return _Utils_update(
-					formData,
-					{P: _class});
-		}
-	});
-var $author$project$Pupil$update = F3(
-	function (msg, model, events) {
-		switch (msg.$) {
-			case 0:
-				var data = msg.a;
-				return _Utils_update(
-					model,
-					{
-						s: A2($author$project$Pupil$updateFormdata, data, model.s)
-					});
-			case 1:
-				return A2($author$project$Pupil$saveSingle, model, events);
-			case 2:
-				return A2($author$project$Pupil$saveMulti, model, events);
-			case 3:
-				var pupil = msg.a;
-				return _Utils_update(
-					model,
-					{
-						u: A2(
-							$elm$core$List$filter,
-							$elm$core$Basics$neq(pupil),
-							model.u)
-					});
-			default:
-				var pupil = msg.a;
-				var event = msg.b;
-				var choice = msg.c;
-				return _Utils_update(
-					model,
-					{
-						u: A4($author$project$Pupil$changeChoice, model.u, pupil, event, choice)
-					});
+				{x: capacity});
 		}
 	});
 var $elm$core$List$any = F2(
@@ -5424,6 +5242,196 @@ var $elm$core$List$any = F2(
 			}
 		}
 	});
+var $elm$core$String$trim = _String_trim;
+var $author$project$Event$validate = function (model) {
+	var name = $elm$core$String$trim(model.s.E);
+	return ((name === '') || ((model.s.x <= 0) || A2(
+		$elm$core$List$any,
+		function (e) {
+			return _Utils_eq(e.E, name);
+		},
+		model.C))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+		A2($author$project$Event$Obj, name, model.s.x));
+};
+var $author$project$Event$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 0:
+				var data = msg.a;
+				return _Utils_update(
+					model,
+					{
+						s: A2($author$project$Event$updateFormdata, data, model.s),
+						K: false
+					});
+			case 1:
+				var _v1 = $author$project$Event$validate(model);
+				if (!_v1.$) {
+					var _new = _v1.a;
+					return _Utils_update(
+						model,
+						{
+							C: _Utils_ap(
+								model.C,
+								_List_fromArray(
+									[_new])),
+							s: $author$project$Event$emptyFormData,
+							K: false
+						});
+				} else {
+					return _Utils_update(
+						model,
+						{K: true});
+				}
+			default:
+				var obj = msg.a;
+				return _Utils_update(
+					model,
+					{
+						C: A2(
+							$elm$core$List$filter,
+							$elm$core$Basics$neq(obj),
+							model.C),
+						K: false
+					});
+		}
+	});
+var $author$project$Pupil$Choice = F2(
+	function (event, type_) {
+		return {O: event, aV: type_};
+	});
+var $author$project$Pupil$changeChoice = F4(
+	function (pupils, pupil, event, newChoiceType) {
+		return A2(
+			$elm$core$List$map,
+			function (p) {
+				return _Utils_eq(p, pupil) ? _Utils_update(
+					p,
+					{
+						I: A2(
+							$elm$core$List$map,
+							function (c) {
+								return _Utils_eq(c.O, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
+							},
+							p.I)
+					}) : p;
+			},
+			pupils);
+	});
+var $author$project$Pupil$Obj = F3(
+	function (name, _class, choices) {
+		return {I: choices, y: _class, E: name};
+	});
+var $author$project$Pupil$Yellow = 1;
+var $author$project$Pupil$savePupils = F4(
+	function (model, events, namesRaw, classRaw) {
+		var names = A2(
+			$elm$core$List$map,
+			$elm$core$String$trim,
+			A2($elm$core$String$split, ',', namesRaw));
+		var _class = $elm$core$String$trim(classRaw);
+		if ((_class === '') || A2(
+			$elm$core$List$any,
+			$elm$core$Basics$eq(''),
+			names)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var _v0 = function () {
+				var yellowEvents = A2(
+					$elm$core$List$map,
+					function (e) {
+						return A2($author$project$Pupil$Choice, e, 1);
+					},
+					events);
+				var fn = F2(
+					function (name, _v1) {
+						var currentPupils = _v1.a;
+						var e = _v1.b;
+						return (e || A2(
+							$elm$core$List$any,
+							function (p) {
+								return _Utils_eq(p.E, name) && _Utils_eq(p.y, _class);
+							},
+							currentPupils)) ? _Utils_Tuple2(_List_Nil, true) : _Utils_Tuple2(
+							_Utils_ap(
+								currentPupils,
+								_List_fromArray(
+									[
+										A3($author$project$Pupil$Obj, name, _class, yellowEvents)
+									])),
+							false);
+					});
+				return A3(
+					$elm$core$List$foldl,
+					fn,
+					_Utils_Tuple2(model.u, false),
+					names);
+			}();
+			var pupils = _v0.a;
+			var err = _v0.b;
+			return err ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(pupils);
+		}
+	});
+var $author$project$Pupil$updateFormdata = F2(
+	function (msg, formData) {
+		if (!msg.$) {
+			var n = msg.a;
+			return _Utils_update(
+				formData,
+				{X: n});
+		} else {
+			var c = msg.a;
+			return _Utils_update(
+				formData,
+				{y: c});
+		}
+	});
+var $author$project$Pupil$update = F3(
+	function (msg, model, events) {
+		switch (msg.$) {
+			case 0:
+				var data = msg.a;
+				return _Utils_update(
+					model,
+					{
+						s: A2($author$project$Pupil$updateFormdata, data, model.s),
+						K: false
+					});
+			case 1:
+				var _v1 = A4($author$project$Pupil$savePupils, model, events, model.s.X, model.s.y);
+				if (!_v1.$) {
+					var pupils = _v1.a;
+					return _Utils_update(
+						model,
+						{s: $author$project$Pupil$emptyFormData, K: false, u: pupils});
+				} else {
+					return _Utils_update(
+						model,
+						{K: true});
+				}
+			case 2:
+				var pupil = msg.a;
+				return _Utils_update(
+					model,
+					{
+						K: false,
+						u: A2(
+							$elm$core$List$filter,
+							$elm$core$Basics$neq(pupil),
+							model.u)
+					});
+			default:
+				var pupil = msg.a;
+				var event = msg.b;
+				var choice = msg.c;
+				return _Utils_update(
+					model,
+					{
+						K: false,
+						u: A4($author$project$Pupil$changeChoice, model.u, pupil, event, choice)
+					});
+		}
+	});
 var $elm$core$List$member = F2(
 	function (x, xs) {
 		return A2(
@@ -5436,7 +5444,7 @@ var $elm$core$List$member = F2(
 var $author$project$Pupil$updateEvents = F2(
 	function (events, model) {
 		var fn2 = function (c) {
-			return A2($elm$core$List$member, c.N, events);
+			return A2($elm$core$List$member, c.O, events);
 		};
 		var fn1 = F2(
 			function (e, cl) {
@@ -5446,7 +5454,7 @@ var $author$project$Pupil$updateEvents = F2(
 					A2(
 						$elm$core$List$map,
 						function ($) {
-							return $.N;
+							return $.O;
 						},
 						cl)) ? cl : A2(
 					$elm$core$List$cons,
@@ -5462,10 +5470,10 @@ var $author$project$Pupil$updateEvents = F2(
 						return _Utils_update(
 							p,
 							{
-								G: A2(
+								I: A2(
 									$elm$core$List$filter,
 									fn2,
-									A3($elm$core$List$foldl, fn1, p.G, events))
+									A3($elm$core$List$foldl, fn1, p.I, events))
 							});
 					},
 					model.u)
@@ -5473,22 +5481,25 @@ var $author$project$Pupil$updateEvents = F2(
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (!msg.$) {
-			var innerMsg = msg.a;
-			var eventsModel = A2($author$project$Event$update, innerMsg, model.I);
-			return _Utils_update(
-				model,
-				{
-					I: eventsModel,
-					u: A2($author$project$Pupil$updateEvents, eventsModel.I, model.u)
-				});
-		} else {
-			var innerMsg = msg.a;
-			return _Utils_update(
-				model,
-				{
-					u: A3($author$project$Pupil$update, innerMsg, model.u, model.I.I)
-				});
+		switch (msg.$) {
+			case 0:
+				var innerMsg = msg.a;
+				var eventsModel = A2($author$project$Event$update, innerMsg, model.C);
+				return _Utils_update(
+					model,
+					{
+						C: eventsModel,
+						u: A2($author$project$Pupil$updateEvents, eventsModel.C, model.u)
+					});
+			case 1:
+				var innerMsg = msg.a;
+				return _Utils_update(
+					model,
+					{
+						u: A3($author$project$Pupil$update, innerMsg, model.u, model.C.C)
+					});
+			default:
+				return $author$project$Main$init;
 		}
 	});
 var $author$project$Main$EventMsg = function (a) {
@@ -5497,6 +5508,8 @@ var $author$project$Main$EventMsg = function (a) {
 var $author$project$Main$PupilMsg = function (a) {
 	return {$: 1, a: a};
 };
+var $author$project$Main$DeleteAll = {$: 2};
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5530,13 +5543,55 @@ var $author$project$Helpers$classes = function (s) {
 	return $elm$html$Html$Attributes$classList(cl);
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$admin = A2(
+	$elm$html$Html$div,
+	_List_Nil,
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$h2,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Administration')
+				])),
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$author$project$Helpers$classes('btn btn-danger'),
+					$elm$html$Html$Events$onClick($author$project$Main$DeleteAll)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Alle Daten löschen')
+				]))
+		]));
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$p = _VirtualDom_node('p');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$readme = A2(
 	$elm$html$Html$div,
 	_List_fromArray(
@@ -5563,8 +5618,21 @@ var $author$project$Main$readme = A2(
 					$elm$html$Html$text('Dieses Tool speichert die Eingaben im Local Storage des Browsers. Es werden keine eigegebenen Daten über das Internet gesendet.')
 				]))
 		]));
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$core$Dict$isEmpty = function (dict) {
+	if (dict.$ === -2) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5755,6 +5823,7 @@ var $author$project$Algo$headOf = function (path) {
 		'',
 		$elm$core$List$head(path));
 };
+var $elm$core$Basics$not = _Basics_not;
 var $author$project$Algo$extend = F4(
 	function (graph, old, path, _new) {
 		return A2(
@@ -5913,17 +5982,17 @@ var $author$project$Pupil$eventGroup = F2(
 		return A2(
 			$elm$core$List$map,
 			function (c) {
-				return c.N;
+				return c.O;
 			},
 			A2(
 				$elm$core$List$filter,
 				function (c) {
 					return _Utils_eq(c.aV, choice);
 				},
-				pupil.G));
+				pupil.I));
 	});
 var $author$project$Pupil$toVertex = function (m) {
-	return m.J + (' (' + (m.x + ')'));
+	return m.E + (' (' + (m.y + ')'));
 };
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
@@ -5960,8 +6029,8 @@ var $author$project$Event$toVertexList = function (m) {
 	return A3(
 		$elm$core$List$foldl,
 		fn,
-		_Utils_Tuple2(m.B + 1, _List_Nil),
-		A2($elm$core$List$repeat, m.B, m.J)).b;
+		_Utils_Tuple2(m.x + 1, _List_Nil),
+		A2($elm$core$List$repeat, m.x, m.E)).b;
 };
 var $author$project$Event$toVertexListReducer = F2(
 	function (event, list) {
@@ -6127,7 +6196,10 @@ var $author$project$Main$result = function (model) {
 	var unmatched = _v0.b;
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('mb-5')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -6142,7 +6214,7 @@ var $author$project$Main$result = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert.')
+						$elm$html$Html$text('Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen.')
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -6159,7 +6231,13 @@ var $author$project$Main$result = function (model) {
 							[
 								$elm$html$Html$text('Zugeteilte Schüler/Schülerinnen')
 							])),
-						A2(
+						$elm$core$Dict$isEmpty(matched) ? A2(
+						$elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('keine')
+							])) : A2(
 						$elm$html$Html$table,
 						_List_fromArray(
 							[
@@ -6246,7 +6324,13 @@ var $author$project$Main$result = function (model) {
 							[
 								$elm$html$Html$text('Schüler/Schülerinnen ohne Platz')
 							])),
-						A2(
+						$elm$core$List$isEmpty(unmatched) ? A2(
+						$elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Keine')
+							])) : A2(
 						$elm$html$Html$ol,
 						_List_fromArray(
 							[
@@ -6310,29 +6394,6 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$html$Html$Attributes$href = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'href',
-		_VirtualDom_noJavaScriptUri(url));
-};
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 0, a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -6381,7 +6442,7 @@ var $author$project$Event$oneEventLi = function (event) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(event.J),
+						$elm$html$Html$text(event.E),
 						A2(
 						$elm$html$Html$span,
 						_List_fromArray(
@@ -6393,7 +6454,7 @@ var $author$project$Event$oneEventLi = function (event) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								$elm$core$String$fromInt(event.B))
+								$elm$core$String$fromInt(event.x))
 							]))
 					])),
 				A2(
@@ -6402,7 +6463,7 @@ var $author$project$Event$oneEventLi = function (event) {
 					[
 						$elm$html$Html$Attributes$class('link-danger'),
 						$elm$html$Html$Attributes$title('Löschen'),
-						$elm$html$Html$Attributes$href('#'),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
 						A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Löschen'),
 						$elm$html$Html$Events$onClick(
 						$author$project$Event$Delete(event))
@@ -6429,7 +6490,6 @@ var $author$project$Event$allEvents = function (events) {
 			]),
 		A2($elm$core$List$map, $author$project$Event$oneEventLi, events));
 };
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -6495,6 +6555,42 @@ var $elm$html$Html$Events$onSubmit = function (msg) {
 };
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $author$project$Helpers$tagWithInvalidFeedback = F5(
+	function (tag, attrs, identifier, feedback, isInvalid) {
+		if (isInvalid) {
+			var i = identifier + 'Feedback';
+			return _List_fromArray(
+				[
+					A2(
+					tag,
+					A2(
+						$elm$core$List$cons,
+						$elm$html$Html$Attributes$class('is-invalid'),
+						A2(
+							$elm$core$List$cons,
+							A2($elm$html$Html$Attributes$attribute, 'aria-describedby', i),
+							attrs)),
+					_List_Nil),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$id(i),
+							$elm$svg$Svg$Attributes$class('invalid-feedback')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(feedback)
+						]))
+				]);
+		} else {
+			return _List_fromArray(
+				[
+					A2(tag, attrs, _List_Nil)
+				]);
+		}
+	});
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Event$view = function (model) {
@@ -6546,23 +6642,23 @@ var $author$project$Event$view = function (model) {
 									[
 										$elm$html$Html$Attributes$class('col-md-3')
 									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$input,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('form-control'),
-												$elm$html$Html$Attributes$type_('text'),
-												$elm$html$Html$Attributes$placeholder('Name'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Name'),
-												$elm$html$Html$Attributes$required(true),
-												$elm$html$Html$Events$onInput(
-												A2($elm$core$Basics$composeR, $author$project$Event$Name, $author$project$Event$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.s.J)
-											]),
-										_List_Nil)
-									])),
+								A5(
+									$author$project$Helpers$tagWithInvalidFeedback,
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('form-control'),
+											$elm$html$Html$Attributes$type_('text'),
+											$elm$html$Html$Attributes$placeholder('Name'),
+											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Name'),
+											$elm$html$Html$Attributes$required(true),
+											$elm$html$Html$Events$onInput(
+											A2($elm$core$Basics$composeR, $author$project$Event$Name, $author$project$Event$FormDataMsg)),
+											$elm$html$Html$Attributes$value(model.s.E)
+										]),
+									'newGroupName',
+									'Gruppe ist bereits vorhanden',
+									model.K)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -6588,7 +6684,7 @@ var $author$project$Event$view = function (model) {
 														$elm$core$Maybe$withDefault(0),
 														A2($elm$core$Basics$composeR, $author$project$Event$Capacity, $author$project$Event$FormDataMsg)))),
 												$elm$html$Html$Attributes$value(
-												$elm$core$String$fromInt(model.s.B))
+												$elm$core$String$fromInt(model.s.x))
 											]),
 										_List_Nil),
 										A2(
@@ -6639,7 +6735,7 @@ var $author$project$Event$view = function (model) {
 							[
 								$elm$html$Html$text('Alle Gruppen')
 							])),
-						$author$project$Event$allEvents(model.I)
+						$author$project$Event$allEvents(model.C)
 					]))
 			]));
 };
@@ -6649,24 +6745,17 @@ var $author$project$Pupil$Class = function (a) {
 var $author$project$Pupil$FormDataMsg = function (a) {
 	return {$: 0, a: a};
 };
-var $author$project$Pupil$MultiClass = function (a) {
-	return {$: 3, a: a};
-};
-var $author$project$Pupil$MultiNames = function (a) {
-	return {$: 2, a: a};
-};
-var $author$project$Pupil$MultiSave = {$: 2};
-var $author$project$Pupil$Name = function (a) {
+var $author$project$Pupil$Names = function (a) {
 	return {$: 0, a: a};
 };
 var $author$project$Pupil$Save = {$: 1};
 var $author$project$Pupil$Delete = function (a) {
-	return {$: 3, a: a};
+	return {$: 2, a: a};
 };
 var $author$project$Pupil$Red = 2;
 var $author$project$Pupil$ChangeChoice = F3(
 	function (a, b, c) {
-		return {$: 4, a: a, b: b, c: c};
+		return {$: 3, a: a, b: b, c: c};
 	});
 var $elm$svg$Svg$Attributes$fillRule = _VirtualDom_attribute('fill-rule');
 var $author$project$Helpers$svgIconArrowDown = A2(
@@ -6787,7 +6876,7 @@ var $author$project$Pupil$oneEventLi = F3(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(event.J),
+					$elm$html$Html$text(event.E),
 					A2($elm$html$Html$span, _List_Nil, buttons)
 				]));
 	});
@@ -6912,7 +7001,7 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text(pupil.J + (' (Klasse ' + (pupil.x + ')')))
+								$elm$html$Html$text(pupil.E + (' (Klasse ' + (pupil.y + ')')))
 							])),
 						A2(
 						$elm$html$Html$ul,
@@ -6933,7 +7022,7 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 					[
 						$elm$html$Html$Attributes$class('link-danger'),
 						$elm$html$Html$Attributes$title('Löschen'),
-						$elm$html$Html$Attributes$href('#'),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
 						A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Löschen'),
 						$elm$html$Html$Events$onClick(
 						$author$project$Pupil$Delete(pupil))
@@ -7000,7 +7089,7 @@ var $author$project$Pupil$view = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Neuen Schüler oder neue Schülerin hinzufügen')
+								$elm$html$Html$text('Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen')
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -7016,23 +7105,23 @@ var $author$project$Pupil$view = function (model) {
 									[
 										$elm$html$Html$Attributes$class('col-md-3')
 									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$input,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('form-control'),
-												$elm$html$Html$Attributes$type_('text'),
-												$elm$html$Html$Attributes$placeholder('Name'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Name'),
-												$elm$html$Html$Attributes$required(true),
-												$elm$html$Html$Events$onInput(
-												A2($elm$core$Basics$composeR, $author$project$Pupil$Name, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.s.J)
-											]),
-										_List_Nil)
-									])),
+								A5(
+									$author$project$Helpers$tagWithInvalidFeedback,
+									$elm$html$Html$textarea,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('form-control'),
+											$elm$html$Html$Attributes$rows(1),
+											$elm$html$Html$Attributes$placeholder('Namen (mit Komma getrennt)'),
+											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Komma getrennt)'),
+											$elm$html$Html$Attributes$required(true),
+											$elm$html$Html$Events$onInput(
+											A2($elm$core$Basics$composeR, $author$project$Pupil$Names, $author$project$Pupil$FormDataMsg)),
+											$elm$html$Html$Attributes$value(model.s.X)
+										]),
+									'newPupilNames',
+									'Schüler/Schülerin ist in dieser Klasse bereits vorhanden',
+									model.K)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -7052,7 +7141,7 @@ var $author$project$Pupil$view = function (model) {
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
 												A2($elm$core$Basics$composeR, $author$project$Pupil$Class, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.s.x)
+												$elm$html$Html$Attributes$value(model.s.y)
 											]),
 										_List_Nil)
 									])),
@@ -7073,102 +7162,7 @@ var $author$project$Pupil$view = function (model) {
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Eine/n Hinzufügen')
-											]))
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$form,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mb-3'),
-						$elm$html$Html$Events$onSubmit($author$project$Pupil$MultiSave)
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h3,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$hidden(true)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$author$project$Helpers$classes('row g-3')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-md-3')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$textarea,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('form-control'),
-												$elm$html$Html$Attributes$rows(1),
-												$elm$html$Html$Attributes$placeholder('Namen (mit Komma getrennt)'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Komma getrennt)'),
-												$elm$html$Html$Attributes$required(true),
-												$elm$html$Html$Events$onInput(
-												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiNames, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.s.X)
-											]),
-										_List_Nil)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-md-3')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$input,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('form-control'),
-												$elm$html$Html$Attributes$type_('text'),
-												$elm$html$Html$Attributes$placeholder('Klasse'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Klasse'),
-												$elm$html$Html$Attributes$required(true),
-												$elm$html$Html$Events$onInput(
-												A2($elm$core$Basics$composeR, $author$project$Pupil$MultiClass, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.s.P)
-											]),
-										_List_Nil)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-md-3')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$button,
-										_List_fromArray(
-											[
-												$author$project$Helpers$classes('btn btn-primary'),
-												$elm$html$Html$Attributes$type_('submit')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Mehrere Hinzufügen')
+												$elm$html$Html$text('Hinzufügen')
 											]))
 									]))
 							]))
@@ -7210,12 +7204,13 @@ var $author$project$Main$view = function (model) {
 						A2(
 						$elm$html$Html$map,
 						$author$project$Main$EventMsg,
-						$author$project$Event$view(model.I)),
+						$author$project$Event$view(model.C)),
 						A2(
 						$elm$html$Html$map,
 						$author$project$Main$PupilMsg,
 						$author$project$Pupil$view(model.u)),
-						$author$project$Main$result(model)
+						$author$project$Main$result(model),
+						$author$project$Main$admin
 					]))
 			]));
 };

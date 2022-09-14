@@ -1,4 +1,4 @@
-module Helpers exposing (classes, isValidNameOrClass, svgIconArrowDown, svgIconArrowUp, svgIconXLg)
+module Helpers exposing (classes, svgIconArrowDown, svgIconArrowUp, svgIconXLg, tagWithInvalidFeedback)
 
 import Html
 import Html.Attributes
@@ -78,6 +78,23 @@ svgIconArrowDown =
         ]
 
 
-isValidNameOrClass : String -> Bool
-isValidNameOrClass name =
-    String.trim name /= ""
+tagWithInvalidFeedback :
+    (List (Html.Attribute msg) -> List (Html.Html msg) -> Html.Html msg)
+    -> List (Html.Attribute msg)
+    -> String
+    -> String
+    -> Bool
+    -> List (Html.Html msg)
+tagWithInvalidFeedback tag attrs identifier feedback isInvalid =
+    if isInvalid then
+        let
+            i : String
+            i =
+                identifier ++ "Feedback"
+        in
+        [ tag (Html.Attributes.class "is-invalid" :: (Html.Attributes.attribute "aria-describedby" i :: attrs)) []
+        , Html.div [ Html.Attributes.id i, class "invalid-feedback" ] [ Html.text feedback ]
+        ]
+
+    else
+        [ tag attrs [] ]

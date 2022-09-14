@@ -7,6 +7,7 @@ import Event
 import Helpers exposing (classes)
 import Html exposing (..)
 import Html.Attributes exposing (class, scope)
+import Html.Events exposing (onClick)
 import Pupil
 
 
@@ -43,6 +44,7 @@ init =
 type Msg
     = EventMsg Event.Msg
     | PupilMsg Pupil.Msg
+    | DeleteAll
 
 
 update : Msg -> Model -> Model
@@ -58,6 +60,9 @@ update msg model =
         PupilMsg innerMsg ->
             { model | pupils = Pupil.update innerMsg model.pupils model.events.events }
 
+        DeleteAll ->
+            init
+
 
 
 -- VIEW
@@ -71,6 +76,7 @@ view model =
             , Event.view model.events |> map EventMsg
             , Pupil.view model.pupils |> map PupilMsg
             , result model
+            , admin
             ]
         ]
 
@@ -89,29 +95,45 @@ result model =
         ( matched, unmatched ) =
             matchedAndUnmatchedPupils model.pupils.pupils
     in
-    div []
+    div [ class "mb-5" ]
         [ h2 [] [ text "Ergebnis" ]
-        , p [] [ text "Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert." ]
+        , p [] [ text "Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen." ]
         , div [ class "col-md-8" ]
             [ h3 []
                 [ text "Zugeteilte Schüler/Schülerinnen" ]
-            , table
-                [ class "table" ]
-                [ thead [] [ tr [] [ th [ scope "col" ] [ text "Name" ], th [ scope "col" ] [ text "Gruppe" ] ] ]
-                , tbody []
-                    (matched
-                        |> Dict.toList
-                        |> List.map (\( a, b ) -> tr [] [ td [] [ text a ], td [] [ text b ] ])
-                    )
-                ]
+            , if Dict.isEmpty matched then
+                p [] [ text "keine" ]
+
+              else
+                table
+                    [ class "table" ]
+                    [ thead [] [ tr [] [ th [ scope "col" ] [ text "Name" ], th [ scope "col" ] [ text "Gruppe" ] ] ]
+                    , tbody []
+                        (matched
+                            |> Dict.toList
+                            |> List.map (\( a, b ) -> tr [] [ td [] [ text a ], td [] [ text b ] ])
+                        )
+                    ]
             ]
         , div [ class "col-md-8" ]
             [ h3 [] [ text "Schüler/Schülerinnen ohne Platz" ]
-            , ol [ classes "list-group list-group-flush list-group-numbered" ]
-                (unmatched
-                    |> List.map (\v -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text v ] ])
-                )
+            , if List.isEmpty unmatched then
+                p [] [ text "Keine" ]
+
+              else
+                ol [ classes "list-group list-group-flush list-group-numbered" ]
+                    (unmatched
+                        |> List.map (\v -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text v ] ])
+                    )
             ]
+        ]
+
+
+admin : Html Msg
+admin =
+    div []
+        [ h2 [] [ text "Administration" ]
+        , button [ classes "btn btn-danger", onClick DeleteAll ] [ text "Alle Daten löschen" ]
         ]
 
 

@@ -1,9 +1,9 @@
 module Event exposing (Model, Msg, Obj, init, toVertexList, toVertexListReducer, update, view)
 
 import Algo exposing (Vertex)
-import Helpers exposing (classes, isValidNameOrClass, svgIconXLg)
+import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, hidden, href, placeholder, required, title, type_, value)
+import Html.Attributes exposing (attribute, class, hidden, placeholder, required, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 
 
@@ -14,12 +14,13 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 type alias Model =
     { events : List Obj
     , formData : Obj
+    , formInvalid : Bool
     }
 
 
 init : Model
 init =
-    Model [] emptyFormData
+    Model [] emptyFormData False
 
 
 emptyFormData : Obj
@@ -76,17 +77,22 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         FormDataMsg data ->
-            { model | formData = updateFormdata data model.formData }
+            { model | formData = updateFormdata data model.formData, formInvalid = False }
 
         Save ->
-            if isValidNameOrClass model.formData.name && model.formData.capacity > 0 then
-                { model | formData = emptyFormData, events = model.events ++ [ model.formData ] }
+            case validate model of
+                Just new ->
+                    { model
+                        | formData = emptyFormData
+                        , events = model.events ++ [ new ]
+                        , formInvalid = False
+                    }
 
-            else
-                model
+                Nothing ->
+                    { model | formInvalid = True }
 
         Delete obj ->
-            { model | events = model.events |> List.filter ((/=) obj) }
+            { model | events = model.events |> List.filter ((/=) obj), formInvalid = False }
 
 
 updateFormdata : FormDataInput -> Obj -> Obj
@@ -97,6 +103,24 @@ updateFormdata msg formData =
 
         Capacity capacity ->
             { formData | capacity = capacity }
+
+
+validate : Model -> Maybe Obj
+validate model =
+    let
+        name : String
+        name =
+            model.formData.name |> String.trim
+    in
+    if
+        (name == "")
+            || (model.formData.capacity <= 0)
+            || (model.events |> List.any (\e -> e.name == name))
+    then
+        Nothing
+
+    else
+        Just (Obj name model.formData.capacity)
 
 
 
@@ -111,7 +135,8 @@ view model =
             [ h3 [ hidden True ] [ text "Neue Gruppe hinzufügen" ]
             , div [ classes "row g-3" ]
                 [ div [ class "col-md-3" ]
-                    [ input
+                    (tagWithInvalidFeedback
+                        input
                         [ class "form-control"
                         , type_ "text"
                         , placeholder "Name"
@@ -120,8 +145,10 @@ view model =
                         , onInput (Name >> FormDataMsg)
                         , value model.formData.name
                         ]
-                        []
-                    ]
+                        "newGroupName"
+                        "Gruppe ist bereits vorhanden"
+                        model.formInvalid
+                    )
                 , div [ class "col-md-3" ]
                     [ input
                         [ class "form-control"
@@ -160,5 +187,5 @@ oneEventLi event =
             [ text event.name
             , span [ classes "ms-2 badge bg-primary rounded-pill", title "Anzahl der Plätze", attribute "aria-label" "Anzahl der Plätze" ] [ text <| String.fromInt event.capacity ]
             ]
-        , a [ class "link-danger", title "Löschen", href "#", attribute "aria-label" "Löschen", onClick <| Delete event ] [ svgIconXLg ]
+        , a [ class "link-danger", title "Löschen", attribute "role" "button", attribute "aria-label" "Löschen", onClick <| Delete event ] [ svgIconXLg ]
         ]
