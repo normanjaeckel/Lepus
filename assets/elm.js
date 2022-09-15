@@ -80,6 +80,271 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 
 
 
+// EQUALITY
+
+function _Utils_eq(x, y)
+{
+	for (
+		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
+		isEqual && (pair = stack.pop());
+		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
+		)
+	{}
+
+	return isEqual;
+}
+
+function _Utils_eqHelp(x, y, depth, stack)
+{
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object' || x === null || y === null)
+	{
+		typeof x === 'function' && _Debug_crash(5);
+		return false;
+	}
+
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
+	}
+
+	/**_UNUSED/
+	if (x.$ === 'Set_elm_builtin')
+	{
+		x = $elm$core$Set$toList(x);
+		y = $elm$core$Set$toList(y);
+	}
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	/**/
+	if (x.$ < 0)
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	for (var key in x)
+	{
+		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+var _Utils_equal = F2(_Utils_eq);
+var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
+
+
+
+// COMPARISONS
+
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
+
+function _Utils_cmp(x, y, ord)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
+	}
+
+	/**_UNUSED/
+	if (x instanceof String)
+	{
+		var a = x.valueOf();
+		var b = y.valueOf();
+		return a === b ? 0 : a < b ? -1 : 1;
+	}
+	//*/
+
+	/**/
+	if (typeof x.$ === 'undefined')
+	//*/
+	/**_UNUSED/
+	if (x.$[0] === '#')
+	//*/
+	{
+		return (ord = _Utils_cmp(x.a, y.a))
+			? ord
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
+	}
+
+	// traverse conses until end of a list or a mismatch
+	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
+	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
+}
+
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
+
+var _Utils_compare = F2(function(x, y)
+{
+	var n = _Utils_cmp(x, y);
+	return n < 0 ? $elm$core$Basics$LT : n ? $elm$core$Basics$GT : $elm$core$Basics$EQ;
+});
+
+
+// COMMON VALUES
+
+var _Utils_Tuple0 = 0;
+var _Utils_Tuple0_UNUSED = { $: '#0' };
+
+function _Utils_Tuple2(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2_UNUSED(a, b) { return { $: '#2', a: a, b: b }; }
+
+function _Utils_Tuple3(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3_UNUSED(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+
+function _Utils_chr(c) { return c; }
+function _Utils_chr_UNUSED(c) { return new String(c); }
+
+
+// RECORDS
+
+function _Utils_update(oldRecord, updatedFields)
+{
+	var newRecord = {};
+
+	for (var key in oldRecord)
+	{
+		newRecord[key] = oldRecord[key];
+	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
+	return newRecord;
+}
+
+
+// APPEND
+
+var _Utils_append = F2(_Utils_ap);
+
+function _Utils_ap(xs, ys)
+{
+	// append Strings
+	if (typeof xs === 'string')
+	{
+		return xs + ys;
+	}
+
+	// append Lists
+	if (!xs.b)
+	{
+		return ys;
+	}
+	var root = _List_Cons(xs.a, ys);
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		curr = curr.b = _List_Cons(xs.a, ys);
+	}
+	return root;
+}
+
+
+
+var _List_Nil = { $: 0 };
+var _List_Nil_UNUSED = { $: '[]' };
+
+function _List_Cons(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons_UNUSED(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
+	}));
+});
+
+
+
 var _JsArray_empty = [];
 
 function _JsArray_singleton(value)
@@ -519,277 +784,12 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ai.P === region.as.P)
+	if (region.ai.P === region.at.P)
 	{
 		return 'on line ' + region.ai.P;
 	}
-	return 'on lines ' + region.ai.P + ' through ' + region.as.P;
+	return 'on lines ' + region.ai.P + ' through ' + region.at.P;
 }
-
-
-
-// EQUALITY
-
-function _Utils_eq(x, y)
-{
-	for (
-		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
-		isEqual && (pair = stack.pop());
-		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
-		)
-	{}
-
-	return isEqual;
-}
-
-function _Utils_eqHelp(x, y, depth, stack)
-{
-	if (x === y)
-	{
-		return true;
-	}
-
-	if (typeof x !== 'object' || x === null || y === null)
-	{
-		typeof x === 'function' && _Debug_crash(5);
-		return false;
-	}
-
-	if (depth > 100)
-	{
-		stack.push(_Utils_Tuple2(x,y));
-		return true;
-	}
-
-	/**_UNUSED/
-	if (x.$ === 'Set_elm_builtin')
-	{
-		x = $elm$core$Set$toList(x);
-		y = $elm$core$Set$toList(y);
-	}
-	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
-	{
-		x = $elm$core$Dict$toList(x);
-		y = $elm$core$Dict$toList(y);
-	}
-	//*/
-
-	/**/
-	if (x.$ < 0)
-	{
-		x = $elm$core$Dict$toList(x);
-		y = $elm$core$Dict$toList(y);
-	}
-	//*/
-
-	for (var key in x)
-	{
-		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-var _Utils_equal = F2(_Utils_eq);
-var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
-
-
-
-// COMPARISONS
-
-// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
-// the particular integer values assigned to LT, EQ, and GT.
-
-function _Utils_cmp(x, y, ord)
-{
-	if (typeof x !== 'object')
-	{
-		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
-	}
-
-	/**_UNUSED/
-	if (x instanceof String)
-	{
-		var a = x.valueOf();
-		var b = y.valueOf();
-		return a === b ? 0 : a < b ? -1 : 1;
-	}
-	//*/
-
-	/**/
-	if (typeof x.$ === 'undefined')
-	//*/
-	/**_UNUSED/
-	if (x.$[0] === '#')
-	//*/
-	{
-		return (ord = _Utils_cmp(x.a, y.a))
-			? ord
-			: (ord = _Utils_cmp(x.b, y.b))
-				? ord
-				: _Utils_cmp(x.c, y.c);
-	}
-
-	// traverse conses until end of a list or a mismatch
-	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
-	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
-}
-
-var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
-var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
-var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
-var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
-
-var _Utils_compare = F2(function(x, y)
-{
-	var n = _Utils_cmp(x, y);
-	return n < 0 ? $elm$core$Basics$LT : n ? $elm$core$Basics$GT : $elm$core$Basics$EQ;
-});
-
-
-// COMMON VALUES
-
-var _Utils_Tuple0 = 0;
-var _Utils_Tuple0_UNUSED = { $: '#0' };
-
-function _Utils_Tuple2(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2_UNUSED(a, b) { return { $: '#2', a: a, b: b }; }
-
-function _Utils_Tuple3(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3_UNUSED(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
-
-function _Utils_chr(c) { return c; }
-function _Utils_chr_UNUSED(c) { return new String(c); }
-
-
-// RECORDS
-
-function _Utils_update(oldRecord, updatedFields)
-{
-	var newRecord = {};
-
-	for (var key in oldRecord)
-	{
-		newRecord[key] = oldRecord[key];
-	}
-
-	for (var key in updatedFields)
-	{
-		newRecord[key] = updatedFields[key];
-	}
-
-	return newRecord;
-}
-
-
-// APPEND
-
-var _Utils_append = F2(_Utils_ap);
-
-function _Utils_ap(xs, ys)
-{
-	// append Strings
-	if (typeof xs === 'string')
-	{
-		return xs + ys;
-	}
-
-	// append Lists
-	if (!xs.b)
-	{
-		return ys;
-	}
-	var root = _List_Cons(xs.a, ys);
-	xs = xs.b
-	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		curr = curr.b = _List_Cons(xs.a, ys);
-	}
-	return root;
-}
-
-
-
-var _List_Nil = { $: 0 };
-var _List_Nil_UNUSED = { $: '[]' };
-
-function _List_Cons(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons_UNUSED(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
-	}));
-});
 
 
 
@@ -2719,7 +2719,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		z: func(record.z),
+		A: func(record.A),
 		aj: record.aj,
 		ag: record.ag
 	}
@@ -2989,7 +2989,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.z;
+		var message = !tag ? value : tag < 3 ? value.a : value.A;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aj;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aJ === next.aJ
-							&& curr.ax === next.ax
-							&& curr.aG.a === next.aG.a
+							&& curr.aK === next.aK
+							&& curr.ay === next.ay
+							&& curr.aH.a === next.aH.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aP: _Browser_getScene(),
+		aQ: _Browser_getScene(),
 		aW: {
 			aY: _Browser_window.pageXOffset,
 			aZ: _Browser_window.pageYOffset,
 			aX: _Browser_doc.documentElement.clientWidth,
-			aw: _Browser_doc.documentElement.clientHeight
+			ax: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4263,7 +4263,7 @@ function _Browser_getScene()
 	var elem = _Browser_doc.documentElement;
 	return {
 		aX: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		aw: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		ax: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aP: {
+			aQ: {
 				aX: node.scrollWidth,
-				aw: node.scrollHeight
+				ax: node.scrollHeight
 			},
 			aW: {
 				aY: node.scrollLeft,
 				aZ: node.scrollTop,
 				aX: node.clientWidth,
-				aw: node.clientHeight
+				ax: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aP: _Browser_getScene(),
+			aQ: _Browser_getScene(),
 			aW: {
 				aY: x,
 				aZ: y,
 				aX: _Browser_doc.documentElement.clientWidth,
-				aw: _Browser_doc.documentElement.clientHeight
+				ax: _Browser_doc.documentElement.clientHeight
 			},
 			a7: {
 				aY: x + rect.left,
 				aZ: y + rect.top,
 				aX: rect.width,
-				aw: rect.height
+				ax: rect.height
 			}
 		};
 	});
@@ -4370,31 +4370,10 @@ function _Browser_load(url)
 		}
 	}));
 }
+var $elm$core$Basics$EQ = 1;
+var $elm$core$Basics$GT = 2;
+var $elm$core$Basics$LT = 0;
 var $elm$core$List$cons = _List_cons;
-var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
-var $elm$core$Array$foldr = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (!node.$) {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldr, func, acc, values);
-				}
-			});
-		return A3(
-			$elm$core$Elm$JsArray$foldr,
-			helper,
-			A3($elm$core$Elm$JsArray$foldr, func, baseCase, tail),
-			tree);
-	});
-var $elm$core$Array$toList = function (array) {
-	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
-};
 var $elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
@@ -4447,31 +4426,30 @@ var $elm$core$Set$toList = function (_v0) {
 	var dict = _v0;
 	return $elm$core$Dict$keys(dict);
 };
-var $elm$core$Basics$EQ = 1;
-var $elm$core$Basics$GT = 2;
-var $elm$core$Basics$LT = 0;
-var $elm$core$Basics$False = 1;
-var $author$project$Event$Model = F3(
-	function (events, formData, formInvalid) {
-		return {C: events, s: formData, K: formInvalid};
+var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
+var $elm$core$Array$foldr = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (!node.$) {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, func, acc, values);
+				}
+			});
+		return A3(
+			$elm$core$Elm$JsArray$foldr,
+			helper,
+			A3($elm$core$Elm$JsArray$foldr, func, baseCase, tail),
+			tree);
 	});
-var $author$project$Event$Obj = F2(
-	function (name, capacity) {
-		return {x: capacity, E: name};
-	});
-var $author$project$Event$emptyFormData = A2($author$project$Event$Obj, '', 1);
-var $author$project$Event$init = A3($author$project$Event$Model, _List_Nil, $author$project$Event$emptyFormData, false);
-var $author$project$Pupil$Model = F3(
-	function (pupils, formData, formInvalid) {
-		return {s: formData, K: formInvalid, u: pupils};
-	});
-var $author$project$Pupil$FormData = F2(
-	function (names, _class) {
-		return {y: _class, X: names};
-	});
-var $author$project$Pupil$emptyFormData = A2($author$project$Pupil$FormData, '', '');
-var $author$project$Pupil$init = A3($author$project$Pupil$Model, _List_Nil, $author$project$Pupil$emptyFormData, false);
-var $author$project$Main$init = {C: $author$project$Event$init, u: $author$project$Pupil$init};
+var $elm$core$Array$toList = function (array) {
+	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
+};
 var $elm$core$Result$Err = function (a) {
 	return {$: 1, a: a};
 };
@@ -4493,6 +4471,7 @@ var $elm$core$Result$Ok = function (a) {
 var $elm$json$Json$Decode$OneOf = function (a) {
 	return {$: 2, a: a};
 };
+var $elm$core$Basics$False = 1;
 var $elm$core$Basics$add = _Basics_add;
 var $elm$core$Maybe$Just = function (a) {
 	return {$: 0, a: a};
@@ -4895,7 +4874,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {at: fragment, ax: host, aE: path, aG: port_, aJ: protocol, aK: query};
+		return {au: fragment, ay: host, aF: path, aH: port_, aK: protocol, aL: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5173,28 +5152,202 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
+var $elm$browser$Browser$element = _Browser_element;
+var $elm$json$Json$Decode$decodeString = _Json_runOnString;
+var $author$project$Main$Model = F2(
+	function (pupils, events) {
+		return {z: events, s: pupils};
+	});
+var $author$project$Event$Model = F3(
+	function (events, formData, formInvalid) {
+		return {z: events, v: formData, L: formInvalid};
+	});
+var $author$project$Event$Obj = F2(
+	function (name, capacity) {
+		return {t: capacity, B: name};
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Event$decoderEvent = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Event$Obj,
+	A2($elm$json$Json$Decode$field, 'name', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'capacity', $elm$json$Json$Decode$int));
+var $author$project$Event$emptyFormData = A2($author$project$Event$Obj, '', 1);
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $author$project$Event$decoder = A2(
+	$elm$json$Json$Decode$map,
+	function (p) {
+		return A3($author$project$Event$Model, p, $author$project$Event$emptyFormData, false);
+	},
+	$elm$json$Json$Decode$list($author$project$Event$decoderEvent));
+var $author$project$Pupil$Model = F3(
+	function (pupils, formData, formInvalid) {
+		return {v: formData, L: formInvalid, s: pupils};
+	});
+var $author$project$Pupil$Obj = F3(
+	function (name, _class, choices) {
+		return {E: choices, u: _class, B: name};
+	});
+var $author$project$Pupil$Choice = F2(
+	function (event, type_) {
+		return {K: event, am: type_};
+	});
+var $author$project$Pupil$Green = 0;
+var $author$project$Pupil$Red = 2;
+var $author$project$Pupil$Yellow = 1;
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $author$project$Pupil$decoderChoice = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Pupil$Choice,
+	A2($elm$json$Json$Decode$field, 'event', $author$project$Event$decoderEvent),
+	A2(
+		$elm$json$Json$Decode$field,
+		'type',
+		A2(
+			$elm$json$Json$Decode$andThen,
+			function (t) {
+				return (t === 'green') ? $elm$json$Json$Decode$succeed(0) : ((t === 'yellow') ? $elm$json$Json$Decode$succeed(1) : ((t === 'red') ? $elm$json$Json$Decode$succeed(2) : $elm$json$Json$Decode$fail('invalid choice type')));
+			},
+			$elm$json$Json$Decode$string)));
+var $author$project$Pupil$FormData = F2(
+	function (names, _class) {
+		return {u: _class, X: names};
+	});
+var $author$project$Pupil$emptyFormData = A2($author$project$Pupil$FormData, '', '');
+var $elm$json$Json$Decode$map3 = _Json_map3;
+var $author$project$Pupil$decoder = A2(
+	$elm$json$Json$Decode$map,
+	function (p) {
+		return A3($author$project$Pupil$Model, p, $author$project$Pupil$emptyFormData, false);
+	},
+	$elm$json$Json$Decode$list(
+		A4(
+			$elm$json$Json$Decode$map3,
+			$author$project$Pupil$Obj,
+			A2($elm$json$Json$Decode$field, 'name', $elm$json$Json$Decode$string),
+			A2($elm$json$Json$Decode$field, 'class', $elm$json$Json$Decode$string),
+			A2(
+				$elm$json$Json$Decode$field,
+				'choices',
+				$elm$json$Json$Decode$list($author$project$Pupil$decoderChoice)))));
+var $author$project$Main$decoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Main$Model,
+	A2($elm$json$Json$Decode$field, 'pupils', $author$project$Pupil$decoder),
+	A2($elm$json$Json$Decode$field, 'events', $author$project$Event$decoder));
+var $author$project$Event$init = A3($author$project$Event$Model, _List_Nil, $author$project$Event$emptyFormData, false);
+var $author$project$Pupil$init = A3($author$project$Pupil$Model, _List_Nil, $author$project$Pupil$emptyFormData, false);
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$init = function (s) {
+	var _v0 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decoder, s);
+	if (!_v0.$) {
+		var model = _v0.a;
+		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+	} else {
+		return _Utils_Tuple2(
+			{z: $author$project$Event$init, s: $author$project$Pupil$init},
+			$elm$core$Platform$Cmd$none);
+	}
+};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$browser$Browser$sandbox = function (impl) {
-	return _Browser_element(
-		{
-			be: function (_v0) {
-				return _Utils_Tuple2(impl.be, $elm$core$Platform$Cmd$none);
-			},
-			bu: function (_v1) {
-				return $elm$core$Platform$Sub$none;
-			},
-			by: F2(
-				function (msg, model) {
-					return _Utils_Tuple2(
-						A2(impl.by, msg, model),
-						$elm$core$Platform$Cmd$none);
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
 				}),
-			bz: impl.bz
-		});
+			_Json_emptyObject(0),
+			pairs));
 };
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Event$eventToJSON = function (e) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'name',
+				$elm$json$Json$Encode$string(e.B)),
+				_Utils_Tuple2(
+				'capacity',
+				$elm$json$Json$Encode$int(e.t))
+			]));
+};
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(0),
+				entries));
+	});
+var $author$project$Event$modelToJSON = function (model) {
+	return A2($elm$json$Json$Encode$list, $author$project$Event$eventToJSON, model.z);
+};
+var $author$project$Pupil$choiceTypeToString = function (c) {
+	switch (c) {
+		case 0:
+			return 'green';
+		case 1:
+			return 'yellow';
+		default:
+			return 'red';
+	}
+};
+var $author$project$Pupil$choiceToJSON = function (choice) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'event',
+				$author$project$Event$eventToJSON(choice.K)),
+				_Utils_Tuple2(
+				'type',
+				$elm$json$Json$Encode$string(
+					$author$project$Pupil$choiceTypeToString(choice.am)))
+			]));
+};
+var $author$project$Pupil$pupilToJSON = function (p) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'name',
+				$elm$json$Json$Encode$string(p.B)),
+				_Utils_Tuple2(
+				'class',
+				$elm$json$Json$Encode$string(p.u)),
+				_Utils_Tuple2(
+				'choices',
+				A2($elm$json$Json$Encode$list, $author$project$Pupil$choiceToJSON, p.E))
+			]));
+};
+var $author$project$Pupil$modelToJSON = function (model) {
+	return A2($elm$json$Json$Encode$list, $author$project$Pupil$pupilToJSON, model.s);
+};
+var $author$project$Main$modelToJSON = function (model) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'pupils',
+				$author$project$Pupil$modelToJSON(model.s)),
+				_Utils_Tuple2(
+				'events',
+				$author$project$Event$modelToJSON(model.z))
+			]));
+};
+var $author$project$Main$setStorage = _Platform_outgoingPort('setStorage', $elm$json$Json$Encode$string);
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -5213,12 +5366,12 @@ var $author$project$Event$updateFormdata = F2(
 			var name = msg.a;
 			return _Utils_update(
 				formData,
-				{E: name});
+				{B: name});
 		} else {
 			var capacity = msg.a;
 			return _Utils_update(
 				formData,
-				{x: capacity});
+				{t: capacity});
 		}
 	});
 var $elm$core$List$any = F2(
@@ -5244,14 +5397,14 @@ var $elm$core$List$any = F2(
 	});
 var $elm$core$String$trim = _String_trim;
 var $author$project$Event$validate = function (model) {
-	var name = $elm$core$String$trim(model.s.E);
-	return ((name === '') || ((model.s.x <= 0) || A2(
+	var name = $elm$core$String$trim(model.v.B);
+	return ((name === '') || ((model.v.t <= 0) || A2(
 		$elm$core$List$any,
 		function (e) {
-			return _Utils_eq(e.E, name);
+			return _Utils_eq(e.B, name);
 		},
-		model.C))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-		A2($author$project$Event$Obj, name, model.s.x));
+		model.z))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+		A2($author$project$Event$Obj, name, model.v.t));
 };
 var $author$project$Event$update = F2(
 	function (msg, model) {
@@ -5261,8 +5414,8 @@ var $author$project$Event$update = F2(
 				return _Utils_update(
 					model,
 					{
-						s: A2($author$project$Event$updateFormdata, data, model.s),
-						K: false
+						v: A2($author$project$Event$updateFormdata, data, model.v),
+						L: false
 					});
 			case 1:
 				var _v1 = $author$project$Event$validate(model);
@@ -5271,34 +5424,30 @@ var $author$project$Event$update = F2(
 					return _Utils_update(
 						model,
 						{
-							C: _Utils_ap(
-								model.C,
+							z: _Utils_ap(
+								model.z,
 								_List_fromArray(
 									[_new])),
-							s: $author$project$Event$emptyFormData,
-							K: false
+							v: $author$project$Event$emptyFormData,
+							L: false
 						});
 				} else {
 					return _Utils_update(
 						model,
-						{K: true});
+						{L: true});
 				}
 			default:
 				var obj = msg.a;
 				return _Utils_update(
 					model,
 					{
-						C: A2(
+						z: A2(
 							$elm$core$List$filter,
 							$elm$core$Basics$neq(obj),
-							model.C),
-						K: false
+							model.z),
+						L: false
 					});
 		}
-	});
-var $author$project$Pupil$Choice = F2(
-	function (event, type_) {
-		return {O: event, aV: type_};
 	});
 var $author$project$Pupil$changeChoice = F4(
 	function (pupils, pupil, event, newChoiceType) {
@@ -5308,21 +5457,16 @@ var $author$project$Pupil$changeChoice = F4(
 				return _Utils_eq(p, pupil) ? _Utils_update(
 					p,
 					{
-						I: A2(
+						E: A2(
 							$elm$core$List$map,
 							function (c) {
-								return _Utils_eq(c.O, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
+								return _Utils_eq(c.K, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
 							},
-							p.I)
+							p.E)
 					}) : p;
 			},
 			pupils);
 	});
-var $author$project$Pupil$Obj = F3(
-	function (name, _class, choices) {
-		return {I: choices, y: _class, E: name};
-	});
-var $author$project$Pupil$Yellow = 1;
 var $author$project$Pupil$savePupils = F4(
 	function (model, events, namesRaw, classRaw) {
 		var names = A2(
@@ -5350,7 +5494,7 @@ var $author$project$Pupil$savePupils = F4(
 						return (e || A2(
 							$elm$core$List$any,
 							function (p) {
-								return _Utils_eq(p.E, name) && _Utils_eq(p.y, _class);
+								return _Utils_eq(p.B, name) && _Utils_eq(p.u, _class);
 							},
 							currentPupils)) ? _Utils_Tuple2(_List_Nil, true) : _Utils_Tuple2(
 							_Utils_ap(
@@ -5364,7 +5508,7 @@ var $author$project$Pupil$savePupils = F4(
 				return A3(
 					$elm$core$List$foldl,
 					fn,
-					_Utils_Tuple2(model.u, false),
+					_Utils_Tuple2(model.s, false),
 					names);
 			}();
 			var pupils = _v0.a;
@@ -5383,7 +5527,7 @@ var $author$project$Pupil$updateFormdata = F2(
 			var c = msg.a;
 			return _Utils_update(
 				formData,
-				{y: c});
+				{u: c});
 		}
 	});
 var $author$project$Pupil$update = F3(
@@ -5394,31 +5538,31 @@ var $author$project$Pupil$update = F3(
 				return _Utils_update(
 					model,
 					{
-						s: A2($author$project$Pupil$updateFormdata, data, model.s),
-						K: false
+						v: A2($author$project$Pupil$updateFormdata, data, model.v),
+						L: false
 					});
 			case 1:
-				var _v1 = A4($author$project$Pupil$savePupils, model, events, model.s.X, model.s.y);
+				var _v1 = A4($author$project$Pupil$savePupils, model, events, model.v.X, model.v.u);
 				if (!_v1.$) {
 					var pupils = _v1.a;
 					return _Utils_update(
 						model,
-						{s: $author$project$Pupil$emptyFormData, K: false, u: pupils});
+						{v: $author$project$Pupil$emptyFormData, L: false, s: pupils});
 				} else {
 					return _Utils_update(
 						model,
-						{K: true});
+						{L: true});
 				}
 			case 2:
 				var pupil = msg.a;
 				return _Utils_update(
 					model,
 					{
-						K: false,
-						u: A2(
+						L: false,
+						s: A2(
 							$elm$core$List$filter,
 							$elm$core$Basics$neq(pupil),
-							model.u)
+							model.s)
 					});
 			default:
 				var pupil = msg.a;
@@ -5427,8 +5571,8 @@ var $author$project$Pupil$update = F3(
 				return _Utils_update(
 					model,
 					{
-						K: false,
-						u: A4($author$project$Pupil$changeChoice, model.u, pupil, event, choice)
+						L: false,
+						s: A4($author$project$Pupil$changeChoice, model.s, pupil, event, choice)
 					});
 		}
 	});
@@ -5444,7 +5588,7 @@ var $elm$core$List$member = F2(
 var $author$project$Pupil$updateEvents = F2(
 	function (events, model) {
 		var fn2 = function (c) {
-			return A2($elm$core$List$member, c.O, events);
+			return A2($elm$core$List$member, c.K, events);
 		};
 		var fn1 = F2(
 			function (e, cl) {
@@ -5454,7 +5598,7 @@ var $author$project$Pupil$updateEvents = F2(
 					A2(
 						$elm$core$List$map,
 						function ($) {
-							return $.O;
+							return $.K;
 						},
 						cl)) ? cl : A2(
 					$elm$core$List$cons,
@@ -5464,43 +5608,52 @@ var $author$project$Pupil$updateEvents = F2(
 		return _Utils_update(
 			model,
 			{
-				u: A2(
+				s: A2(
 					$elm$core$List$map,
 					function (p) {
 						return _Utils_update(
 							p,
 							{
-								I: A2(
+								E: A2(
 									$elm$core$List$filter,
 									fn2,
-									A3($elm$core$List$foldl, fn1, p.I, events))
+									A3($elm$core$List$foldl, fn1, p.E, events))
 							});
 					},
-					model.u)
+					model.s)
 			});
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 0:
-				var innerMsg = msg.a;
-				var eventsModel = A2($author$project$Event$update, innerMsg, model.C);
-				return _Utils_update(
-					model,
-					{
-						C: eventsModel,
-						u: A2($author$project$Pupil$updateEvents, eventsModel.C, model.u)
-					});
-			case 1:
-				var innerMsg = msg.a;
-				return _Utils_update(
-					model,
-					{
-						u: A3($author$project$Pupil$update, innerMsg, model.u, model.C.C)
-					});
-			default:
-				return $author$project$Main$init;
-		}
+		var updatedModel = function () {
+			switch (msg.$) {
+				case 0:
+					var innerMsg = msg.a;
+					var eventsModel = A2($author$project$Event$update, innerMsg, model.z);
+					return _Utils_update(
+						model,
+						{
+							z: eventsModel,
+							s: A2($author$project$Pupil$updateEvents, eventsModel.z, model.s)
+						});
+				case 1:
+					var innerMsg = msg.a;
+					return _Utils_update(
+						model,
+						{
+							s: A3($author$project$Pupil$update, innerMsg, model.s, model.z.z)
+						});
+				default:
+					return $author$project$Main$init('').a;
+			}
+		}();
+		return _Utils_Tuple2(
+			updatedModel,
+			$author$project$Main$setStorage(
+				A2(
+					$elm$json$Json$Encode$encode,
+					0,
+					$author$project$Main$modelToJSON(updatedModel))));
 	});
 var $author$project$Main$EventMsg = function (a) {
 	return {$: 0, a: a};
@@ -5510,7 +5663,6 @@ var $author$project$Main$PupilMsg = function (a) {
 };
 var $author$project$Main$DeleteAll = {$: 2};
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5976,23 +6128,22 @@ var $author$project$Algo$run = F2(
 					},
 					$elm$core$Dict$keys(graph))));
 	});
-var $author$project$Pupil$Green = 0;
 var $author$project$Pupil$eventGroup = F2(
 	function (choice, pupil) {
 		return A2(
 			$elm$core$List$map,
 			function (c) {
-				return c.O;
+				return c.K;
 			},
 			A2(
 				$elm$core$List$filter,
 				function (c) {
-					return _Utils_eq(c.aV, choice);
+					return _Utils_eq(c.am, choice);
 				},
-				pupil.I));
+				pupil.E));
 	});
 var $author$project$Pupil$toVertex = function (m) {
-	return m.E + (' (' + (m.y + ')'));
+	return m.B + (' (' + (m.u + ')'));
 };
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
@@ -6029,8 +6180,8 @@ var $author$project$Event$toVertexList = function (m) {
 	return A3(
 		$elm$core$List$foldl,
 		fn,
-		_Utils_Tuple2(m.x + 1, _List_Nil),
-		A2($elm$core$List$repeat, m.x, m.E)).b;
+		_Utils_Tuple2(m.t + 1, _List_Nil),
+		A2($elm$core$List$repeat, m.t, m.B)).b;
 };
 var $author$project$Event$toVertexListReducer = F2(
 	function (event, list) {
@@ -6191,7 +6342,7 @@ var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Main$result = function (model) {
-	var _v0 = $author$project$Main$matchedAndUnmatchedPupils(model.u.u);
+	var _v0 = $author$project$Main$matchedAndUnmatchedPupils(model.s.s);
 	var matched = _v0.a;
 	var unmatched = _v0.b;
 	return A2(
@@ -6442,7 +6593,7 @@ var $author$project$Event$oneEventLi = function (event) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(event.E),
+						$elm$html$Html$text(event.B),
 						A2(
 						$elm$html$Html$span,
 						_List_fromArray(
@@ -6454,7 +6605,7 @@ var $author$project$Event$oneEventLi = function (event) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								$elm$core$String$fromInt(event.x))
+								$elm$core$String$fromInt(event.t))
 							]))
 					])),
 				A2(
@@ -6511,12 +6662,10 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
 	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $elm$html$Html$Events$targetValue = A2(
 	$elm$json$Json$Decode$at,
 	_List_fromArray(
@@ -6654,11 +6803,11 @@ var $author$project$Event$view = function (model) {
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeR, $author$project$Event$Name, $author$project$Event$FormDataMsg)),
-											$elm$html$Html$Attributes$value(model.s.E)
+											$elm$html$Html$Attributes$value(model.v.B)
 										]),
 									'newGroupName',
 									'Gruppe ist bereits vorhanden',
-									model.K)),
+									model.L)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -6684,7 +6833,7 @@ var $author$project$Event$view = function (model) {
 														$elm$core$Maybe$withDefault(0),
 														A2($elm$core$Basics$composeR, $author$project$Event$Capacity, $author$project$Event$FormDataMsg)))),
 												$elm$html$Html$Attributes$value(
-												$elm$core$String$fromInt(model.s.x))
+												$elm$core$String$fromInt(model.v.t))
 											]),
 										_List_Nil),
 										A2(
@@ -6735,7 +6884,7 @@ var $author$project$Event$view = function (model) {
 							[
 								$elm$html$Html$text('Alle Gruppen')
 							])),
-						$author$project$Event$allEvents(model.C)
+						$author$project$Event$allEvents(model.z)
 					]))
 			]));
 };
@@ -6752,7 +6901,6 @@ var $author$project$Pupil$Save = {$: 1};
 var $author$project$Pupil$Delete = function (a) {
 	return {$: 2, a: a};
 };
-var $author$project$Pupil$Red = 2;
 var $author$project$Pupil$ChangeChoice = F3(
 	function (a, b, c) {
 		return {$: 3, a: a, b: b, c: c};
@@ -6876,7 +7024,7 @@ var $author$project$Pupil$oneEventLi = F3(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(event.E),
+					$elm$html$Html$text(event.B),
 					A2($elm$html$Html$span, _List_Nil, buttons)
 				]));
 	});
@@ -7001,7 +7149,7 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text(pupil.E + (' (Klasse ' + (pupil.y + ')')))
+								$elm$html$Html$text(pupil.B + (' (Klasse ' + (pupil.u + ')')))
 							])),
 						A2(
 						$elm$html$Html$ul,
@@ -7117,11 +7265,11 @@ var $author$project$Pupil$view = function (model) {
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeR, $author$project$Pupil$Names, $author$project$Pupil$FormDataMsg)),
-											$elm$html$Html$Attributes$value(model.s.X)
+											$elm$html$Html$Attributes$value(model.v.X)
 										]),
 									'newPupilNames',
 									'Schüler/Schülerin ist in dieser Klasse bereits vorhanden',
-									model.K)),
+									model.L)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -7141,7 +7289,7 @@ var $author$project$Pupil$view = function (model) {
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
 												A2($elm$core$Basics$composeR, $author$project$Pupil$Class, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.s.y)
+												$elm$html$Html$Attributes$value(model.v.u)
 											]),
 										_List_Nil)
 									])),
@@ -7182,7 +7330,7 @@ var $author$project$Pupil$view = function (model) {
 							[
 								$elm$html$Html$text('Alle Schüler/Schülerinnen')
 							])),
-						$author$project$Pupil$allPupils(model.u)
+						$author$project$Pupil$allPupils(model.s)
 					]))
 			]));
 };
@@ -7204,17 +7352,23 @@ var $author$project$Main$view = function (model) {
 						A2(
 						$elm$html$Html$map,
 						$author$project$Main$EventMsg,
-						$author$project$Event$view(model.C)),
+						$author$project$Event$view(model.z)),
 						A2(
 						$elm$html$Html$map,
 						$author$project$Main$PupilMsg,
-						$author$project$Pupil$view(model.u)),
+						$author$project$Pupil$view(model.s)),
 						$author$project$Main$result(model),
 						$author$project$Main$admin
 					]))
 			]));
 };
-var $author$project$Main$main = $elm$browser$Browser$sandbox(
-	{be: $author$project$Main$init, by: $author$project$Main$update, bz: $author$project$Main$view});
-_Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
+var $author$project$Main$main = $elm$browser$Browser$element(
+	{
+		be: $author$project$Main$init,
+		bu: function (_v0) {
+			return $elm$core$Platform$Sub$none;
+		},
+		by: $author$project$Main$update,
+		bz: $author$project$Main$view
+	});
+_Platform_export({'Main':{'init':$author$project$Main$main($elm$json$Json$Decode$string)(0)}});}(this));

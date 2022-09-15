@@ -1,10 +1,12 @@
-module Event exposing (Model, Msg, Obj, init, toVertexList, toVertexListReducer, update, view)
+module Event exposing (Model, Msg, Obj, decoder, decoderEvent, eventToJSON, init, modelToJSON, toVertexList, toVertexListReducer, update, view)
 
 import Algo exposing (Vertex)
 import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, hidden, placeholder, required, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Json.Decode as D
+import Json.Encode as E
 
 
 
@@ -56,6 +58,34 @@ toVertexList m =
 toVertexListReducer : Obj -> List Algo.Vertex -> List Algo.Vertex
 toVertexListReducer event list =
     toVertexList event ++ list
+
+
+decoder : D.Decoder Model
+decoder =
+    D.map
+        (\p -> Model p emptyFormData False)
+        (D.list decoderEvent)
+
+
+decoderEvent : D.Decoder Obj
+decoderEvent =
+    D.map2
+        Obj
+        (D.field "name" D.string)
+        (D.field "capacity" D.int)
+
+
+modelToJSON : Model -> E.Value
+modelToJSON model =
+    model.events |> E.list eventToJSON
+
+
+eventToJSON : Obj -> E.Value
+eventToJSON e =
+    E.object
+        [ ( "name", E.string e.name )
+        , ( "capacity", E.int e.capacity )
+        ]
 
 
 

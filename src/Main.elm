@@ -1,4 +1,4 @@
-module Main exposing (finalize, main)
+port module Main exposing (finalize, main)
 
 import Algo
 import Browser
@@ -8,15 +8,18 @@ import Helpers exposing (classes)
 import Html exposing (..)
 import Html.Attributes exposing (class, scope)
 import Html.Events exposing (onClick)
+import Json.Decode as D
+import Json.Encode as E
 import Pupil
 
 
-main : Program () Model Msg
+main : Program String Model Msg
 main =
-    Browser.sandbox
+    Browser.element
         { init = init
         , view = view
         , update = update
+        , subscriptions = \_ -> Sub.none
         }
 
 
@@ -30,11 +33,33 @@ type alias Model =
     }
 
 
-init : Model
-init =
-    { pupils = Pupil.init
-    , events = Event.init
-    }
+init : String -> ( Model, Cmd Msg )
+init s =
+    case D.decodeString decoder s of
+        Ok model ->
+            ( model, Cmd.none )
+
+        Err _ ->
+            ( { pupils = Pupil.init
+              , events = Event.init
+              }
+            , Cmd.none
+            )
+
+
+decoder : D.Decoder Model
+decoder =
+    D.map2 Model
+        (D.field "pupils" Pupil.decoder)
+        (D.field "events" Event.decoder)
+
+
+modelToJSON : Model -> E.Value
+modelToJSON model =
+    E.object
+        [ ( "pupils", Pupil.modelToJSON model.pupils )
+        , ( "events", Event.modelToJSON model.events )
+        ]
 
 
 
@@ -47,21 +72,26 @@ type Msg
     | DeleteAll
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        EventMsg innerMsg ->
-            let
-                eventsModel =
-                    Event.update innerMsg model.events
-            in
-            { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils }
+    let
+        updatedModel : Model
+        updatedModel =
+            case msg of
+                EventMsg innerMsg ->
+                    let
+                        eventsModel =
+                            Event.update innerMsg model.events
+                    in
+                    { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils }
 
-        PupilMsg innerMsg ->
-            { model | pupils = Pupil.update innerMsg model.pupils model.events.events }
+                PupilMsg innerMsg ->
+                    { model | pupils = Pupil.update innerMsg model.pupils model.events.events }
 
-        DeleteAll ->
-            init
+                DeleteAll ->
+                    init "" |> Tuple.first
+    in
+    ( updatedModel, modelToJSON updatedModel |> E.encode 0 |> setStorage )
 
 
 
@@ -135,6 +165,13 @@ admin =
         [ h2 [] [ text "Administration" ]
         , button [ classes "btn btn-danger", onClick DeleteAll ] [ text "Alle Daten löschen" ]
         ]
+
+
+
+-- PORTS
+
+
+port setStorage : String -> Cmd msg
 
 
 

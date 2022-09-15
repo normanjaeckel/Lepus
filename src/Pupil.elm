@@ -1,4 +1,4 @@
-module Pupil exposing (Choice, ChoiceType(..), Model, Msg, Obj, eventGroup, init, toVertex, update, updateEvents, view)
+module Pupil exposing (Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, toVertex, update, updateEvents, view)
 
 import Algo
 import Event
@@ -6,6 +6,8 @@ import Helpers exposing (classes, svgIconArrowDown, svgIconArrowUp, svgIconXLg, 
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, hidden, placeholder, required, rows, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Json.Decode as D
+import Json.Encode as E
 
 
 
@@ -54,6 +56,19 @@ type ChoiceType
     | Red
 
 
+choiceTypeToString : ChoiceType -> String
+choiceTypeToString c =
+    case c of
+        Green ->
+            "green"
+
+        Yellow ->
+            "yellow"
+
+        Red ->
+            "red"
+
+
 toVertex : Obj -> Algo.Vertex
 toVertex m =
     m.name ++ " (" ++ m.class ++ ")"
@@ -64,6 +79,68 @@ eventGroup choice pupil =
     pupil.choices
         |> List.filter (\c -> c.type_ == choice)
         |> List.map (\c -> c.event)
+
+
+decoder : D.Decoder Model
+decoder =
+    D.map
+        (\p -> Model p emptyFormData False)
+        (D.list
+            (D.map3
+                Obj
+                (D.field "name" D.string)
+                (D.field "class" D.string)
+                (D.field "choices" (D.list decoderChoice))
+            )
+        )
+
+
+decoderChoice : D.Decoder Choice
+decoderChoice =
+    D.map2
+        Choice
+        (D.field "event" Event.decoderEvent)
+        (D.field "type"
+            (D.string
+                |> D.andThen
+                    (\t ->
+                        if t == "green" then
+                            D.succeed Green
+
+                        else if t == "yellow" then
+                            D.succeed Yellow
+
+                        else if t == "red" then
+                            D.succeed Red
+
+                        else
+                            D.fail "invalid choice type"
+                    )
+            )
+        )
+
+
+modelToJSON : Model -> E.Value
+modelToJSON model =
+    model.pupils |> E.list pupilToJSON
+
+
+pupilToJSON : Obj -> E.Value
+pupilToJSON =
+    \p ->
+        E.object
+            [ ( "name", E.string p.name )
+            , ( "class", E.string p.class )
+            , ( "choices", p.choices |> E.list choiceToJSON )
+            ]
+
+
+choiceToJSON : Choice -> E.Value
+choiceToJSON choice =
+    E.object
+        [ ( "event", Event.eventToJSON choice.event )
+        , ( "type", E.string <| choiceTypeToString choice.type_ )
+        ]
 
 
 
