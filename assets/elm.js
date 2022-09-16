@@ -5467,17 +5467,24 @@ var $author$project$Pupil$changeChoice = F4(
 			},
 			pupils);
 	});
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $author$project$Pupil$savePupils = F4(
 	function (model, events, namesRaw, classRaw) {
 		var names = A2(
-			$elm$core$List$map,
-			$elm$core$String$trim,
-			A2($elm$core$String$split, ',', namesRaw));
+			$elm$core$List$filter,
+			$elm$core$Basics$neq(''),
+			A2(
+				$elm$core$List$map,
+				$elm$core$String$trim,
+				A2($elm$core$String$split, ',', namesRaw)));
 		var _class = $elm$core$String$trim(classRaw);
-		if ((_class === '') || A2(
-			$elm$core$List$any,
-			$elm$core$Basics$eq(''),
-			names)) {
+		if ((_class === '') || $elm$core$List$isEmpty(names)) {
 			return $elm$core$Maybe$Nothing;
 		} else {
 			var _v0 = function () {
@@ -5773,13 +5780,6 @@ var $author$project$Main$readme = A2(
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $elm$core$Dict$isEmpty = function (dict) {
 	if (dict.$ === -2) {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
 		return true;
 	} else {
 		return false;
@@ -7268,7 +7268,7 @@ var $author$project$Pupil$view = function (model) {
 											$elm$html$Html$Attributes$value(model.v.X)
 										]),
 									'newPupilNames',
-									'Schüler/Schülerin ist in dieser Klasse bereits vorhanden',
+									'Schüler/Schülerin ist in dieser Klasse bereits vorhanden oder sonst ungültige Eingabe',
 									model.L)),
 								A2(
 								$elm$html$Html$div,

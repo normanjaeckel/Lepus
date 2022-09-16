@@ -199,9 +199,9 @@ savePupils model events namesRaw classRaw =
 
         names : List String
         names =
-            namesRaw |> String.split "," |> List.map String.trim
+            namesRaw |> String.split "," |> List.map String.trim |> List.filter ((/=) "")
     in
-    if (class == "") || (names |> List.any ((==) "")) then
+    if (class == "") || List.isEmpty names then
         Nothing
 
     else
@@ -300,7 +300,7 @@ view model =
                         , value model.formData.names
                         ]
                         "newPupilNames"
-                        "Schüler/Schülerin ist in dieser Klasse bereits vorhanden"
+                        "Schüler/Schülerin ist in dieser Klasse bereits vorhanden oder sonst ungültige Eingabe"
                         model.formInvalid
                     )
                 , div [ class "col-md-3" ]
