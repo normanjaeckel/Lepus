@@ -1,6 +1,5 @@
-module Event exposing (Action(..), Model, Msg, Obj, decoder, decoderEvent, eventToJSON, init, modelToJSON, toVertexList, toVertexListReducer, update, view)
+module Event exposing (Action(..), Model, Msg, Obj, decoder, decoderEvent, eventToJSON, extendToCapacity, init, modelToJSON, update, view)
 
-import Algo exposing (Vertex)
 import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, hidden, placeholder, required, title, type_, value)
@@ -27,19 +26,20 @@ init =
 
 emptyFormData : Obj
 emptyFormData =
-    Obj "" 1
+    Obj "" 1 0
 
 
 type alias Obj =
     { name : String
     , capacity : Int
+    , internalID : Int
     }
 
 
-toVertexList : Obj -> List Vertex
-toVertexList m =
+extendToCapacity : Obj -> List Obj
+extendToCapacity event =
     let
-        fn : String -> ( Int, List String ) -> ( Int, List String )
+        fn : Obj -> ( Int, List Obj ) -> ( Int, List Obj )
         fn =
             \e t ->
                 let
@@ -47,17 +47,12 @@ toVertexList m =
                     newIndex =
                         Tuple.first t - 1
                 in
-                ( newIndex, (e ++ "-" ++ String.fromInt newIndex) :: Tuple.second t )
+                ( newIndex, { e | internalID = newIndex } :: Tuple.second t )
     in
-    m.name
-        |> List.repeat m.capacity
-        |> List.foldl fn ( m.capacity + 1, [] )
+    event
+        |> List.repeat event.capacity
+        |> List.foldl fn ( event.capacity + 1, [] )
         |> Tuple.second
-
-
-toVertexListReducer : Obj -> List Algo.Vertex -> List Algo.Vertex
-toVertexListReducer event list =
-    toVertexList event ++ list
 
 
 decoder : D.Decoder Model
@@ -70,7 +65,7 @@ decoder =
 decoderEvent : D.Decoder Obj
 decoderEvent =
     D.map2
-        Obj
+        (\n c -> Obj n c 0)
         (D.field "name" D.string)
         (D.field "capacity" D.int)
 
@@ -157,7 +152,7 @@ validate model =
         Nothing
 
     else
-        Just (Obj name model.formData.capacity)
+        Just (Obj name model.formData.capacity 0)
 
 
 

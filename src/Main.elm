@@ -2,7 +2,6 @@ port module Main exposing (finalize, main)
 
 import Algo
 import Browser
-import Dict
 import Event
 import Helpers exposing (classes)
 import Html exposing (..)
@@ -148,7 +147,7 @@ result model =
         , div [ class "col-md-8" ]
             [ h3 []
                 [ text "Zugeteilte Schüler/Schülerinnen" ]
-            , if Dict.isEmpty matched then
+            , if List.isEmpty matched then
                 p [] [ text "keine" ]
 
               else
@@ -157,8 +156,15 @@ result model =
                     [ thead [] [ tr [] [ th [ scope "col" ] [ text "Name" ], th [ scope "col" ] [ text "Gruppe" ] ] ]
                     , tbody []
                         (matched
-                            |> Dict.toList
-                            |> List.map (\( a, b ) -> tr [] [ td [] [ text a ], td [] [ text b ] ])
+                            |> List.map
+                                (\( k, v ) ->
+                                    case ( k, v ) of
+                                        ( Algo.Left p, Algo.Right e ) ->
+                                            tr [] [ td [] [ text p.name ], td [] [ text e.name ] ]
+
+                                        _ ->
+                                            tr [] []
+                                )
                         )
                     ]
             ]
@@ -170,17 +176,17 @@ result model =
               else
                 ol [ classes "list-group list-group-flush list-group-numbered" ]
                     (unmatched
-                        |> List.map (\v -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text v ] ])
+                        |> List.map (\p -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text p.name ] ])
                     )
             ]
         , div [ class "col-md-8" ]
             [ h3 [] [ text "Statistik" ]
             , p []
-                [ span [ classes "badge text-bg-secondary me-2", title "Gesamt" ] [ text <| String.fromInt <| (List.length <| Dict.keys matched) + List.length unmatched ]
+                [ span [ classes "badge text-bg-secondary me-2", title "Gesamt" ] [ text <| String.fromInt <| List.length matched + List.length unmatched ]
                 , span [ class "me-2" ] [ text "=" ]
-                , span [ classes "badge text-bg-success me-2", title "Grün" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Green model.pupils.pupils matched ]
+                , span [ classes "badge text-bg-success me-2", title "Grün" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Green matched ]
                 , span [ class "me-2" ] [ text "+" ]
-                , span [ classes "badge text-bg-warning me-2", title "Gelb" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Yellow model.pupils.pupils matched ]
+                , span [ classes "badge text-bg-warning me-2", title "Gelb" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Yellow matched ]
                 , span [ class "me-2" ] [ text "+" ]
                 , span [ classes "badge text-bg-danger", title "Rot" ] [ text <| String.fromInt <| List.length unmatched ]
                 ]
@@ -196,37 +202,32 @@ admin =
         ]
 
 
-onColor : Pupil.ChoiceType -> List Pupil.Obj -> Algo.Matching -> List Algo.Vertex
-onColor color pupils matching =
+onColor : Pupil.ChoiceType -> Algo.Matching Pupil.Obj Event.Obj -> List (Algo.Vertex Pupil.Obj Event.Obj)
+onColor color matching =
     let
-        fn : ( Algo.Vertex, Algo.Vertex ) -> Bool
+        fn : ( Algo.Vertex Pupil.Obj Event.Obj, Algo.Vertex Pupil.Obj Event.Obj ) -> Bool
         fn =
-            \( k, v ) ->
-                case
-                    pupils
-                        |> List.filter (Pupil.toVertex >> (==) k)
-                        |> List.head
-                of
-                    Nothing ->
-                        False
-
-                    Just p ->
-                        p.choices
+            \( left, right ) ->
+                case ( left, right ) of
+                    ( Algo.Left pupil, Algo.Right event ) ->
+                        pupil.choices
                             |> List.any
                                 (\c ->
                                     case ( c.type_, color ) of
                                         ( Pupil.Green, Pupil.Green ) ->
-                                            Event.toVertexList c.event |> List.member v
+                                            { event | internalID = 0 } == c.event
 
                                         ( Pupil.Yellow, Pupil.Yellow ) ->
-                                            Event.toVertexList c.event |> List.member v
+                                            { event | internalID = 0 } == c.event
 
                                         _ ->
                                             False
                                 )
+
+                    _ ->
+                        False
     in
     matching
-        |> Dict.toList
         |> List.filter fn
         |> List.map Tuple.first
 
@@ -242,108 +243,148 @@ port setStorage : String -> Cmd msg
 -- LOGIC
 
 
-matchedAndUnmatchedPupils : List Pupil.Obj -> ( Algo.Matching, List Algo.Vertex )
+matchedAndUnmatchedPupils : List Pupil.Obj -> ( Algo.Matching Pupil.Obj Event.Obj, List Pupil.Obj )
 matchedAndUnmatchedPupils pupils =
     let
+        matched : Algo.Matching Pupil.Obj Event.Obj
         matched =
             finalize pupils
     in
     ( matched
     , pupils
-        |> List.map Pupil.toVertex
-        |> List.filter (\v -> not <| List.member v (Dict.keys matched))
+        |> List.filter
+            (\p ->
+                case matched |> Algo.getFromMatching (Algo.Left p) of
+                    Nothing ->
+                        True
+
+                    Just _ ->
+                        False
+            )
     )
 
 
-finalize : List Pupil.Obj -> Algo.Matching
+finalize : List Pupil.Obj -> Algo.Matching Pupil.Obj Event.Obj
 finalize pupils =
     let
-        step1 : Algo.Matching
+        step1 : Algo.Matching Pupil.Obj Event.Obj
         step1 =
-            Dict.empty |> Algo.run (toGraphFromGreen pupils)
+            [] |> Algo.run (toGraphFromGreen pupils)
 
-        step2 : Algo.Matching
+        step2 : Algo.Matching Pupil.Obj Event.Obj
         step2 =
-            Dict.empty |> Algo.run (toGraphFromYellowWithoutMatched pupils step1)
+            [] |> Algo.run (toGraphFromYellowWithoutMatched pupils step1)
 
-        step3 : Algo.Matching -> Algo.Matching
+        step3 : Algo.Matching Pupil.Obj Event.Obj -> Algo.Matching Pupil.Obj Event.Obj
         step3 =
             Algo.run (toGraphFromGreenAndYellow pupils)
     in
-    Dict.union step1 step2 |> step3
+    (step1 ++ step2) |> step3
 
 
-toGraphFromGreen : List Pupil.Obj -> Algo.Graph
+toGraphFromGreen : List Pupil.Obj -> Algo.Graph Pupil.Obj Event.Obj
 toGraphFromGreen pupils =
     let
-        emptyGraph : Algo.Graph
+        emptyGraph : Algo.Graph Pupil.Obj Event.Obj
         emptyGraph =
-            Dict.empty
+            []
 
-        fn : Pupil.Obj -> Algo.Graph -> Algo.Graph
+        fn : Pupil.Obj -> Algo.Graph Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
         fn =
             \pupil graph ->
-                graph
-                    |> Dict.insert
-                        (pupil |> Pupil.toVertex)
-                        (pupil |> Pupil.eventGroup Pupil.Green |> List.foldl Event.toVertexListReducer [])
+                let
+                    k : Algo.Vertex Pupil.Obj Event.Obj
+                    k =
+                        Algo.Left pupil
+
+                    v : List (Algo.Vertex Pupil.Obj Event.Obj)
+                    v =
+                        pupil
+                            |> Pupil.eventGroup Pupil.Green
+                            |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
+                            |> List.map Algo.Right
+                in
+                ( k, v ) :: graph
     in
     pupils
         |> List.foldl fn emptyGraph
 
 
-toGraphFromYellowWithoutMatched : List Pupil.Obj -> Algo.Matching -> Algo.Graph
+toGraphFromYellowWithoutMatched : List Pupil.Obj -> Algo.Matching Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
 toGraphFromYellowWithoutMatched pupils matching =
     let
         onlyRemaining : Pupil.Obj -> Bool
         onlyRemaining =
             \pupil ->
-                Dict.member (pupil |> Pupil.toVertex) matching |> not
+                matching
+                    |> List.any
+                        (\( k, _ ) ->
+                            case k of
+                                Algo.Left p ->
+                                    p == pupil
 
-        onlyUnmatchedVertices : Algo.Vertex -> Bool
+                                _ ->
+                                    False
+                        )
+                    |> not
+
+        onlyUnmatchedVertices : Algo.Vertex Pupil.Obj Event.Obj -> Bool
         onlyUnmatchedVertices =
-            \vertex -> matching |> Dict.values |> List.member vertex |> not
+            \vertex -> matching |> List.any (Tuple.second >> (==) vertex) |> not
 
-        emptyGraph : Algo.Graph
+        emptyGraph : Algo.Graph Pupil.Obj Event.Obj
         emptyGraph =
-            Dict.empty
+            []
 
-        fn : Pupil.Obj -> Algo.Graph -> Algo.Graph
+        fn : Pupil.Obj -> Algo.Graph Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
         fn =
             \pupil graph ->
-                graph
-                    |> Dict.insert
-                        (pupil |> Pupil.toVertex)
-                        (pupil
+                let
+                    k : Algo.Vertex Pupil.Obj Event.Obj
+                    k =
+                        Algo.Left pupil
+
+                    v : List (Algo.Vertex Pupil.Obj Event.Obj)
+                    v =
+                        pupil
                             |> Pupil.eventGroup Pupil.Yellow
-                            |> List.foldl Event.toVertexListReducer []
+                            |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
+                            |> List.map Algo.Right
                             |> List.filter onlyUnmatchedVertices
-                        )
+                in
+                ( k, v ) :: graph
     in
     pupils
         |> List.filter onlyRemaining
         |> List.foldl fn emptyGraph
 
 
-toGraphFromGreenAndYellow : List Pupil.Obj -> Algo.Graph
+toGraphFromGreenAndYellow : List Pupil.Obj -> Algo.Graph Pupil.Obj Event.Obj
 toGraphFromGreenAndYellow pupils =
     let
-        emptyGraph : Algo.Graph
+        emptyGraph : Algo.Graph Pupil.Obj Event.Obj
         emptyGraph =
-            Dict.empty
+            []
 
-        fn : Pupil.Obj -> Algo.Graph -> Algo.Graph
+        fn : Pupil.Obj -> Algo.Graph Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
         fn =
             \pupil graph ->
                 let
                     events : List Event.Obj
                     events =
                         (pupil |> Pupil.eventGroup Pupil.Green) ++ (pupil |> Pupil.eventGroup Pupil.Yellow)
+
+                    k : Algo.Vertex Pupil.Obj Event.Obj
+                    k =
+                        Algo.Left pupil
+
+                    v : List (Algo.Vertex Pupil.Obj Event.Obj)
+                    v =
+                        events
+                            |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
+                            |> List.map Algo.Right
                 in
-                graph
-                    |> Dict.insert
-                        (pupil |> Pupil.toVertex)
-                        (events |> List.foldl Event.toVertexListReducer [])
+                ( k, v ) :: graph
     in
     pupils
         |> List.foldl fn emptyGraph

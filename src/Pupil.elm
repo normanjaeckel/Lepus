@@ -1,6 +1,5 @@
-module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, toVertex, update, updateEvents, view)
+module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, update, updateEvents, view)
 
-import Algo
 import Event
 import Helpers exposing (classes, svgIconArrowDown, svgIconArrowUp, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
@@ -67,11 +66,6 @@ choiceTypeToString c =
 
         Red ->
             "red"
-
-
-toVertex : Obj -> Algo.Vertex
-toVertex m =
-    m.name ++ " (" ++ m.class ++ ")"
 
 
 eventGroup : ChoiceType -> Obj -> List Event.Obj

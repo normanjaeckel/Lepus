@@ -1,44 +1,42 @@
-module Algo exposing (Graph, Matching, Vertex, run)
+module Algo exposing (Graph, Matching, Vertex(..), getFromMatching, run)
 
-import Dict
 import List
 
 
-{-| Vertex must be a comparable so we can use Elm's Dict.
--}
-type alias Vertex =
-    String
+type Vertex a b
+    = Left a
+    | Right b
 
 
 {-| We construct the bipartite graph with all vertices on the left side and
 their edges to vertices on the right side. Isolated vertices on the right
 side are ignored.
 -}
-type alias Graph =
-    Dict.Dict Vertex (List Vertex)
+type alias Graph a b =
+    List ( Vertex a b, List (Vertex a b) )
 
 
-type alias Matching =
-    Dict.Dict Vertex Vertex
+type alias Matching a b =
+    List ( Vertex a b, Vertex a b )
 
 
-type alias Path =
-    List Vertex
+type alias Path a b =
+    List (Vertex a b)
 
 
-type alias IntermediateResult =
-    { paths : List Path
-    , free : Maybe Path
+type alias IntermediateResult a b =
+    { paths : List (Path a b)
+    , free : Maybe (Path a b)
     }
 
 
-run : Graph -> Matching -> Matching
+run : Graph a b -> Matching a b -> Matching a b
 run graph initialMatching =
     graph
-        |> Dict.keys
+        |> List.map Tuple.first
         |> List.filter
-            (\vertex ->
-                case Dict.get vertex initialMatching of
+            (\left ->
+                case initialMatching |> getFromMatching left of
                     Nothing ->
                         True
 
@@ -46,26 +44,25 @@ run graph initialMatching =
                         False
             )
         |> List.foldl
-            (\vertex matching ->
-                case find graph matching (extend graph [] [ vertex ] []) of
+            (\left matching ->
+                case find graph matching (extend graph [] [ left ] []) of
                     Nothing ->
                         matching
 
                     Just path ->
                         matching |> apply path
             )
-            (initialMatching |> reverseMatching)
-        |> reverseMatching
+            initialMatching
 
 
-find : Graph -> Matching -> List Path -> Maybe Path
+find : Graph a b -> Matching a b -> List (Path a b) -> Maybe (Path a b)
 find graph matching paths =
     if paths |> List.isEmpty then
         Nothing
 
     else
         let
-            res : IntermediateResult
+            res : IntermediateResult a b
             res =
                 update matching paths
         in
@@ -79,58 +76,82 @@ find graph matching paths =
                     |> find graph matching
 
 
-update : Matching -> List Path -> IntermediateResult
+update : Matching a b -> List (Path a b) -> IntermediateResult a b
 update matching paths =
     case paths of
         [] ->
             IntermediateResult [] Nothing
 
-        one :: rest ->
-            case matching |> Dict.get (headOf one) of
+        firstPath :: remainingPaths ->
+            case List.head firstPath of
                 Nothing ->
-                    IntermediateResult [] (Just one)
+                    IntermediateResult [] Nothing
 
-                Just vertex ->
-                    let
-                        res : IntermediateResult
-                        res =
-                            update matching rest
-                    in
-                    case res.free of
-                        Just path ->
-                            IntermediateResult [] (Just path)
-
+                Just headOfPath ->
+                    case matching |> getFromMatching headOfPath of
                         Nothing ->
-                            IntermediateResult ((vertex :: one) :: res.paths) Nothing
+                            IntermediateResult [] (Just firstPath)
+
+                        Just left ->
+                            let
+                                res : IntermediateResult a b
+                                res =
+                                    update matching remainingPaths
+                            in
+                            case res.free of
+                                Just path ->
+                                    IntermediateResult [] (Just path)
+
+                                Nothing ->
+                                    IntermediateResult ((left :: firstPath) :: res.paths) Nothing
 
 
-headOf : Path -> Vertex
-headOf path =
-    List.head path |> Maybe.withDefault ""
-
-
-extend : Graph -> List Path -> Path -> List Path -> List Path
+extend : Graph a b -> List (Path a b) -> Path a b -> List (Path a b) -> List (Path a b)
 extend graph old path new =
-    Dict.get (headOf path) graph
+    List.head path
+        |> Maybe.andThen (\left -> graph |> getFromGraph left |> Just)
         |> Maybe.withDefault []
-        |> List.filter (\e -> old |> List.any (\p -> List.member e p) |> not)
-        |> List.map (\e -> e :: path)
+        |> List.filter (\right -> old |> List.any (\p -> List.member right p) |> not)
+        |> List.map (\right -> right :: path)
         |> List.append new
 
 
-apply : Path -> Matching -> Matching
+apply : Path a b -> Matching a b -> Matching a b
 apply path matching =
     case path of
-        first :: second :: rest ->
-            matching |> Dict.insert first second |> apply rest
+        right :: left :: rest ->
+            matching
+                |> List.filter (\( l, _ ) -> l /= left)
+                |> (::) ( left, right )
+                |> apply rest
 
         _ ->
             matching
 
 
-reverseMatching : Matching -> Matching
-reverseMatching matching =
-    matching |> Dict.toList |> List.map (\t -> ( Tuple.second t, Tuple.first t )) |> Dict.fromList
+getFromMatching : Vertex a b -> Matching a b -> Maybe (Vertex a b)
+getFromMatching vertex matching =
+    case vertex of
+        Left _ ->
+            matching
+                |> List.filter (\( a, _ ) -> vertex == a)
+                |> List.head
+                |> Maybe.andThen (\( _, b ) -> Just b)
+
+        Right _ ->
+            matching
+                |> List.filter (\( _, b ) -> vertex == b)
+                |> List.head
+                |> Maybe.andThen (\( a, _ ) -> Just a)
+
+
+getFromGraph : Vertex a b -> Graph a b -> List (Vertex a b)
+getFromGraph left graph =
+    graph
+        |> List.filter (Tuple.first >> (==) left)
+        |> List.head
+        |> Maybe.andThen (Just << Tuple.second)
+        |> Maybe.withDefault []
 
 
 
