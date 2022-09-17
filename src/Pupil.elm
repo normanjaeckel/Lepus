@@ -69,9 +69,9 @@ choiceTypeToString c =
 
 
 eventGroup : ChoiceType -> Obj -> List Event.Obj
-eventGroup choice pupil =
+eventGroup choiceType pupil =
     pupil.choices
-        |> List.filter (\c -> c.type_ == choice)
+        |> List.filter (\c -> c.type_ == choiceType)
         |> List.map (\c -> c.event)
 
 

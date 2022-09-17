@@ -140,6 +140,24 @@ result model =
     let
         ( matched, unmatched ) =
             matchedAndUnmatchedPupils model.pupils.pupils
+
+        tableRow : Pupil.Obj -> Event.Obj -> Html Msg
+        tableRow =
+            \p e ->
+                tr []
+                    [ td [] [ text <| p.name ++ " (Klasse " ++ p.class ++ ")" ]
+                    , td []
+                        [ span
+                            [ classes <|
+                                if p |> Pupil.eventGroup Pupil.Green |> List.member { e | internalID = 0 } then
+                                    "badge text-bg-success"
+
+                                else
+                                    "badge text-bg-warning"
+                            ]
+                            [ text e.name ]
+                        ]
+                    ]
     in
     div [ class "mb-5" ]
         [ h2 [] [ text "Ergebnis" ]
@@ -153,14 +171,14 @@ result model =
               else
                 table
                     [ class "table" ]
-                    [ thead [] [ tr [] [ th [ scope "col" ] [ text "Name" ], th [ scope "col" ] [ text "Gruppe" ] ] ]
+                    [ thead [] [ tr [] [ th [ scope "col" ] [ text "Name und Klasse" ], th [ scope "col" ] [ text "Gruppe" ] ] ]
                     , tbody []
                         (matched
                             |> List.map
                                 (\( k, v ) ->
                                     case ( k, v ) of
                                         ( Algo.Left p, Algo.Right e ) ->
-                                            tr [] [ td [] [ text p.name ], td [] [ text e.name ] ]
+                                            tableRow p e
 
                                         _ ->
                                             tr [] []
