@@ -1,4 +1,4 @@
-module Pupil exposing (Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, toVertex, update, updateEvents, view)
+module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, toVertex, update, updateEvents, view)
 
 import Algo
 import Event
@@ -154,30 +154,35 @@ type Msg
     | ChangeChoice Obj Event.Obj ChoiceType
 
 
+type Action
+    = PupilsChanged
+    | FormChanged
+
+
 type FormDataInput
     = Names String
     | Class String
 
 
-update : Msg -> Model -> List Event.Obj -> Model
+update : Msg -> Model -> List Event.Obj -> ( Model, Action )
 update msg model events =
     case msg of
         FormDataMsg data ->
-            { model | formData = updateFormdata data model.formData, formInvalid = False }
+            ( { model | formData = updateFormdata data model.formData, formInvalid = False }, FormChanged )
 
         Save ->
             case savePupils model events model.formData.names model.formData.class of
                 Just pupils ->
-                    { model | formData = emptyFormData, pupils = pupils, formInvalid = False }
+                    ( { model | formData = emptyFormData, pupils = pupils, formInvalid = False }, PupilsChanged )
 
                 Nothing ->
-                    { model | formInvalid = True }
+                    ( { model | formInvalid = True }, FormChanged )
 
         Delete pupil ->
-            { model | pupils = model.pupils |> List.filter ((/=) pupil), formInvalid = False }
+            ( { model | pupils = model.pupils |> List.filter ((/=) pupil), formInvalid = False }, PupilsChanged )
 
         ChangeChoice pupil event choice ->
-            { model | pupils = changeChoice model.pupils pupil event choice, formInvalid = False }
+            ( { model | pupils = changeChoice model.pupils pupil event choice, formInvalid = False }, PupilsChanged )
 
 
 updateFormdata : FormDataInput -> FormData -> FormData

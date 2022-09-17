@@ -1,4 +1,4 @@
-module Event exposing (Model, Msg, Obj, decoder, decoderEvent, eventToJSON, init, modelToJSON, toVertexList, toVertexListReducer, update, view)
+module Event exposing (Action(..), Model, Msg, Obj, decoder, decoderEvent, eventToJSON, init, modelToJSON, toVertexList, toVertexListReducer, update, view)
 
 import Algo exposing (Vertex)
 import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
@@ -98,31 +98,38 @@ type Msg
     | Delete Obj
 
 
+type Action
+    = EventsChanged
+    | FormChanged
+
+
 type FormDataInput
     = Name String
     | Capacity Int
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Action )
 update msg model =
     case msg of
         FormDataMsg data ->
-            { model | formData = updateFormdata data model.formData, formInvalid = False }
+            ( { model | formData = updateFormdata data model.formData, formInvalid = False }, FormChanged )
 
         Save ->
             case validate model of
                 Just new ->
-                    { model
+                    ( { model
                         | formData = emptyFormData
                         , events = model.events ++ [ new ]
                         , formInvalid = False
-                    }
+                      }
+                    , EventsChanged
+                    )
 
                 Nothing ->
-                    { model | formInvalid = True }
+                    ( { model | formInvalid = True }, FormChanged )
 
         Delete obj ->
-            { model | events = model.events |> List.filter ((/=) obj), formInvalid = False }
+            ( { model | events = model.events |> List.filter ((/=) obj), formInvalid = False }, EventsChanged )
 
 
 updateFormdata : FormDataInput -> Obj -> Obj

@@ -6,7 +6,7 @@ import Dict
 import Event
 import Helpers exposing (classes)
 import Html exposing (..)
-import Html.Attributes exposing (class, scope)
+import Html.Attributes exposing (class, scope, title)
 import Html.Events exposing (onClick)
 import Json.Decode as D
 import Json.Encode as E
@@ -75,23 +75,40 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
-        updatedModel : Model
-        updatedModel =
+        ( updatedModel, setToStorage ) =
             case msg of
                 EventMsg innerMsg ->
                     let
-                        eventsModel =
+                        ( eventsModel, action ) =
                             Event.update innerMsg model.events
                     in
-                    { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils }
+                    case action of
+                        Event.FormChanged ->
+                            ( { model | events = eventsModel }, False )
+
+                        Event.EventsChanged ->
+                            ( { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils }, True )
 
                 PupilMsg innerMsg ->
-                    { model | pupils = Pupil.update innerMsg model.pupils model.events.events }
+                    let
+                        ( pupilsModel, action ) =
+                            Pupil.update innerMsg model.pupils model.events.events
+                    in
+                    case action of
+                        Pupil.FormChanged ->
+                            ( { model | pupils = pupilsModel }, False )
+
+                        Pupil.PupilsChanged ->
+                            ( { model | pupils = pupilsModel }, True )
 
                 DeleteAll ->
-                    init "" |> Tuple.first
+                    ( init "" |> Tuple.first, True )
     in
-    ( updatedModel, modelToJSON updatedModel |> E.encode 0 |> setStorage )
+    if setToStorage then
+        ( updatedModel, modelToJSON updatedModel |> E.encode 0 |> setStorage )
+
+    else
+        ( updatedModel, Cmd.none )
 
 
 
@@ -156,6 +173,18 @@ result model =
                         |> List.map (\v -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text v ] ])
                     )
             ]
+        , div [ class "col-md-8" ]
+            [ h3 [] [ text "Statistik" ]
+            , p []
+                [ span [ classes "badge text-bg-secondary me-2", title "Gesamt" ] [ text <| String.fromInt <| (List.length <| Dict.keys matched) + List.length unmatched ]
+                , span [ class "me-2" ] [ text "=" ]
+                , span [ classes "badge text-bg-success me-2", title "Grün" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Green model.pupils.pupils matched ]
+                , span [ class "me-2" ] [ text "+" ]
+                , span [ classes "badge text-bg-warning me-2", title "Gelb" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Yellow model.pupils.pupils matched ]
+                , span [ class "me-2" ] [ text "+" ]
+                , span [ classes "badge text-bg-danger", title "Rot" ] [ text <| String.fromInt <| List.length unmatched ]
+                ]
+            ]
         ]
 
 
@@ -165,6 +194,41 @@ admin =
         [ h2 [] [ text "Administration" ]
         , button [ classes "btn btn-danger", onClick DeleteAll ] [ text "Alle Daten löschen" ]
         ]
+
+
+onColor : Pupil.ChoiceType -> List Pupil.Obj -> Algo.Matching -> List Algo.Vertex
+onColor color pupils matching =
+    let
+        fn : ( Algo.Vertex, Algo.Vertex ) -> Bool
+        fn =
+            \( k, v ) ->
+                case
+                    pupils
+                        |> List.filter (Pupil.toVertex >> (==) k)
+                        |> List.head
+                of
+                    Nothing ->
+                        False
+
+                    Just p ->
+                        p.choices
+                            |> List.any
+                                (\c ->
+                                    case ( c.type_, color ) of
+                                        ( Pupil.Green, Pupil.Green ) ->
+                                            Event.toVertexList c.event |> List.member v
+
+                                        ( Pupil.Yellow, Pupil.Yellow ) ->
+                                            Event.toVertexList c.event |> List.member v
+
+                                        _ ->
+                                            False
+                                )
+    in
+    matching
+        |> Dict.toList
+        |> List.filter fn
+        |> List.map Tuple.first
 
 
 
