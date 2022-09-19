@@ -209,7 +209,7 @@ allEvents events =
         p [ hidden True ] [ text "Noch keine Gruppen angelegt" ]
 
     else
-        ol [ classes "list-group list-group-flush list-group-numbered" ] (events |> List.map oneEventLi)
+        ol [ classes "list-group list-group-flush list-group-numbered" ] (events |> List.sortBy .name |> List.map oneEventLi)
 
 
 oneEventLi : Obj -> Html Msg

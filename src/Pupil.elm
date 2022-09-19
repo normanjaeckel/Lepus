@@ -1,4 +1,4 @@
-module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, update, updateEvents, view)
+module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, pupilDisplay, pupilSorting, update, updateEvents, view)
 
 import Event
 import Helpers exposing (classes, svgIconArrowDown, svgIconArrowUp, svgIconXLg, tagWithInvalidFeedback)
@@ -41,6 +41,16 @@ type alias Obj =
     , class : String
     , choices : List Choice
     }
+
+
+pupilDisplay : Obj -> String
+pupilDisplay pupil =
+    pupil.name ++ " (Klasse " ++ pupil.class ++ ")"
+
+
+pupilSorting : Obj -> String
+pupilSorting pupil =
+    pupil.class ++ pupil.name
 
 
 type alias Choice =
@@ -285,7 +295,7 @@ view model =
     div [ class "mb-5" ]
         [ h2 [] [ text "Schüler/Schülerinnen" ]
         , form [ class "mb-3", onSubmit Save ]
-            [ h3 [ hidden True ] [ text "Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen" ]
+            [ h3 [ hidden True ] [ text "Schüler und Schülerinnen der gleichen Klasse hinzufügen" ]
             , div [ classes "row g-3" ]
                 [ div [ class "col-md-3" ]
                     (tagWithInvalidFeedback
@@ -330,7 +340,7 @@ allPupils pupils =
         p [ hidden True ] [ text "Noch keine Schüler oder Schülerinnen angelegt" ]
 
     else
-        ol [ classes "list-group list-group-flush list-group-numbered" ] (pupils |> List.map onePupilLi)
+        ol [ classes "list-group list-group-flush list-group-numbered" ] (pupils |> List.sortBy pupilSorting |> List.map onePupilLi)
 
 
 onePupilLi : Obj -> Html Msg
@@ -359,9 +369,9 @@ onePupilLi pupil =
                         ]
                     ]
     in
-    li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
+    li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5 pt-4 pb-2" ]
         [ div [ classes "ms-2 w-100" ]
-            [ div [] [ text <| pupil.name ++ " (Klasse " ++ pupil.class ++ ")" ]
+            [ div [] [ text <| pupilDisplay pupil ]
             , ul [ classes "list-group list-group-flush" ]
                 [ innerLi Green, innerLi Yellow, innerLi Red ]
             ]
@@ -380,7 +390,7 @@ eventList choice pupil =
         span [ class "ms-3" ] [ text "–" ]
 
     else
-        ul [ classes "list-group list-group-flush " ] (events |> List.map (oneEventLi choice pupil))
+        ul [ classes "list-group list-group-flush " ] (events |> List.sortBy .name |> List.map (oneEventLi choice pupil))
 
 
 oneEventLi : ChoiceType -> Obj -> Event.Obj -> Html Msg

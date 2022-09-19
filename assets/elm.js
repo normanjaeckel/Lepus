@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.af.M === region.ap.M)
+	if (region.ag.N === region.aq.N)
 	{
-		return 'on line ' + region.af.M;
+		return 'on line ' + region.ag.N;
 	}
-	return 'on lines ' + region.af.M + ' through ' + region.ap.M;
+	return 'on lines ' + region.ag.N + ' through ' + region.aq.N;
 }
 
 
@@ -2719,9 +2719,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		z: func(record.z),
-		ag: record.ag,
-		ad: record.ad
+		A: func(record.A),
+		ah: record.ah,
+		ae: record.ae
 	}
 });
 
@@ -2989,11 +2989,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.z;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ag;
+		var message = !tag ? value : tag < 3 ? value.a : value.A;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ah;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ad) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ae) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3983,7 +3983,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.bz,
 		impl.bu,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.ae && impl.ae(sendToApp)
+			var divertHrefToApp = impl.af && impl.af(sendToApp)
 			var view = impl.bA;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -3992,7 +3992,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.a$);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.a0);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
@@ -4058,7 +4058,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		ae: function(sendToApp)
+		af: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aI === next.aI
-							&& curr.av === next.av
-							&& curr.aF.a === next.aF.a
+							&& curr.aJ === next.aJ
+							&& curr.aw === next.aw
+							&& curr.aG.a === next.aG.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { bc: 'hidden', a1: 'visibilitychange' }
+		? { bc: 'hidden', a2: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { bc: 'mozHidden', a1: 'mozvisibilitychange' }
+		? { bc: 'mozHidden', a2: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { bc: 'msHidden', a1: 'msvisibilitychange' }
+		? { bc: 'msHidden', a2: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { bc: 'webkitHidden', a1: 'webkitvisibilitychange' }
-		: { bc: 'hidden', a1: 'visibilitychange' };
+		? { bc: 'webkitHidden', a2: 'webkitvisibilitychange' }
+		: { bc: 'hidden', a2: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aO: _Browser_getScene(),
-		aU: {
-			aW: _Browser_window.pageXOffset,
-			aX: _Browser_window.pageYOffset,
-			aV: _Browser_doc.documentElement.clientWidth,
-			au: _Browser_doc.documentElement.clientHeight
+		aP: _Browser_getScene(),
+		aV: {
+			aX: _Browser_window.pageXOffset,
+			aY: _Browser_window.pageYOffset,
+			aW: _Browser_doc.documentElement.clientWidth,
+			av: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aV: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		au: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aW: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		av: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aO: {
-				aV: node.scrollWidth,
-				au: node.scrollHeight
+			aP: {
+				aW: node.scrollWidth,
+				av: node.scrollHeight
 			},
-			aU: {
-				aW: node.scrollLeft,
-				aX: node.scrollTop,
-				aV: node.clientWidth,
-				au: node.clientHeight
+			aV: {
+				aX: node.scrollLeft,
+				aY: node.scrollTop,
+				aW: node.clientWidth,
+				av: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aO: _Browser_getScene(),
-			aU: {
-				aW: x,
-				aX: y,
-				aV: _Browser_doc.documentElement.clientWidth,
-				au: _Browser_doc.documentElement.clientHeight
+			aP: _Browser_getScene(),
+			aV: {
+				aX: x,
+				aY: y,
+				aW: _Browser_doc.documentElement.clientWidth,
+				av: _Browser_doc.documentElement.clientHeight
 			},
 			a7: {
-				aW: x + rect.left,
-				aX: y + rect.top,
-				aV: rect.width,
-				au: rect.height
+				aX: x + rect.left,
+				aY: y + rect.top,
+				aW: rect.width,
+				av: rect.height
 			}
 		};
 	});
@@ -4874,7 +4874,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ar: fragment, av: host, aD: path, aF: port_, aI: protocol, aJ: query};
+		return {as: fragment, aw: host, aE: path, aG: port_, aJ: protocol, aK: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5156,15 +5156,15 @@ var $elm$browser$Browser$element = _Browser_element;
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $author$project$Main$Model = F2(
 	function (pupils, events) {
-		return {y: events, q: pupils};
+		return {z: events, q: pupils};
 	});
 var $author$project$Event$Model = F3(
 	function (events, formData, formInvalid) {
-		return {y: events, u: formData, I: formInvalid};
+		return {z: events, v: formData, J: formInvalid};
 	});
 var $author$project$Event$Obj = F3(
 	function (name, capacity, internalID) {
-		return {t: capacity, aw: internalID, D: name};
+		return {t: capacity, ax: internalID, B: name};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5187,15 +5187,15 @@ var $author$project$Event$decoder = A2(
 	$elm$json$Json$Decode$list($author$project$Event$decoderEvent));
 var $author$project$Pupil$Model = F3(
 	function (pupils, formData, formInvalid) {
-		return {u: formData, I: formInvalid, q: pupils};
+		return {v: formData, J: formInvalid, q: pupils};
 	});
 var $author$project$Pupil$Obj = F3(
 	function (name, _class, choices) {
-		return {a3: choices, a4: _class, D: name};
+		return {a4: choices, u: _class, B: name};
 	});
 var $author$project$Pupil$Choice = F2(
 	function (event, type_) {
-		return {aq: event, by: type_};
+		return {ar: event, by: type_};
 	});
 var $author$project$Pupil$Green = 0;
 var $author$project$Pupil$Red = 2;
@@ -5217,7 +5217,7 @@ var $author$project$Pupil$decoderChoice = A3(
 			$elm$json$Json$Decode$string)));
 var $author$project$Pupil$FormData = F2(
 	function (names, _class) {
-		return {a4: _class, U: names};
+		return {u: _class, V: names};
 	});
 var $author$project$Pupil$emptyFormData = A2($author$project$Pupil$FormData, '', '');
 var $elm$json$Json$Decode$map3 = _Json_map3;
@@ -5252,7 +5252,7 @@ var $author$project$Main$init = function (s) {
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	} else {
 		return _Utils_Tuple2(
-			{y: $author$project$Event$init, q: $author$project$Pupil$init},
+			{z: $author$project$Event$init, q: $author$project$Pupil$init},
 			$elm$core$Platform$Cmd$none);
 	}
 };
@@ -5279,7 +5279,7 @@ var $author$project$Event$eventToJSON = function (e) {
 			[
 				_Utils_Tuple2(
 				'name',
-				$elm$json$Json$Encode$string(e.D)),
+				$elm$json$Json$Encode$string(e.B)),
 				_Utils_Tuple2(
 				'capacity',
 				$elm$json$Json$Encode$int(e.t))
@@ -5295,7 +5295,7 @@ var $elm$json$Json$Encode$list = F2(
 				entries));
 	});
 var $author$project$Event$modelToJSON = function (model) {
-	return A2($elm$json$Json$Encode$list, $author$project$Event$eventToJSON, model.y);
+	return A2($elm$json$Json$Encode$list, $author$project$Event$eventToJSON, model.z);
 };
 var $author$project$Pupil$choiceTypeToString = function (c) {
 	switch (c) {
@@ -5313,7 +5313,7 @@ var $author$project$Pupil$choiceToJSON = function (choice) {
 			[
 				_Utils_Tuple2(
 				'event',
-				$author$project$Event$eventToJSON(choice.aq)),
+				$author$project$Event$eventToJSON(choice.ar)),
 				_Utils_Tuple2(
 				'type',
 				$elm$json$Json$Encode$string(
@@ -5326,13 +5326,13 @@ var $author$project$Pupil$pupilToJSON = function (p) {
 			[
 				_Utils_Tuple2(
 				'name',
-				$elm$json$Json$Encode$string(p.D)),
+				$elm$json$Json$Encode$string(p.B)),
 				_Utils_Tuple2(
 				'class',
-				$elm$json$Json$Encode$string(p.a4)),
+				$elm$json$Json$Encode$string(p.u)),
 				_Utils_Tuple2(
 				'choices',
-				A2($elm$json$Json$Encode$list, $author$project$Pupil$choiceToJSON, p.a3))
+				A2($elm$json$Json$Encode$list, $author$project$Pupil$choiceToJSON, p.a4))
 			]));
 };
 var $author$project$Pupil$modelToJSON = function (model) {
@@ -5347,7 +5347,7 @@ var $author$project$Main$modelToJSON = function (model) {
 				$author$project$Pupil$modelToJSON(model.q)),
 				_Utils_Tuple2(
 				'events',
-				$author$project$Event$modelToJSON(model.y))
+				$author$project$Event$modelToJSON(model.z))
 			]));
 };
 var $author$project$Main$setStorage = _Platform_outgoingPort('setStorage', $elm$json$Json$Encode$string);
@@ -5371,7 +5371,7 @@ var $author$project$Event$updateFormdata = F2(
 			var name = msg.a;
 			return _Utils_update(
 				formData,
-				{D: name});
+				{B: name});
 		} else {
 			var capacity = msg.a;
 			return _Utils_update(
@@ -5402,14 +5402,14 @@ var $elm$core$List$any = F2(
 	});
 var $elm$core$String$trim = _String_trim;
 var $author$project$Event$validate = function (model) {
-	var name = $elm$core$String$trim(model.u.D);
-	return ((name === '') || ((model.u.t <= 0) || A2(
+	var name = $elm$core$String$trim(model.v.B);
+	return ((name === '') || ((model.v.t <= 0) || A2(
 		$elm$core$List$any,
 		function (e) {
-			return _Utils_eq(e.D, name);
+			return _Utils_eq(e.B, name);
 		},
-		model.y))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-		A3($author$project$Event$Obj, name, model.u.t, 0));
+		model.z))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+		A3($author$project$Event$Obj, name, model.v.t, 0));
 };
 var $author$project$Event$update = F2(
 	function (msg, model) {
@@ -5420,8 +5420,8 @@ var $author$project$Event$update = F2(
 					_Utils_update(
 						model,
 						{
-							u: A2($author$project$Event$updateFormdata, data, model.u),
-							I: false
+							v: A2($author$project$Event$updateFormdata, data, model.v),
+							J: false
 						}),
 					1);
 			case 1:
@@ -5432,19 +5432,19 @@ var $author$project$Event$update = F2(
 						_Utils_update(
 							model,
 							{
-								y: _Utils_ap(
-									model.y,
+								z: _Utils_ap(
+									model.z,
 									_List_fromArray(
 										[_new])),
-								u: $author$project$Event$emptyFormData,
-								I: false
+								v: $author$project$Event$emptyFormData,
+								J: false
 							}),
 						0);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{I: true}),
+							{J: true}),
 						1);
 				}
 			default:
@@ -5453,11 +5453,11 @@ var $author$project$Event$update = F2(
 					_Utils_update(
 						model,
 						{
-							y: A2(
+							z: A2(
 								$elm$core$List$filter,
 								$elm$core$Basics$neq(obj),
-								model.y),
-							I: false
+								model.z),
+							J: false
 						}),
 					0);
 		}
@@ -5472,12 +5472,12 @@ var $author$project$Pupil$changeChoice = F4(
 				return _Utils_eq(p, pupil) ? _Utils_update(
 					p,
 					{
-						a3: A2(
+						a4: A2(
 							$elm$core$List$map,
 							function (c) {
-								return _Utils_eq(c.aq, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
+								return _Utils_eq(c.ar, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
 							},
-							p.a3)
+							p.a4)
 					}) : p;
 			},
 			pupils);
@@ -5516,7 +5516,7 @@ var $author$project$Pupil$savePupils = F4(
 						return (e || A2(
 							$elm$core$List$any,
 							function (p) {
-								return _Utils_eq(p.D, name) && _Utils_eq(p.a4, _class);
+								return _Utils_eq(p.B, name) && _Utils_eq(p.u, _class);
 							},
 							currentPupils)) ? _Utils_Tuple2(_List_Nil, true) : _Utils_Tuple2(
 							_Utils_ap(
@@ -5544,12 +5544,12 @@ var $author$project$Pupil$updateFormdata = F2(
 			var n = msg.a;
 			return _Utils_update(
 				formData,
-				{U: n});
+				{V: n});
 		} else {
 			var c = msg.a;
 			return _Utils_update(
 				formData,
-				{a4: c});
+				{u: c});
 		}
 	});
 var $author$project$Pupil$update = F3(
@@ -5561,24 +5561,24 @@ var $author$project$Pupil$update = F3(
 					_Utils_update(
 						model,
 						{
-							u: A2($author$project$Pupil$updateFormdata, data, model.u),
-							I: false
+							v: A2($author$project$Pupil$updateFormdata, data, model.v),
+							J: false
 						}),
 					1);
 			case 1:
-				var _v1 = A4($author$project$Pupil$savePupils, model, events, model.u.U, model.u.a4);
+				var _v1 = A4($author$project$Pupil$savePupils, model, events, model.v.V, model.v.u);
 				if (!_v1.$) {
 					var pupils = _v1.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{u: $author$project$Pupil$emptyFormData, I: false, q: pupils}),
+							{v: $author$project$Pupil$emptyFormData, J: false, q: pupils}),
 						0);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{I: true}),
+							{J: true}),
 						1);
 				}
 			case 2:
@@ -5587,7 +5587,7 @@ var $author$project$Pupil$update = F3(
 					_Utils_update(
 						model,
 						{
-							I: false,
+							J: false,
 							q: A2(
 								$elm$core$List$filter,
 								$elm$core$Basics$neq(pupil),
@@ -5602,7 +5602,7 @@ var $author$project$Pupil$update = F3(
 					_Utils_update(
 						model,
 						{
-							I: false,
+							J: false,
 							q: A4($author$project$Pupil$changeChoice, model.q, pupil, event, choice)
 						}),
 					0);
@@ -5620,7 +5620,7 @@ var $elm$core$List$member = F2(
 var $author$project$Pupil$updateEvents = F2(
 	function (events, model) {
 		var fn2 = function (c) {
-			return A2($elm$core$List$member, c.aq, events);
+			return A2($elm$core$List$member, c.ar, events);
 		};
 		var fn1 = F2(
 			function (e, cl) {
@@ -5630,7 +5630,7 @@ var $author$project$Pupil$updateEvents = F2(
 					A2(
 						$elm$core$List$map,
 						function ($) {
-							return $.aq;
+							return $.ar;
 						},
 						cl)) ? cl : A2(
 					$elm$core$List$cons,
@@ -5646,10 +5646,10 @@ var $author$project$Pupil$updateEvents = F2(
 						return _Utils_update(
 							p,
 							{
-								a3: A2(
+								a4: A2(
 									$elm$core$List$filter,
 									fn2,
-									A3($elm$core$List$foldl, fn1, p.a3, events))
+									A3($elm$core$List$foldl, fn1, p.a4, events))
 							});
 					},
 					model.q)
@@ -5661,28 +5661,28 @@ var $author$project$Main$update = F2(
 			switch (msg.$) {
 				case 0:
 					var innerMsg = msg.a;
-					var _v2 = A2($author$project$Event$update, innerMsg, model.y);
+					var _v2 = A2($author$project$Event$update, innerMsg, model.z);
 					var eventsModel = _v2.a;
 					var action = _v2.b;
 					if (action === 1) {
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{y: eventsModel}),
+								{z: eventsModel}),
 							false);
 					} else {
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									y: eventsModel,
-									q: A2($author$project$Pupil$updateEvents, eventsModel.y, model.q)
+									z: eventsModel,
+									q: A2($author$project$Pupil$updateEvents, eventsModel.z, model.q)
 								}),
 							true);
 					}
 				case 1:
 					var innerMsg = msg.a;
-					var _v4 = A3($author$project$Pupil$update, innerMsg, model.q, model.y.y);
+					var _v4 = A3($author$project$Pupil$update, innerMsg, model.q, model.z.z);
 					var pupilsModel = _v4.a;
 					var action = _v4.b;
 					if (action === 1) {
@@ -5834,14 +5834,14 @@ var $author$project$Pupil$eventGroup = F2(
 		return A2(
 			$elm$core$List$map,
 			function (c) {
-				return c.aq;
+				return c.ar;
 			},
 			A2(
 				$elm$core$List$filter,
 				function (c) {
 					return _Utils_eq(c.by, choiceType);
 				},
-				pupil.a3));
+				pupil.a4));
 	});
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $elm$html$Html$li = _VirtualDom_node('li');
@@ -5968,7 +5968,7 @@ var $author$project$Algo$extend = F4(
 	});
 var $author$project$Algo$IntermediateResult = F2(
 	function (paths, free) {
-		return {Y: free, ac: paths};
+		return {Z: free, ad: paths};
 	});
 var $author$project$Algo$getFromMatching = F2(
 	function (vertex, matching) {
@@ -6025,7 +6025,7 @@ var $author$project$Algo$update = F2(
 				} else {
 					var left = _v2.a;
 					var res = A2($author$project$Algo$update, matching, remainingPaths);
-					var _v3 = res.Y;
+					var _v3 = res.Z;
 					if (!_v3.$) {
 						var path = _v3.a;
 						return A2(
@@ -6038,7 +6038,7 @@ var $author$project$Algo$update = F2(
 							A2(
 								$elm$core$List$cons,
 								A2($elm$core$List$cons, left, firstPath),
-								res.ac),
+								res.ad),
 							$elm$core$Maybe$Nothing);
 					}
 				}
@@ -6051,7 +6051,7 @@ var $author$project$Algo$find = F3(
 			return $elm$core$Maybe$Nothing;
 		} else {
 			var res = A2($author$project$Algo$update, matching, paths);
-			var _v0 = res.Y;
+			var _v0 = res.Z;
 			if (!_v0.$) {
 				var path = _v0.a;
 				return $elm$core$Maybe$Just(path);
@@ -6064,7 +6064,7 @@ var $author$project$Algo$find = F3(
 						$elm$core$List$foldl,
 						A2($author$project$Algo$extend, graph, paths),
 						_List_Nil,
-						res.ac));
+						res.ad));
 			}
 		}
 	});
@@ -6139,7 +6139,7 @@ var $author$project$Event$extendToCapacity = function (event) {
 					$elm$core$List$cons,
 					_Utils_update(
 						e,
-						{aw: newIndex}),
+						{ax: newIndex}),
 					t.b));
 		});
 	return A3(
@@ -6314,8 +6314,8 @@ var $author$project$Main$onColor = F2(
 										return _Utils_eq(
 											_Utils_update(
 												event,
-												{aw: 0}),
-											c.aq);
+												{ax: 0}),
+											c.ar);
 									} else {
 										break _v2$2;
 									}
@@ -6326,8 +6326,8 @@ var $author$project$Main$onColor = F2(
 										return _Utils_eq(
 											_Utils_update(
 												event,
-												{aw: 0}),
-											c.aq);
+												{ax: 0}),
+											c.ar);
 									} else {
 										break _v2$2;
 									}
@@ -6337,7 +6337,7 @@ var $author$project$Main$onColor = F2(
 						}
 						return false;
 					},
-					pupil.a3);
+					pupil.a4);
 			} else {
 				return false;
 			}
@@ -6347,7 +6347,14 @@ var $author$project$Main$onColor = F2(
 			$elm$core$Tuple$first,
 			A2($elm$core$List$filter, fn, matching));
 	});
+var $author$project$Pupil$pupilDisplay = function (pupil) {
+	return pupil.B + (' (Klasse ' + (pupil.u + ')'));
+};
+var $author$project$Pupil$pupilSorting = function (pupil) {
+	return _Utils_ap(pupil.u, pupil.B);
+};
 var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
+var $elm$core$List$sortBy = _List_sortBy;
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
@@ -6369,7 +6376,8 @@ var $author$project$Main$result = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text(p.D + (' (Klasse ' + (p.a4 + ')')))
+								$elm$html$Html$text(
+								$author$project$Pupil$pupilDisplay(p))
 							])),
 						A2(
 						$elm$html$Html$td,
@@ -6385,12 +6393,12 @@ var $author$project$Main$result = function (model) {
 											$elm$core$List$member,
 											_Utils_update(
 												e,
-												{aw: 0}),
+												{ax: 0}),
 											A2($author$project$Pupil$eventGroup, 0, p)) ? 'badge text-bg-success' : 'badge text-bg-warning')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text(e.D)
+										$elm$html$Html$text(e.B)
 									]))
 							]))
 					]));
@@ -6486,19 +6494,30 @@ var $author$project$Main$result = function (model) {
 								_List_Nil,
 								A2(
 									$elm$core$List$map,
-									function (_v1) {
-										var k = _v1.a;
-										var v = _v1.b;
-										var _v2 = _Utils_Tuple2(k, v);
-										if ((!_v2.a.$) && (_v2.b.$ === 1)) {
-											var p = _v2.a.a;
-											var e = _v2.b.a;
+									function (_v3) {
+										var k = _v3.a;
+										var v = _v3.b;
+										var _v4 = _Utils_Tuple2(k, v);
+										if ((!_v4.a.$) && (_v4.b.$ === 1)) {
+											var p = _v4.a.a;
+											var e = _v4.b.a;
 											return A2(tableRow, p, e);
 										} else {
 											return A2($elm$html$Html$tr, _List_Nil, _List_Nil);
 										}
 									},
-									matched))
+									A2(
+										$elm$core$List$sortBy,
+										function (_v1) {
+											var k = _v1.a;
+											if (!k.$) {
+												var p = k.a;
+												return $author$project$Pupil$pupilSorting(p);
+											} else {
+												return '';
+											}
+										},
+										matched)))
 							]))
 					])),
 				A2(
@@ -6547,11 +6566,12 @@ var $author$project$Main$result = function (model) {
 												]),
 											_List_fromArray(
 												[
-													$elm$html$Html$text(p.D)
+													$elm$html$Html$text(
+													$author$project$Pupil$pupilDisplay(p))
 												]))
 										]));
 							},
-							unmatched))
+							A2($elm$core$List$sortBy, $author$project$Pupil$pupilSorting, unmatched)))
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -6739,7 +6759,7 @@ var $author$project$Event$oneEventLi = function (event) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(event.D),
+						$elm$html$Html$text(event.B),
 						A2(
 						$elm$html$Html$span,
 						_List_fromArray(
@@ -6785,7 +6805,15 @@ var $author$project$Event$allEvents = function (events) {
 			[
 				$author$project$Helpers$classes('list-group list-group-flush list-group-numbered')
 			]),
-		A2($elm$core$List$map, $author$project$Event$oneEventLi, events));
+		A2(
+			$elm$core$List$map,
+			$author$project$Event$oneEventLi,
+			A2(
+				$elm$core$List$sortBy,
+				function ($) {
+					return $.B;
+				},
+				events)));
 };
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$input = _VirtualDom_node('input');
@@ -6944,11 +6972,11 @@ var $author$project$Event$view = function (model) {
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeR, $author$project$Event$Name, $author$project$Event$FormDataMsg)),
-											$elm$html$Html$Attributes$value(model.u.D)
+											$elm$html$Html$Attributes$value(model.v.B)
 										]),
 									'newGroupName',
 									'Gruppe ist bereits vorhanden',
-									model.I)),
+									model.J)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -6974,7 +7002,7 @@ var $author$project$Event$view = function (model) {
 														$elm$core$Maybe$withDefault(0),
 														A2($elm$core$Basics$composeR, $author$project$Event$Capacity, $author$project$Event$FormDataMsg)))),
 												$elm$html$Html$Attributes$value(
-												$elm$core$String$fromInt(model.u.t))
+												$elm$core$String$fromInt(model.v.t))
 											]),
 										_List_Nil),
 										A2(
@@ -7025,7 +7053,7 @@ var $author$project$Event$view = function (model) {
 							[
 								$elm$html$Html$text('Alle Gruppen')
 							])),
-						$author$project$Event$allEvents(model.y)
+						$author$project$Event$allEvents(model.z)
 					]))
 			]));
 };
@@ -7165,7 +7193,7 @@ var $author$project$Pupil$oneEventLi = F3(
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(event.D),
+					$elm$html$Html$text(event.B),
 					A2($elm$html$Html$span, _List_Nil, buttons)
 				]));
 	});
@@ -7191,7 +7219,12 @@ var $author$project$Pupil$eventList = F2(
 			A2(
 				$elm$core$List$map,
 				A2($author$project$Pupil$oneEventLi, choice, pupil),
-				events));
+				A2(
+					$elm$core$List$sortBy,
+					function ($) {
+						return $.B;
+					},
+					events)));
 	});
 var $author$project$Pupil$onePupilLi = function (pupil) {
 	var innerLi = function (ct) {
@@ -7273,7 +7306,7 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 		$elm$html$Html$li,
 		_List_fromArray(
 			[
-				$author$project$Helpers$classes('list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5')
+				$author$project$Helpers$classes('list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5 pt-4 pb-2')
 			]),
 		_List_fromArray(
 			[
@@ -7290,7 +7323,8 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text(pupil.D + (' (Klasse ' + (pupil.a4 + ')')))
+								$elm$html$Html$text(
+								$author$project$Pupil$pupilDisplay(pupil))
 							])),
 						A2(
 						$elm$html$Html$ul,
@@ -7336,7 +7370,10 @@ var $author$project$Pupil$allPupils = function (pupils) {
 			[
 				$author$project$Helpers$classes('list-group list-group-flush list-group-numbered')
 			]),
-		A2($elm$core$List$map, $author$project$Pupil$onePupilLi, pupils));
+		A2(
+			$elm$core$List$map,
+			$author$project$Pupil$onePupilLi,
+			A2($elm$core$List$sortBy, $author$project$Pupil$pupilSorting, pupils)));
 };
 var $elm$html$Html$Attributes$rows = function (n) {
 	return A2(
@@ -7378,7 +7415,7 @@ var $author$project$Pupil$view = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Mehrere Schüler und Schülerinnen der gleichen Klasse hinzufügen')
+								$elm$html$Html$text('Schüler und Schülerinnen der gleichen Klasse hinzufügen')
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -7406,11 +7443,11 @@ var $author$project$Pupil$view = function (model) {
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeR, $author$project$Pupil$Names, $author$project$Pupil$FormDataMsg)),
-											$elm$html$Html$Attributes$value(model.u.U)
+											$elm$html$Html$Attributes$value(model.v.V)
 										]),
 									'newPupilNames',
 									'Schüler/Schülerin ist in dieser Klasse bereits vorhanden oder sonst ungültige Eingabe',
-									model.I)),
+									model.J)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -7430,7 +7467,7 @@ var $author$project$Pupil$view = function (model) {
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
 												A2($elm$core$Basics$composeR, $author$project$Pupil$Class, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.u.a4)
+												$elm$html$Html$Attributes$value(model.v.u)
 											]),
 										_List_Nil)
 									])),
@@ -7493,7 +7530,7 @@ var $author$project$Main$view = function (model) {
 						A2(
 						$elm$html$Html$map,
 						$author$project$Main$EventMsg,
-						$author$project$Event$view(model.y)),
+						$author$project$Event$view(model.z)),
 						A2(
 						$elm$html$Html$map,
 						$author$project$Main$PupilMsg,

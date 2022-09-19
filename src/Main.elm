@@ -145,7 +145,7 @@ result model =
         tableRow =
             \p e ->
                 tr []
-                    [ td [] [ text <| p.name ++ " (Klasse " ++ p.class ++ ")" ]
+                    [ td [] [ text <| Pupil.pupilDisplay p ]
                     , td []
                         [ span
                             [ classes <|
@@ -174,6 +174,15 @@ result model =
                     [ thead [] [ tr [] [ th [ scope "col" ] [ text "Name und Klasse" ], th [ scope "col" ] [ text "Gruppe" ] ] ]
                     , tbody []
                         (matched
+                            |> List.sortBy
+                                (\( k, _ ) ->
+                                    case k of
+                                        Algo.Left p ->
+                                            Pupil.pupilSorting p
+
+                                        _ ->
+                                            ""
+                                )
                             |> List.map
                                 (\( k, v ) ->
                                     case ( k, v ) of
@@ -194,7 +203,8 @@ result model =
               else
                 ol [ classes "list-group list-group-flush list-group-numbered" ]
                     (unmatched
-                        |> List.map (\p -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text p.name ] ])
+                        |> List.sortBy Pupil.pupilSorting
+                        |> List.map (\p -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text <| Pupil.pupilDisplay p ] ])
                     )
             ]
         , div [ class "col-md-8" ]
