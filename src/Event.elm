@@ -2,7 +2,7 @@ module Event exposing (Action(..), Model, Msg, Obj, decoder, decoderEvent, event
 
 import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, hidden, placeholder, required, title, type_, value)
+import Html.Attributes exposing (attribute, class, hidden, placeholder, required, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Json.Decode as D
 import Json.Encode as E
@@ -219,5 +219,13 @@ oneEventLi event =
             [ text event.name
             , span [ classes "ms-2 badge bg-primary rounded-pill", title "Anzahl der Plätze", attribute "aria-label" "Anzahl der Plätze" ] [ text <| String.fromInt event.capacity ]
             ]
-        , a [ class "link-danger", title "Löschen", attribute "role" "button", attribute "aria-label" "Löschen", onClick <| Delete event ] [ svgIconXLg ]
+        , a
+            [ class "link-danger"
+            , title "Löschen"
+            , tabindex 0
+            , attribute "role" "button"
+            , attribute "aria-label" "Löschen"
+            , onClick <| Delete event
+            ]
+            [ svgIconXLg ]
         ]

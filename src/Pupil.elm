@@ -3,7 +3,7 @@ module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, deco
 import Event
 import Helpers exposing (classes, svgIconArrowDown, svgIconArrowUp, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, hidden, placeholder, required, rows, title, type_, value)
+import Html.Attributes exposing (attribute, class, hidden, placeholder, required, rows, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Json.Decode as D
 import Json.Encode as E
@@ -208,7 +208,7 @@ savePupils model events namesRaw classRaw =
 
         names : List String
         names =
-            namesRaw |> String.split "," |> List.map String.trim |> List.filter ((/=) "")
+            namesRaw |> String.split "\n" |> List.map String.trim |> List.filter ((/=) "")
     in
     if (class == "") || List.isEmpty names then
         Nothing
@@ -302,8 +302,8 @@ view model =
                         textarea
                         [ class "form-control"
                         , rows 1
-                        , placeholder "Namen (mit Komma getrennt)"
-                        , attribute "aria-label" "Namen (mit Komma getrennt)"
+                        , placeholder "Namen (mit Zeilenumbrüchen getrennt)"
+                        , attribute "aria-label" "Namen (mit Zeilenumbrüchen getrennt)"
                         , required True
                         , onInput (Names >> FormDataMsg)
                         , value model.formData.names
@@ -375,7 +375,15 @@ onePupilLi pupil =
             , ul [ classes "list-group list-group-flush" ]
                 [ innerLi Green, innerLi Yellow, innerLi Red ]
             ]
-        , a [ class "link-danger", title "Löschen", attribute "role" "button", attribute "aria-label" "Löschen", onClick <| Delete pupil ] [ svgIconXLg ]
+        , a
+            [ class "link-danger"
+            , title "Löschen"
+            , tabindex 0
+            , attribute "role" "button"
+            , attribute "aria-label" "Löschen"
+            , onClick <| Delete pupil
+            ]
+            [ svgIconXLg ]
         ]
 
 
@@ -403,6 +411,7 @@ oneEventLi choice pupil event =
                     [ button
                         [ classes "btn btn-outline-warning"
                         , title "zu Gelb"
+                        , type_ "button"
                         , attribute "aria-label" "zu Gelb"
                         , onClick <| ChangeChoice pupil event Yellow
                         ]
@@ -413,6 +422,7 @@ oneEventLi choice pupil event =
                     [ button
                         [ classes "btn btn-outline-success"
                         , title "zu Grün"
+                        , type_ "button"
                         , attribute "aria-label" "zu Grün"
                         , onClick <| ChangeChoice pupil event Green
                         ]
@@ -420,6 +430,7 @@ oneEventLi choice pupil event =
                     , button
                         [ classes "btn btn-outline-danger ms-1"
                         , title "zu Rot"
+                        , type_ "button"
                         , attribute "aria-label" "zu Rot"
                         , onClick <| ChangeChoice pupil event Red
                         ]
@@ -430,6 +441,7 @@ oneEventLi choice pupil event =
                     [ button
                         [ classes "btn btn-outline-warning"
                         , title "zu Gelb"
+                        , type_ "button"
                         , attribute "aria-label" "zu Gelb"
                         , onClick <| ChangeChoice pupil event Yellow
                         ]

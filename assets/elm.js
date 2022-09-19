@@ -5497,7 +5497,7 @@ var $author$project$Pupil$savePupils = F4(
 			A2(
 				$elm$core$List$map,
 				$elm$core$String$trim,
-				A2($elm$core$String$split, ',', namesRaw)));
+				A2($elm$core$String$split, '\n', namesRaw)));
 		var _class = $elm$core$String$trim(classRaw);
 		if ((_class === '') || $elm$core$List$isEmpty(names)) {
 			return $elm$core$Maybe$Nothing;
@@ -5774,6 +5774,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$admin = A2(
 	$elm$html$Html$div,
 	_List_Nil,
@@ -5791,6 +5792,7 @@ var $author$project$Main$admin = A2(
 			_List_fromArray(
 				[
 					$author$project$Helpers$classes('btn btn-danger'),
+					$elm$html$Html$Attributes$type_('button'),
 					$elm$html$Html$Events$onClick($author$project$Main$DeleteAll)
 				]),
 			_List_fromArray(
@@ -5829,6 +5831,15 @@ var $author$project$Main$readme = A2(
 					$elm$html$Html$text('Dieses Tool speichert die Eingaben im Local Storage des Browsers. Es werden keine eigegebenen Daten über das Internet gesendet.')
 				]))
 		]));
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $author$project$Pupil$eventGroup = F2(
 	function (choiceType, pupil) {
 		return A2(
@@ -6356,6 +6367,51 @@ var $author$project$Pupil$pupilSorting = function (pupil) {
 var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
 var $elm$core$List$sortBy = _List_sortBy;
 var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$fillRule = _VirtualDom_attribute('fill-rule');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $author$project$Helpers$svgIconSortAlphaDown = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$width('16'),
+			$elm$svg$Svg$Attributes$height('16'),
+			$elm$svg$Svg$Attributes$fill('currentColor'),
+			$elm$svg$Svg$Attributes$class('bi'),
+			$elm$svg$Svg$Attributes$class('bi-sort-alpha-down'),
+			$elm$svg$Svg$Attributes$viewBox('0 0 16 16')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$fillRule('evenodd'),
+					$elm$svg$Svg$Attributes$d('M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371h-1.781zm1.57-.785L11 2.687h-.047l-.652 2.157h1.351z')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$d('M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645V14zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293V2.5z')
+				]),
+			_List_Nil)
+		]));
+var $elm$html$Html$Attributes$tabindex = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'tabIndex',
+		$elm$core$String$fromInt(n));
+};
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
 var $elm$html$Html$td = _VirtualDom_node('td');
@@ -6475,7 +6531,19 @@ var $author$project$Main$result = function (model) {
 													]),
 												_List_fromArray(
 													[
-														$elm$html$Html$text('Name und Klasse')
+														$elm$html$Html$text('Name und Klasse'),
+														A2(
+														$elm$html$Html$a,
+														_List_fromArray(
+															[
+																$author$project$Helpers$classes('link-primary ms-2'),
+																$elm$html$Html$Attributes$title('Nach Name und Klasse aufsteigend sortieren'),
+																$elm$html$Html$Attributes$tabindex(0),
+																A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Name und Klasse aufsteigend sortieren')
+															]),
+														_List_fromArray(
+															[$author$project$Helpers$svgIconSortAlphaDown]))
 													])),
 												A2(
 												$elm$html$Html$th,
@@ -6485,7 +6553,19 @@ var $author$project$Main$result = function (model) {
 													]),
 												_List_fromArray(
 													[
-														$elm$html$Html$text('Gruppe')
+														$elm$html$Html$text('Gruppe'),
+														A2(
+														$elm$html$Html$a,
+														_List_fromArray(
+															[
+																$author$project$Helpers$classes('link-primary ms-2'),
+																$elm$html$Html$Attributes$title('Nach Gruppe aufsteigend sortieren'),
+																$elm$html$Html$Attributes$tabindex(0),
+																A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Gruppe aufsteigend sortieren')
+															]),
+														_List_fromArray(
+															[$author$project$Helpers$svgIconSortAlphaDown]))
 													]))
 											]))
 									])),
@@ -6703,24 +6783,6 @@ var $elm$html$Html$Attributes$hidden = $elm$html$Html$Attributes$boolProperty('h
 var $author$project$Event$Delete = function (a) {
 	return {$: 2, a: a};
 };
-var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$virtual_dom$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
-var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Helpers$svgIconXLg = A2(
 	$elm$svg$Svg$svg,
 	_List_fromArray(
@@ -6780,6 +6842,7 @@ var $author$project$Event$oneEventLi = function (event) {
 					[
 						$elm$html$Html$Attributes$class('link-danger'),
 						$elm$html$Html$Attributes$title('Löschen'),
+						$elm$html$Html$Attributes$tabindex(0),
 						A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
 						A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Löschen'),
 						$elm$html$Html$Events$onClick(
@@ -6909,7 +6972,6 @@ var $author$project$Helpers$tagWithInvalidFeedback = F5(
 				]);
 		}
 	});
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Event$view = function (model) {
 	return A2(
@@ -7074,7 +7136,6 @@ var $author$project$Pupil$ChangeChoice = F3(
 	function (a, b, c) {
 		return {$: 3, a: a, b: b, c: c};
 	});
-var $elm$svg$Svg$Attributes$fillRule = _VirtualDom_attribute('fill-rule');
 var $author$project$Helpers$svgIconArrowDown = A2(
 	$elm$svg$Svg$svg,
 	_List_fromArray(
@@ -7132,6 +7193,7 @@ var $author$project$Pupil$oneEventLi = F3(
 								[
 									$author$project$Helpers$classes('btn btn-outline-warning'),
 									$elm$html$Html$Attributes$title('zu Gelb'),
+									$elm$html$Html$Attributes$type_('button'),
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Gelb'),
 									$elm$html$Html$Events$onClick(
 									A3($author$project$Pupil$ChangeChoice, pupil, event, 1))
@@ -7148,6 +7210,7 @@ var $author$project$Pupil$oneEventLi = F3(
 								[
 									$author$project$Helpers$classes('btn btn-outline-success'),
 									$elm$html$Html$Attributes$title('zu Grün'),
+									$elm$html$Html$Attributes$type_('button'),
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Grün'),
 									$elm$html$Html$Events$onClick(
 									A3($author$project$Pupil$ChangeChoice, pupil, event, 0))
@@ -7160,6 +7223,7 @@ var $author$project$Pupil$oneEventLi = F3(
 								[
 									$author$project$Helpers$classes('btn btn-outline-danger ms-1'),
 									$elm$html$Html$Attributes$title('zu Rot'),
+									$elm$html$Html$Attributes$type_('button'),
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Rot'),
 									$elm$html$Html$Events$onClick(
 									A3($author$project$Pupil$ChangeChoice, pupil, event, 2))
@@ -7176,6 +7240,7 @@ var $author$project$Pupil$oneEventLi = F3(
 								[
 									$author$project$Helpers$classes('btn btn-outline-warning'),
 									$elm$html$Html$Attributes$title('zu Gelb'),
+									$elm$html$Html$Attributes$type_('button'),
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Gelb'),
 									$elm$html$Html$Events$onClick(
 									A3($author$project$Pupil$ChangeChoice, pupil, event, 1))
@@ -7345,6 +7410,7 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 					[
 						$elm$html$Html$Attributes$class('link-danger'),
 						$elm$html$Html$Attributes$title('Löschen'),
+						$elm$html$Html$Attributes$tabindex(0),
 						A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
 						A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Löschen'),
 						$elm$html$Html$Events$onClick(
@@ -7438,8 +7504,8 @@ var $author$project$Pupil$view = function (model) {
 										[
 											$elm$html$Html$Attributes$class('form-control'),
 											$elm$html$Html$Attributes$rows(1),
-											$elm$html$Html$Attributes$placeholder('Namen (mit Komma getrennt)'),
-											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Komma getrennt)'),
+											$elm$html$Html$Attributes$placeholder('Namen (mit Zeilenumbrüchen getrennt)'),
+											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Zeilenumbrüchen getrennt)'),
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeR, $author$project$Pupil$Names, $author$project$Pupil$FormDataMsg)),

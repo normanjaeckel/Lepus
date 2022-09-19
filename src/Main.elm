@@ -3,9 +3,9 @@ port module Main exposing (finalize, main)
 import Algo
 import Browser
 import Event
-import Helpers exposing (classes)
+import Helpers exposing (classes, svgIconSortAlphaDown)
 import Html exposing (..)
-import Html.Attributes exposing (class, scope, title)
+import Html.Attributes exposing (attribute, class, scope, tabindex, title, type_)
 import Html.Events exposing (onClick)
 import Json.Decode as D
 import Json.Encode as E
@@ -171,7 +171,32 @@ result model =
               else
                 table
                     [ class "table" ]
-                    [ thead [] [ tr [] [ th [ scope "col" ] [ text "Name und Klasse" ], th [ scope "col" ] [ text "Gruppe" ] ] ]
+                    [ thead []
+                        [ tr []
+                            [ th [ scope "col" ]
+                                [ text "Name und Klasse"
+                                , a
+                                    [ classes "link-primary ms-2"
+                                    , title "Nach Name und Klasse aufsteigend sortieren"
+                                    , tabindex 0
+                                    , attribute "role" "button"
+                                    , attribute "aria-label" "Nach Name und Klasse aufsteigend sortieren"
+                                    ]
+                                    [ svgIconSortAlphaDown ]
+                                ]
+                            , th [ scope "col" ]
+                                [ text "Gruppe"
+                                , a
+                                    [ classes "link-primary ms-2"
+                                    , title "Nach Gruppe aufsteigend sortieren"
+                                    , tabindex 0
+                                    , attribute "role" "button"
+                                    , attribute "aria-label" "Nach Gruppe aufsteigend sortieren"
+                                    ]
+                                    [ svgIconSortAlphaDown ]
+                                ]
+                            ]
+                        ]
                     , tbody []
                         (matched
                             |> List.sortBy
@@ -226,7 +251,7 @@ admin : Html Msg
 admin =
     div []
         [ h2 [] [ text "Administration" ]
-        , button [ classes "btn btn-danger", onClick DeleteAll ] [ text "Alle Daten löschen" ]
+        , button [ classes "btn btn-danger", type_ "button", onClick DeleteAll ] [ text "Alle Daten löschen" ]
         ]
 
 
