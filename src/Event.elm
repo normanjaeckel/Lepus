@@ -4,6 +4,7 @@ import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, hidden, placeholder, required, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Lazy exposing (lazy)
 import Json.Decode as D
 import Json.Encode as E
 
@@ -198,7 +199,7 @@ view model =
             ]
         , div []
             [ h3 [ hidden True ] [ text "Alle Gruppen" ]
-            , allEvents model.events
+            , lazy allEvents model.events
             ]
         ]
 
@@ -209,7 +210,7 @@ allEvents events =
         p [ hidden True ] [ text "Noch keine Gruppen angelegt" ]
 
     else
-        ol [ classes "list-group list-group-flush list-group-numbered" ] (events |> List.sortBy .name |> List.map oneEventLi)
+        ol [ classes "list-group list-group-flush list-group-numbered" ] (events |> List.sortBy .name |> List.map (lazy oneEventLi))
 
 
 oneEventLi : Obj -> Html Msg

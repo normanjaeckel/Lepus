@@ -5,6 +5,7 @@ import Helpers exposing (classes, svgIconArrowDown, svgIconArrowUp, svgIconXLg, 
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, hidden, placeholder, required, rows, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Lazy exposing (lazy, lazy3)
 import Json.Decode as D
 import Json.Encode as E
 
@@ -329,7 +330,7 @@ view model =
             ]
         , div []
             [ h3 [ hidden True ] [ text "Alle Schüler/Schülerinnen" ]
-            , allPupils model.pupils
+            , lazy allPupils model.pupils
             ]
         ]
 
@@ -340,7 +341,7 @@ allPupils pupils =
         p [ hidden True ] [ text "Noch keine Schüler oder Schülerinnen angelegt" ]
 
     else
-        ol [ classes "list-group list-group-flush list-group-numbered" ] (pupils |> List.sortBy pupilSorting |> List.map onePupilLi)
+        ol [ classes "list-group list-group-flush list-group-numbered" ] (pupils |> List.sortBy pupilSorting |> List.map (lazy onePupilLi))
 
 
 onePupilLi : Obj -> Html Msg
@@ -365,7 +366,7 @@ onePupilLi pupil =
                 li [ classes "list-group-item d-flex justify-content-between align-items-start" ]
                     [ div [ classes "row container-fluid" ]
                         [ div [ class "col-2" ] [ s ]
-                        , div [ class "col-10" ] [ pupil |> eventList ct ]
+                        , div [ class "col-10" ] [ pupil |> lazy (eventList ct) ]
                         ]
                     ]
     in
@@ -398,7 +399,7 @@ eventList choice pupil =
         span [ class "ms-3" ] [ text "–" ]
 
     else
-        ul [ classes "list-group list-group-flush " ] (events |> List.sortBy .name |> List.map (oneEventLi choice pupil))
+        ul [ classes "list-group list-group-flush " ] (events |> List.sortBy .name |> List.map (lazy3 oneEventLi choice pupil))
 
 
 oneEventLi : ChoiceType -> Obj -> Event.Obj -> Html Msg

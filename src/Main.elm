@@ -3,10 +3,12 @@ port module Main exposing (finalize, main)
 import Algo
 import Browser
 import Event
+import File.Download
 import Helpers exposing (classes, svgIconSortAlphaDown)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, scope, tabindex, title, type_)
 import Html.Events exposing (onClick)
+import Html.Lazy exposing (lazy)
 import Json.Decode as D
 import Json.Encode as E
 import Pupil
@@ -69,45 +71,45 @@ type Msg
     = EventMsg Event.Msg
     | PupilMsg Pupil.Msg
     | DeleteAll
+    | Export
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
-        ( updatedModel, setToStorage ) =
-            case msg of
-                EventMsg innerMsg ->
-                    let
-                        ( eventsModel, action ) =
-                            Event.update innerMsg model.events
-                    in
-                    case action of
-                        Event.FormChanged ->
-                            ( { model | events = eventsModel }, False )
-
-                        Event.EventsChanged ->
-                            ( { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils }, True )
-
-                PupilMsg innerMsg ->
-                    let
-                        ( pupilsModel, action ) =
-                            Pupil.update innerMsg model.pupils model.events.events
-                    in
-                    case action of
-                        Pupil.FormChanged ->
-                            ( { model | pupils = pupilsModel }, False )
-
-                        Pupil.PupilsChanged ->
-                            ( { model | pupils = pupilsModel }, True )
-
-                DeleteAll ->
-                    ( init "" |> Tuple.first, True )
+        s =
+            \updatedModel -> ( updatedModel, modelToJSON updatedModel |> E.encode 0 |> setStorage )
     in
-    if setToStorage then
-        ( updatedModel, modelToJSON updatedModel |> E.encode 0 |> setStorage )
+    case msg of
+        EventMsg innerMsg ->
+            let
+                ( eventsModel, action ) =
+                    Event.update innerMsg model.events
+            in
+            case action of
+                Event.FormChanged ->
+                    ( { model | events = eventsModel }, Cmd.none )
 
-    else
-        ( updatedModel, Cmd.none )
+                Event.EventsChanged ->
+                    { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils } |> s
+
+        PupilMsg innerMsg ->
+            let
+                ( pupilsModel, action ) =
+                    Pupil.update innerMsg model.pupils model.events.events
+            in
+            case action of
+                Pupil.FormChanged ->
+                    ( { model | pupils = pupilsModel }, Cmd.none )
+
+                Pupil.PupilsChanged ->
+                    { model | pupils = pupilsModel } |> s
+
+        DeleteAll ->
+            (init "" |> Tuple.first) |> s
+
+        Export ->
+            ( model, File.Download.string "export.json" "application/json" (modelToJSON model |> E.encode 4) )
 
 
 
@@ -119,9 +121,9 @@ view model =
     div [ classes "container p-3 py-md-5" ]
         [ main_ []
             [ readme
-            , Event.view model.events |> map EventMsg
-            , Pupil.view model.pupils |> map PupilMsg
-            , result model
+            , lazy Event.view model.events |> map EventMsg
+            , lazy Pupil.view model.pupils |> map PupilMsg
+            , lazy result model.pupils.pupils
             , admin
             ]
         ]
@@ -135,11 +137,11 @@ readme =
         ]
 
 
-result : Model -> Html Msg
-result model =
+result : List Pupil.Obj -> Html Msg
+result pupils =
     let
         ( matched, unmatched ) =
-            matchedAndUnmatchedPupils model.pupils.pupils
+            matchedAndUnmatchedPupils pupils
 
         tableRow : Pupil.Obj -> Event.Obj -> Html Msg
         tableRow =
@@ -252,6 +254,7 @@ admin =
     div []
         [ h2 [] [ text "Administration" ]
         , button [ classes "btn btn-danger", type_ "button", onClick DeleteAll ] [ text "Alle Daten löschen" ]
+        , button [ classes "btn btn-secondary ms-2", type_ "button", onClick Export ] [ text "Export" ]
         ]
 
 

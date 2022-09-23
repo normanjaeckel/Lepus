@@ -4370,6 +4370,184 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+
+// DECODER
+
+var _File_decoder = _Json_decodePrim(function(value) {
+	// NOTE: checks if `File` exists in case this is run on node
+	return (typeof File !== 'undefined' && value instanceof File)
+		? $elm$core$Result$Ok(value)
+		: _Json_expecting('a FILE', value);
+});
+
+
+// METADATA
+
+function _File_name(file) { return file.name; }
+function _File_mime(file) { return file.type; }
+function _File_size(file) { return file.size; }
+
+function _File_lastModified(file)
+{
+	return $elm$time$Time$millisToPosix(file.lastModified);
+}
+
+
+// DOWNLOAD
+
+var _File_downloadNode;
+
+function _File_getDownloadNode()
+{
+	return _File_downloadNode || (_File_downloadNode = document.createElement('a'));
+}
+
+var _File_download = F3(function(name, mime, content)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var blob = new Blob([content], {type: mime});
+
+		// for IE10+
+		if (navigator.msSaveOrOpenBlob)
+		{
+			navigator.msSaveOrOpenBlob(blob, name);
+			return;
+		}
+
+		// for HTML5
+		var node = _File_getDownloadNode();
+		var objectUrl = URL.createObjectURL(blob);
+		node.href = objectUrl;
+		node.download = name;
+		_File_click(node);
+		URL.revokeObjectURL(objectUrl);
+	});
+});
+
+function _File_downloadUrl(href)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var node = _File_getDownloadNode();
+		node.href = href;
+		node.download = '';
+		node.origin === location.origin || (node.target = '_blank');
+		_File_click(node);
+	});
+}
+
+
+// IE COMPATIBILITY
+
+function _File_makeBytesSafeForInternetExplorer(bytes)
+{
+	// only needed by IE10 and IE11 to fix https://github.com/elm/file/issues/10
+	// all other browsers can just run `new Blob([bytes])` directly with no problem
+	//
+	return new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+}
+
+function _File_click(node)
+{
+	// only needed by IE10 and IE11 to fix https://github.com/elm/file/issues/11
+	// all other browsers have MouseEvent and do not need this conditional stuff
+	//
+	if (typeof MouseEvent === 'function')
+	{
+		node.dispatchEvent(new MouseEvent('click'));
+	}
+	else
+	{
+		var event = document.createEvent('MouseEvents');
+		event.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		document.body.appendChild(node);
+		node.dispatchEvent(event);
+		document.body.removeChild(node);
+	}
+}
+
+
+// UPLOAD
+
+var _File_node;
+
+function _File_uploadOne(mimes)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		_File_node = document.createElement('input');
+		_File_node.type = 'file';
+		_File_node.accept = A2($elm$core$String$join, ',', mimes);
+		_File_node.addEventListener('change', function(event)
+		{
+			callback(_Scheduler_succeed(event.target.files[0]));
+		});
+		_File_click(_File_node);
+	});
+}
+
+function _File_uploadOneOrMore(mimes)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		_File_node = document.createElement('input');
+		_File_node.type = 'file';
+		_File_node.multiple = true;
+		_File_node.accept = A2($elm$core$String$join, ',', mimes);
+		_File_node.addEventListener('change', function(event)
+		{
+			var elmFiles = _List_fromArray(event.target.files);
+			callback(_Scheduler_succeed(_Utils_Tuple2(elmFiles.a, elmFiles.b)));
+		});
+		_File_click(_File_node);
+	});
+}
+
+
+// CONTENT
+
+function _File_toString(blob)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var reader = new FileReader();
+		reader.addEventListener('loadend', function() {
+			callback(_Scheduler_succeed(reader.result));
+		});
+		reader.readAsText(blob);
+		return function() { reader.abort(); };
+	});
+}
+
+function _File_toBytes(blob)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var reader = new FileReader();
+		reader.addEventListener('loadend', function() {
+			callback(_Scheduler_succeed(new DataView(reader.result)));
+		});
+		reader.readAsArrayBuffer(blob);
+		return function() { reader.abort(); };
+	});
+}
+
+function _File_toUrl(blob)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var reader = new FileReader();
+		reader.addEventListener('loadend', function() {
+			callback(_Scheduler_succeed(reader.result));
+		});
+		reader.readAsDataURL(blob);
+		return function() { reader.abort(); };
+	});
+}
+
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$GT = 2;
 var $elm$core$Basics$LT = 0;
@@ -5351,6 +5529,15 @@ var $author$project$Main$modelToJSON = function (model) {
 			]));
 };
 var $author$project$Main$setStorage = _Platform_outgoingPort('setStorage', $elm$json$Json$Encode$string);
+var $elm$time$Time$Posix = $elm$core$Basics$identity;
+var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
+var $elm$file$File$Download$string = F3(
+	function (name, mime, content) {
+		return A2(
+			$elm$core$Task$perform,
+			$elm$core$Basics$never,
+			A3(_File_download, name, mime, content));
+	});
 var $author$project$Event$EventsChanged = 0;
 var $author$project$Event$FormChanged = 1;
 var $elm$core$List$filter = F2(
@@ -5657,62 +5844,68 @@ var $author$project$Pupil$updateEvents = F2(
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		var _v0 = function () {
-			switch (msg.$) {
-				case 0:
-					var innerMsg = msg.a;
-					var _v2 = A2($author$project$Event$update, innerMsg, model.z);
-					var eventsModel = _v2.a;
-					var action = _v2.b;
-					if (action === 1) {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{z: eventsModel}),
-							false);
-					} else {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									z: eventsModel,
-									q: A2($author$project$Pupil$updateEvents, eventsModel.z, model.q)
-								}),
-							true);
-					}
-				case 1:
-					var innerMsg = msg.a;
-					var _v4 = A3($author$project$Pupil$update, innerMsg, model.q, model.z.z);
-					var pupilsModel = _v4.a;
-					var action = _v4.b;
-					if (action === 1) {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{q: pupilsModel}),
-							false);
-					} else {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{q: pupilsModel}),
-							true);
-					}
-				default:
+		var s = function (updatedModel) {
+			return _Utils_Tuple2(
+				updatedModel,
+				$author$project$Main$setStorage(
+					A2(
+						$elm$json$Json$Encode$encode,
+						0,
+						$author$project$Main$modelToJSON(updatedModel))));
+		};
+		switch (msg.$) {
+			case 0:
+				var innerMsg = msg.a;
+				var _v1 = A2($author$project$Event$update, innerMsg, model.z);
+				var eventsModel = _v1.a;
+				var action = _v1.b;
+				if (action === 1) {
 					return _Utils_Tuple2(
-						$author$project$Main$init('').a,
-						true);
-			}
-		}();
-		var updatedModel = _v0.a;
-		var setToStorage = _v0.b;
-		return setToStorage ? _Utils_Tuple2(
-			updatedModel,
-			$author$project$Main$setStorage(
-				A2(
-					$elm$json$Json$Encode$encode,
-					0,
-					$author$project$Main$modelToJSON(updatedModel)))) : _Utils_Tuple2(updatedModel, $elm$core$Platform$Cmd$none);
+						_Utils_update(
+							model,
+							{z: eventsModel}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return s(
+						_Utils_update(
+							model,
+							{
+								z: eventsModel,
+								q: A2($author$project$Pupil$updateEvents, eventsModel.z, model.q)
+							}));
+				}
+			case 1:
+				var innerMsg = msg.a;
+				var _v3 = A3($author$project$Pupil$update, innerMsg, model.q, model.z.z);
+				var pupilsModel = _v3.a;
+				var action = _v3.b;
+				if (action === 1) {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{q: pupilsModel}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return s(
+						_Utils_update(
+							model,
+							{q: pupilsModel}));
+				}
+			case 2:
+				return s(
+					$author$project$Main$init('').a);
+			default:
+				return _Utils_Tuple2(
+					model,
+					A3(
+						$elm$file$File$Download$string,
+						'export.json',
+						'application/json',
+						A2(
+							$elm$json$Json$Encode$encode,
+							4,
+							$author$project$Main$modelToJSON(model))));
+		}
 	});
 var $author$project$Main$EventMsg = function (a) {
 	return {$: 0, a: a};
@@ -5721,6 +5914,7 @@ var $author$project$Main$PupilMsg = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$Main$DeleteAll = {$: 2};
+var $author$project$Main$Export = {$: 3};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5798,8 +5992,22 @@ var $author$project$Main$admin = A2(
 			_List_fromArray(
 				[
 					$elm$html$Html$text('Alle Daten löschen')
+				])),
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$author$project$Helpers$classes('btn btn-secondary ms-2'),
+					$elm$html$Html$Attributes$type_('button'),
+					$elm$html$Html$Events$onClick($author$project$Main$Export)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Export')
 				]))
 		]));
+var $elm$virtual_dom$VirtualDom$lazy = _VirtualDom_lazy;
+var $elm$html$Html$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
@@ -6419,7 +6627,7 @@ var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Main$result = function (model) {
+var $author$project$Main$result = function (pupils) {
 	var tableRow = F2(
 		function (p, e) {
 			return A2(
@@ -6459,7 +6667,7 @@ var $author$project$Main$result = function (model) {
 							]))
 					]));
 		});
-	var _v0 = $author$project$Main$matchedAndUnmatchedPupils(model.q.q);
+	var _v0 = $author$project$Main$matchedAndUnmatchedPupils(pupils);
 	var matched = _v0.a;
 	var unmatched = _v0.b;
 	return A2(
@@ -6870,7 +7078,7 @@ var $author$project$Event$allEvents = function (events) {
 			]),
 		A2(
 			$elm$core$List$map,
-			$author$project$Event$oneEventLi,
+			$elm$html$Html$Lazy$lazy($author$project$Event$oneEventLi),
 			A2(
 				$elm$core$List$sortBy,
 				function ($) {
@@ -7115,7 +7323,7 @@ var $author$project$Event$view = function (model) {
 							[
 								$elm$html$Html$text('Alle Gruppen')
 							])),
-						$author$project$Event$allEvents(model.z)
+						A2($elm$html$Html$Lazy$lazy, $author$project$Event$allEvents, model.z)
 					]))
 			]));
 };
@@ -7132,6 +7340,8 @@ var $author$project$Pupil$Save = {$: 1};
 var $author$project$Pupil$Delete = function (a) {
 	return {$: 2, a: a};
 };
+var $elm$virtual_dom$VirtualDom$lazy3 = _VirtualDom_lazy3;
+var $elm$html$Html$Lazy$lazy3 = $elm$virtual_dom$VirtualDom$lazy3;
 var $author$project$Pupil$ChangeChoice = F3(
 	function (a, b, c) {
 		return {$: 3, a: a, b: b, c: c};
@@ -7283,7 +7493,7 @@ var $author$project$Pupil$eventList = F2(
 				]),
 			A2(
 				$elm$core$List$map,
-				A2($author$project$Pupil$oneEventLi, choice, pupil),
+				A3($elm$html$Html$Lazy$lazy3, $author$project$Pupil$oneEventLi, choice, pupil),
 				A2(
 					$elm$core$List$sortBy,
 					function ($) {
@@ -7362,7 +7572,10 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 								]),
 							_List_fromArray(
 								[
-									A2($author$project$Pupil$eventList, ct, pupil)
+									A2(
+									$elm$html$Html$Lazy$lazy,
+									$author$project$Pupil$eventList(ct),
+									pupil)
 								]))
 						]))
 				]));
@@ -7438,7 +7651,7 @@ var $author$project$Pupil$allPupils = function (pupils) {
 			]),
 		A2(
 			$elm$core$List$map,
-			$author$project$Pupil$onePupilLi,
+			$elm$html$Html$Lazy$lazy($author$project$Pupil$onePupilLi),
 			A2($elm$core$List$sortBy, $author$project$Pupil$pupilSorting, pupils)));
 };
 var $elm$html$Html$Attributes$rows = function (n) {
@@ -7574,7 +7787,7 @@ var $author$project$Pupil$view = function (model) {
 							[
 								$elm$html$Html$text('Alle Schüler/Schülerinnen')
 							])),
-						$author$project$Pupil$allPupils(model.q)
+						A2($elm$html$Html$Lazy$lazy, $author$project$Pupil$allPupils, model.q)
 					]))
 			]));
 };
@@ -7596,12 +7809,12 @@ var $author$project$Main$view = function (model) {
 						A2(
 						$elm$html$Html$map,
 						$author$project$Main$EventMsg,
-						$author$project$Event$view(model.z)),
+						A2($elm$html$Html$Lazy$lazy, $author$project$Event$view, model.z)),
 						A2(
 						$elm$html$Html$map,
 						$author$project$Main$PupilMsg,
-						$author$project$Pupil$view(model.q)),
-						$author$project$Main$result(model),
+						A2($elm$html$Html$Lazy$lazy, $author$project$Pupil$view, model.q)),
+						A2($elm$html$Html$Lazy$lazy, $author$project$Main$result, model.q.q),
 						$author$project$Main$admin
 					]))
 			]));
