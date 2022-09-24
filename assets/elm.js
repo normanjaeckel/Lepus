@@ -7340,246 +7340,217 @@ var $author$project$Pupil$Save = {$: 1};
 var $author$project$Pupil$Delete = function (a) {
 	return {$: 2, a: a};
 };
-var $elm$virtual_dom$VirtualDom$lazy3 = _VirtualDom_lazy3;
-var $elm$html$Html$Lazy$lazy3 = $elm$virtual_dom$VirtualDom$lazy3;
 var $author$project$Pupil$ChangeChoice = F3(
 	function (a, b, c) {
 		return {$: 3, a: a, b: b, c: c};
 	});
-var $author$project$Helpers$svgIconArrowDown = A2(
-	$elm$svg$Svg$svg,
-	_List_fromArray(
-		[
-			$elm$svg$Svg$Attributes$width('16'),
-			$elm$svg$Svg$Attributes$height('16'),
-			$elm$svg$Svg$Attributes$fill('currentColor'),
-			$elm$svg$Svg$Attributes$class('bi'),
-			$elm$svg$Svg$Attributes$class('bi-arrow-down'),
-			$elm$svg$Svg$Attributes$viewBox('0 0 16 16')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$svg$Svg$path,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$fillRule('evenodd'),
-					$elm$svg$Svg$Attributes$d('M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z')
-				]),
-			_List_Nil)
-		]));
-var $author$project$Helpers$svgIconArrowUp = A2(
-	$elm$svg$Svg$svg,
-	_List_fromArray(
-		[
-			$elm$svg$Svg$Attributes$width('16'),
-			$elm$svg$Svg$Attributes$height('16'),
-			$elm$svg$Svg$Attributes$fill('currentColor'),
-			$elm$svg$Svg$Attributes$class('bi'),
-			$elm$svg$Svg$Attributes$class('bi-arrow-up'),
-			$elm$svg$Svg$Attributes$viewBox('0 0 16 16')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$svg$Svg$path,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$fillRule('evenodd'),
-					$elm$svg$Svg$Attributes$d('M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z')
-				]),
-			_List_Nil)
-		]));
-var $author$project$Pupil$oneEventLi = F3(
-	function (choice, pupil, event) {
-		var buttons = function () {
-			switch (choice) {
-				case 0:
-					return _List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$author$project$Helpers$classes('btn btn-outline-warning'),
-									$elm$html$Html$Attributes$title('zu Gelb'),
-									$elm$html$Html$Attributes$type_('button'),
-									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Gelb'),
-									$elm$html$Html$Events$onClick(
-									A3($author$project$Pupil$ChangeChoice, pupil, event, 1))
-								]),
-							_List_fromArray(
-								[$author$project$Helpers$svgIconArrowDown]))
-						]);
-				case 1:
-					return _List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$author$project$Helpers$classes('btn btn-outline-success'),
-									$elm$html$Html$Attributes$title('zu Grün'),
-									$elm$html$Html$Attributes$type_('button'),
-									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Grün'),
-									$elm$html$Html$Events$onClick(
-									A3($author$project$Pupil$ChangeChoice, pupil, event, 0))
-								]),
-							_List_fromArray(
-								[$author$project$Helpers$svgIconArrowUp])),
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$author$project$Helpers$classes('btn btn-outline-danger ms-1'),
-									$elm$html$Html$Attributes$title('zu Rot'),
-									$elm$html$Html$Attributes$type_('button'),
-									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Rot'),
-									$elm$html$Html$Events$onClick(
-									A3($author$project$Pupil$ChangeChoice, pupil, event, 2))
-								]),
-							_List_fromArray(
-								[$author$project$Helpers$svgIconArrowDown]))
-						]);
-				default:
-					return _List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$author$project$Helpers$classes('btn btn-outline-warning'),
-									$elm$html$Html$Attributes$title('zu Gelb'),
-									$elm$html$Html$Attributes$type_('button'),
-									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'zu Gelb'),
-									$elm$html$Html$Events$onClick(
-									A3($author$project$Pupil$ChangeChoice, pupil, event, 1))
-								]),
-							_List_fromArray(
-								[$author$project$Helpers$svgIconArrowUp]))
-						]);
-			}
-		}();
-		return A2(
-			$elm$html$Html$li,
-			_List_fromArray(
-				[
-					$author$project$Helpers$classes('list-group-item d-flex justify-content-between align-items-start')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text(event.B),
-					A2($elm$html$Html$span, _List_Nil, buttons)
-				]));
-	});
-var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Pupil$eventList = F2(
-	function (choice, pupil) {
-		var events = A2($author$project$Pupil$eventGroup, choice, pupil);
-		return $elm$core$List$isEmpty(events) ? A2(
-			$elm$html$Html$span,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('ms-3')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('–')
-				])) : A2(
-			$elm$html$Html$ul,
-			_List_fromArray(
-				[
-					$author$project$Helpers$classes('list-group list-group-flush ')
-				]),
-			A2(
-				$elm$core$List$map,
-				A3($elm$html$Html$Lazy$lazy3, $author$project$Pupil$oneEventLi, choice, pupil),
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
+var $author$project$Pupil$innerTable = function (pupil) {
+	return A2(
+		$elm$html$Html$table,
+		_List_fromArray(
+			[
+				$author$project$Helpers$classes('table table-striped')
+			]),
+		_List_fromArray(
+			[
 				A2(
-					$elm$core$List$sortBy,
-					function ($) {
-						return $.B;
-					},
-					events)));
-	});
-var $author$project$Pupil$onePupilLi = function (pupil) {
-	var innerLi = function (ct) {
-		var s = function () {
-			switch (ct) {
-				case 0:
-					return A2(
-						$elm$html$Html$span,
+				$elm$html$Html$thead,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$tr,
+						_List_Nil,
 						_List_fromArray(
 							[
-								$author$project$Helpers$classes('badge text-bg-success')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Grün')
-							]));
-				case 1:
-					return A2(
-						$elm$html$Html$span,
-						_List_fromArray(
-							[
-								$author$project$Helpers$classes('badge text-bg-warning')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Gelb')
-							]));
-				default:
-					return A2(
-						$elm$html$Html$span,
-						_List_fromArray(
-							[
-								$author$project$Helpers$classes('badge text-bg-danger')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Rot')
-							]));
-			}
-		}();
-		return A2(
-			$elm$html$Html$li,
-			_List_fromArray(
-				[
-					$author$project$Helpers$classes('list-group-item d-flex justify-content-between align-items-start')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$author$project$Helpers$classes('row container-fluid')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('col-2')
-								]),
-							_List_fromArray(
-								[s])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('col-10')
-								]),
+								A2(
+								$elm$html$Html$th,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$scope('col')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Gruppe')
+									])),
+								A2(
+								$elm$html$Html$th,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$scope('col')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Farbe')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tbody,
+				_List_Nil,
+				A2(
+					$elm$core$List$map,
+					function (c) {
+						var radioGroup = _Utils_ap(
+							$author$project$Pupil$pupilDisplay(pupil),
+							c.ar.B);
+						return A2(
+							$elm$html$Html$tr,
+							_List_Nil,
 							_List_fromArray(
 								[
 									A2(
-									$elm$html$Html$Lazy$lazy,
-									$author$project$Pupil$eventList(ct),
-									pupil)
-								]))
-						]))
-				]));
-	};
+									$elm$html$Html$th,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$scope('row')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(c.ar.B)
+										])),
+									A2(
+									$elm$html$Html$td,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('form-check form-check-inline')
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$input,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('form-check-input'),
+															$elm$html$Html$Attributes$type_('radio'),
+															$elm$html$Html$Attributes$name(radioGroup),
+															$elm$html$Html$Attributes$id(radioGroup + 'Green'),
+															$elm$html$Html$Attributes$checked(!c.by),
+															$elm$html$Html$Events$onClick(
+															A3($author$project$Pupil$ChangeChoice, pupil, c.ar, 0))
+														]),
+													_List_Nil),
+													A2(
+													$elm$html$Html$label,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('form-check-label'),
+															$elm$html$Html$Attributes$for(radioGroup + 'Green')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$span,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$class('badge text-bg-success')
+																]),
+															_List_fromArray(
+																[
+																	$elm$html$Html$text('Grün')
+																]))
+														]))
+												])),
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('form-check form-check-inline')
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$input,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('form-check-input'),
+															$elm$html$Html$Attributes$type_('radio'),
+															$elm$html$Html$Attributes$name(radioGroup),
+															$elm$html$Html$Attributes$id(radioGroup + 'Yellow'),
+															$elm$html$Html$Attributes$checked(c.by === 1),
+															$elm$html$Html$Events$onClick(
+															A3($author$project$Pupil$ChangeChoice, pupil, c.ar, 1))
+														]),
+													_List_Nil),
+													A2(
+													$elm$html$Html$label,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('form-check-label'),
+															$elm$html$Html$Attributes$for(radioGroup + 'Yellow')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$span,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$class('badge text-bg-warning')
+																]),
+															_List_fromArray(
+																[
+																	$elm$html$Html$text('Gelb')
+																]))
+														]))
+												])),
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('form-check form-check-inline')
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$input,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('form-check-input'),
+															$elm$html$Html$Attributes$type_('radio'),
+															$elm$html$Html$Attributes$name(radioGroup),
+															$elm$html$Html$Attributes$id(radioGroup + 'Red'),
+															$elm$html$Html$Attributes$checked(c.by === 2),
+															$elm$html$Html$Events$onClick(
+															A3($author$project$Pupil$ChangeChoice, pupil, c.ar, 2))
+														]),
+													_List_Nil),
+													A2(
+													$elm$html$Html$label,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('form-check-label'),
+															$elm$html$Html$Attributes$for(radioGroup + 'Red')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$span,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$class('badge text-bg-danger')
+																]),
+															_List_fromArray(
+																[
+																	$elm$html$Html$text('Rot')
+																]))
+														]))
+												]))
+										]))
+								]));
+					},
+					pupil.a4))
+			]));
+};
+var $author$project$Pupil$onePupilLi = function (pupil) {
 	return A2(
 		$elm$html$Html$li,
 		_List_fromArray(
@@ -7604,18 +7575,7 @@ var $author$project$Pupil$onePupilLi = function (pupil) {
 								$elm$html$Html$text(
 								$author$project$Pupil$pupilDisplay(pupil))
 							])),
-						A2(
-						$elm$html$Html$ul,
-						_List_fromArray(
-							[
-								$author$project$Helpers$classes('list-group list-group-flush')
-							]),
-						_List_fromArray(
-							[
-								innerLi(0),
-								innerLi(1),
-								innerLi(2)
-							]))
+						$author$project$Pupil$innerTable(pupil)
 					])),
 				A2(
 				$elm$html$Html$a,

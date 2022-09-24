@@ -3,8 +3,8 @@ module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, deco
 import Event
 import Helpers exposing (classes, svgIconArrowDown, svgIconArrowUp, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, hidden, placeholder, required, rows, tabindex, title, type_, value)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Attributes exposing (attribute, checked, class, for, hidden, id, name, placeholder, required, rows, scope, tabindex, title, type_, value)
+import Html.Events exposing (onCheck, onClick, onInput, onSubmit)
 import Html.Lazy exposing (lazy, lazy3)
 import Json.Decode as D
 import Json.Encode as E
@@ -346,35 +346,10 @@ allPupils pupils =
 
 onePupilLi : Obj -> Html Msg
 onePupilLi pupil =
-    let
-        innerLi : ChoiceType -> Html Msg
-        innerLi =
-            \ct ->
-                let
-                    s : Html Msg
-                    s =
-                        case ct of
-                            Green ->
-                                span [ classes "badge text-bg-success" ] [ text "Grün" ]
-
-                            Yellow ->
-                                span [ classes "badge text-bg-warning" ] [ text "Gelb" ]
-
-                            Red ->
-                                span [ classes "badge text-bg-danger" ] [ text "Rot" ]
-                in
-                li [ classes "list-group-item d-flex justify-content-between align-items-start" ]
-                    [ div [ classes "row container-fluid" ]
-                        [ div [ class "col-2" ] [ s ]
-                        , div [ class "col-10" ] [ pupil |> lazy (eventList ct) ]
-                        ]
-                    ]
-    in
     li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5 pt-4 pb-2" ]
         [ div [ classes "ms-2 w-100" ]
             [ div [] [ text <| pupilDisplay pupil ]
-            , ul [ classes "list-group list-group-flush" ]
-                [ innerLi Green, innerLi Yellow, innerLi Red ]
+            , innerTable pupil
             ]
         , a
             [ class "link-danger"
@@ -388,65 +363,65 @@ onePupilLi pupil =
         ]
 
 
-eventList : ChoiceType -> Obj -> Html Msg
-eventList choice pupil =
-    let
-        events : List Event.Obj
-        events =
-            pupil |> eventGroup choice
-    in
-    if List.isEmpty events then
-        span [ class "ms-3" ] [ text "–" ]
-
-    else
-        ul [ classes "list-group list-group-flush " ] (events |> List.sortBy .name |> List.map (lazy3 oneEventLi choice pupil))
-
-
-oneEventLi : ChoiceType -> Obj -> Event.Obj -> Html Msg
-oneEventLi choice pupil event =
-    let
-        buttons : List (Html Msg)
-        buttons =
-            case choice of
-                Green ->
-                    [ button
-                        [ classes "btn btn-outline-warning"
-                        , title "zu Gelb"
-                        , type_ "button"
-                        , attribute "aria-label" "zu Gelb"
-                        , onClick <| ChangeChoice pupil event Yellow
-                        ]
-                        [ svgIconArrowDown ]
-                    ]
-
-                Yellow ->
-                    [ button
-                        [ classes "btn btn-outline-success"
-                        , title "zu Grün"
-                        , type_ "button"
-                        , attribute "aria-label" "zu Grün"
-                        , onClick <| ChangeChoice pupil event Green
-                        ]
-                        [ svgIconArrowUp ]
-                    , button
-                        [ classes "btn btn-outline-danger ms-1"
-                        , title "zu Rot"
-                        , type_ "button"
-                        , attribute "aria-label" "zu Rot"
-                        , onClick <| ChangeChoice pupil event Red
-                        ]
-                        [ svgIconArrowDown ]
-                    ]
-
-                Red ->
-                    [ button
-                        [ classes "btn btn-outline-warning"
-                        , title "zu Gelb"
-                        , type_ "button"
-                        , attribute "aria-label" "zu Gelb"
-                        , onClick <| ChangeChoice pupil event Yellow
-                        ]
-                        [ svgIconArrowUp ]
-                    ]
-    in
-    li [ classes "list-group-item d-flex justify-content-between align-items-start" ] [ text event.name, span [] buttons ]
+innerTable : Obj -> Html Msg
+innerTable pupil =
+    table [ classes "table table-striped" ]
+        [ thead []
+            [ tr []
+                [ th [ scope "col" ] [ text "Gruppe" ]
+                , th [ scope "col" ] [ text "Farbe" ]
+                ]
+            ]
+        , tbody []
+            (pupil.choices
+                |> List.map
+                    (\c ->
+                        let
+                            radioGroup : String
+                            radioGroup =
+                                pupilDisplay pupil ++ c.event.name
+                        in
+                        tr []
+                            [ th [ scope "row" ] [ text c.event.name ]
+                            , td []
+                                [ div [ class "form-check form-check-inline" ]
+                                    [ input
+                                        [ class "form-check-input"
+                                        , type_ "radio"
+                                        , name radioGroup
+                                        , id (radioGroup ++ "Green")
+                                        , checked (c.type_ == Green)
+                                        , onClick <| ChangeChoice pupil c.event Green
+                                        ]
+                                        []
+                                    , label [ class "form-check-label", for (radioGroup ++ "Green") ] [ span [ class "badge text-bg-success" ] [ text "Grün" ] ]
+                                    ]
+                                , div [ class "form-check form-check-inline" ]
+                                    [ input
+                                        [ class "form-check-input"
+                                        , type_ "radio"
+                                        , name radioGroup
+                                        , id (radioGroup ++ "Yellow")
+                                        , checked (c.type_ == Yellow)
+                                        , onClick <| ChangeChoice pupil c.event Yellow
+                                        ]
+                                        []
+                                    , label [ class "form-check-label", for (radioGroup ++ "Yellow") ] [ span [ class "badge text-bg-warning" ] [ text "Gelb" ] ]
+                                    ]
+                                , div [ class "form-check form-check-inline" ]
+                                    [ input
+                                        [ class "form-check-input"
+                                        , type_ "radio"
+                                        , name radioGroup
+                                        , id (radioGroup ++ "Red")
+                                        , checked (c.type_ == Red)
+                                        , onClick <| ChangeChoice pupil c.event Red
+                                        ]
+                                        []
+                                    , label [ class "form-check-label", for (radioGroup ++ "Red") ] [ span [ class "badge text-bg-danger" ] [ text "Rot" ] ]
+                                    ]
+                                ]
+                            ]
+                    )
+            )
+        ]
