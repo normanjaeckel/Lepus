@@ -1,9 +1,9 @@
-module MainTest exposing (suite)
+module AssignmentTest exposing (suite)
 
 import Algo
+import Assignment
 import Event
 import Expect
-import Main
 import Pupil
 import Test exposing (..)
 
@@ -64,7 +64,7 @@ suite =
                         pupils =
                             [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ]
                     in
-                    Main.finalize pupils
+                    Assignment.finalize pupils
                         |> Expect.all
                             [ Expect.equalLists
                                 [ ( Algo.Left p1, Algo.Right { e1 | internalID = 2 } )
@@ -92,7 +92,7 @@ suite =
                         pupils =
                             [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10a ]
                     in
-                    Main.finalize pupils
+                    Assignment.finalize pupils
                         |> Expect.all
                             [ Expect.equalLists
                                 [ ( Algo.Left p10a, Algo.Right { e4 | internalID = 1 } )
@@ -142,7 +142,7 @@ suite =
                         j3 =
                             Pupil.Obj "C" "" [] |> setupPupil [] [ i1, i2 ] [ i3 ]
                     in
-                    Main.finalize [ j1, j2, j3 ]
+                    Assignment.finalize [ j1, j2, j3 ]
                         |> Expect.all
                             [ howManyGreens [ j1, j2, j3 ] >> Expect.equal 1
                             , List.length >> Expect.equal 3

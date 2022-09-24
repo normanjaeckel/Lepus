@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ag.N === region.aq.N)
+	if (region.ai.N === region.as.N)
 	{
-		return 'on line ' + region.ag.N;
+		return 'on line ' + region.ai.N;
 	}
-	return 'on lines ' + region.ag.N + ' through ' + region.aq.N;
+	return 'on lines ' + region.ai.N + ' through ' + region.as.N;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.be,
-		impl.bz,
-		impl.bu,
+		impl.bg,
+		impl.bB,
+		impl.bw,
 		function() { return function() {} }
 	);
 });
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		A: func(record.A),
-		ah: record.ah,
-		ae: record.ae
+		aj: record.aj,
+		af: record.af
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.A;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ah;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aj;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ae) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.af) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.be,
-		impl.bz,
-		impl.bu,
+		impl.bg,
+		impl.bB,
+		impl.bw,
 		function(sendToApp, initialModel) {
-			var view = impl.bA;
+			var view = impl.bC;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.be,
-		impl.bz,
-		impl.bu,
+		impl.bg,
+		impl.bB,
+		impl.bw,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.af && impl.af(sendToApp)
-			var view = impl.bA;
+			var divertHrefToApp = impl.ag && impl.ag(sendToApp)
+			var view = impl.bC;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.a0);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.a2);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.bx) && (_VirtualDom_doc.title = title = doc.bx);
+				(title !== doc.bz) && (_VirtualDom_doc.title = title = doc.bz);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.bo;
-	var onUrlRequest = impl.bp;
+	var onUrlChange = impl.bq;
+	var onUrlRequest = impl.br;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		af: function(sendToApp)
+		ag: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aJ === next.aJ
-							&& curr.aw === next.aw
-							&& curr.aG.a === next.aG.a
+							&& curr.aL === next.aL
+							&& curr.ay === next.ay
+							&& curr.aI.a === next.aI.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		be: function(flags)
+		bg: function(flags)
 		{
-			return A3(impl.be, flags, _Browser_getUrl(), key);
+			return A3(impl.bg, flags, _Browser_getUrl(), key);
 		},
-		bA: impl.bA,
-		bz: impl.bz,
-		bu: impl.bu
+		bC: impl.bC,
+		bB: impl.bB,
+		bw: impl.bw
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { bc: 'hidden', a2: 'visibilitychange' }
+		? { be: 'hidden', a4: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { bc: 'mozHidden', a2: 'mozvisibilitychange' }
+		? { be: 'mozHidden', a4: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { bc: 'msHidden', a2: 'msvisibilitychange' }
+		? { be: 'msHidden', a4: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { bc: 'webkitHidden', a2: 'webkitvisibilitychange' }
-		: { bc: 'hidden', a2: 'visibilitychange' };
+		? { be: 'webkitHidden', a4: 'webkitvisibilitychange' }
+		: { be: 'hidden', a4: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aP: _Browser_getScene(),
-		aV: {
-			aX: _Browser_window.pageXOffset,
-			aY: _Browser_window.pageYOffset,
-			aW: _Browser_doc.documentElement.clientWidth,
-			av: _Browser_doc.documentElement.clientHeight
+		aR: _Browser_getScene(),
+		aX: {
+			aZ: _Browser_window.pageXOffset,
+			a_: _Browser_window.pageYOffset,
+			aY: _Browser_doc.documentElement.clientWidth,
+			ax: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aW: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		av: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aY: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ax: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aP: {
-				aW: node.scrollWidth,
-				av: node.scrollHeight
+			aR: {
+				aY: node.scrollWidth,
+				ax: node.scrollHeight
 			},
-			aV: {
-				aX: node.scrollLeft,
-				aY: node.scrollTop,
-				aW: node.clientWidth,
-				av: node.clientHeight
+			aX: {
+				aZ: node.scrollLeft,
+				a_: node.scrollTop,
+				aY: node.clientWidth,
+				ax: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aP: _Browser_getScene(),
-			aV: {
-				aX: x,
-				aY: y,
-				aW: _Browser_doc.documentElement.clientWidth,
-				av: _Browser_doc.documentElement.clientHeight
+			aR: _Browser_getScene(),
+			aX: {
+				aZ: x,
+				a_: y,
+				aY: _Browser_doc.documentElement.clientWidth,
+				ax: _Browser_doc.documentElement.clientHeight
 			},
-			a7: {
-				aX: x + rect.left,
-				aY: y + rect.top,
-				aW: rect.width,
-				av: rect.height
+			a9: {
+				aZ: x + rect.left,
+				a_: y + rect.top,
+				aY: rect.width,
+				ax: rect.height
 			}
 		};
 	});
@@ -5052,7 +5052,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {as: fragment, aw: host, aE: path, aG: port_, aJ: protocol, aK: query};
+		return {au: fragment, ay: host, aG: path, aI: port_, aL: protocol, aM: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5332,17 +5332,17 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
-var $author$project$Main$Model = F2(
-	function (pupils, events) {
-		return {z: events, q: pupils};
+var $author$project$Main$Model = F3(
+	function (pupils, events, assignment) {
+		return {M: assignment, z: events, q: pupils};
 	});
 var $author$project$Event$Model = F3(
 	function (events, formData, formInvalid) {
-		return {z: events, v: formData, J: formInvalid};
+		return {z: events, v: formData, I: formInvalid};
 	});
 var $author$project$Event$Obj = F3(
 	function (name, capacity, internalID) {
-		return {t: capacity, ax: internalID, B: name};
+		return {t: capacity, aa: internalID, aD: name};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5365,15 +5365,15 @@ var $author$project$Event$decoder = A2(
 	$elm$json$Json$Decode$list($author$project$Event$decoderEvent));
 var $author$project$Pupil$Model = F3(
 	function (pupils, formData, formInvalid) {
-		return {v: formData, J: formInvalid, q: pupils};
+		return {v: formData, I: formInvalid, q: pupils};
 	});
 var $author$project$Pupil$Obj = F3(
 	function (name, _class, choices) {
-		return {a4: choices, u: _class, B: name};
+		return {a6: choices, u: _class, aD: name};
 	});
 var $author$project$Pupil$Choice = F2(
 	function (event, type_) {
-		return {ar: event, by: type_};
+		return {at: event, bA: type_};
 	});
 var $author$project$Pupil$Green = 0;
 var $author$project$Pupil$Red = 2;
@@ -5414,9 +5414,17 @@ var $author$project$Pupil$decoder = A2(
 				$elm$json$Json$Decode$field,
 				'choices',
 				$elm$json$Json$Decode$list($author$project$Pupil$decoderChoice)))));
+var $author$project$Assignment$Model = function (sortBy) {
+	return {ah: sortBy};
+};
+var $author$project$Assignment$NameSort = 0;
+var $author$project$Assignment$init = $author$project$Assignment$Model(0);
 var $author$project$Main$decoder = A3(
 	$elm$json$Json$Decode$map2,
-	$author$project$Main$Model,
+	F2(
+		function (p, e) {
+			return A3($author$project$Main$Model, p, e, $author$project$Assignment$init);
+		}),
 	A2($elm$json$Json$Decode$field, 'pupils', $author$project$Pupil$decoder),
 	A2($elm$json$Json$Decode$field, 'events', $author$project$Event$decoder));
 var $author$project$Event$init = A3($author$project$Event$Model, _List_Nil, $author$project$Event$emptyFormData, false);
@@ -5430,12 +5438,27 @@ var $author$project$Main$init = function (s) {
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	} else {
 		return _Utils_Tuple2(
-			{z: $author$project$Event$init, q: $author$project$Pupil$init},
+			{M: $author$project$Assignment$init, z: $author$project$Event$init, q: $author$project$Pupil$init},
 			$elm$core$Platform$Cmd$none);
 	}
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$ImportLoaded = function (a) {
+	return {$: 7, a: a};
+};
+var $author$project$Main$ImportSelected = function (a) {
+	return {$: 6, a: a};
+};
+var $elm$time$Time$Posix = $elm$core$Basics$identity;
+var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
+var $elm$file$File$Select$file = F2(
+	function (mimes, toMsg) {
+		return A2(
+			$elm$core$Task$perform,
+			toMsg,
+			_File_uploadOne(mimes));
+	});
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -5457,7 +5480,7 @@ var $author$project$Event$eventToJSON = function (e) {
 			[
 				_Utils_Tuple2(
 				'name',
-				$elm$json$Json$Encode$string(e.B)),
+				$elm$json$Json$Encode$string(e.aD)),
 				_Utils_Tuple2(
 				'capacity',
 				$elm$json$Json$Encode$int(e.t))
@@ -5491,11 +5514,11 @@ var $author$project$Pupil$choiceToJSON = function (choice) {
 			[
 				_Utils_Tuple2(
 				'event',
-				$author$project$Event$eventToJSON(choice.ar)),
+				$author$project$Event$eventToJSON(choice.at)),
 				_Utils_Tuple2(
 				'type',
 				$elm$json$Json$Encode$string(
-					$author$project$Pupil$choiceTypeToString(choice.by)))
+					$author$project$Pupil$choiceTypeToString(choice.bA)))
 			]));
 };
 var $author$project$Pupil$pupilToJSON = function (p) {
@@ -5504,13 +5527,13 @@ var $author$project$Pupil$pupilToJSON = function (p) {
 			[
 				_Utils_Tuple2(
 				'name',
-				$elm$json$Json$Encode$string(p.B)),
+				$elm$json$Json$Encode$string(p.aD)),
 				_Utils_Tuple2(
 				'class',
 				$elm$json$Json$Encode$string(p.u)),
 				_Utils_Tuple2(
 				'choices',
-				A2($elm$json$Json$Encode$list, $author$project$Pupil$choiceToJSON, p.a4))
+				A2($elm$json$Json$Encode$list, $author$project$Pupil$choiceToJSON, p.a6))
 			]));
 };
 var $author$project$Pupil$modelToJSON = function (model) {
@@ -5529,14 +5552,20 @@ var $author$project$Main$modelToJSON = function (model) {
 			]));
 };
 var $author$project$Main$setStorage = _Platform_outgoingPort('setStorage', $elm$json$Json$Encode$string);
-var $elm$time$Time$Posix = $elm$core$Basics$identity;
-var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$file$File$Download$string = F3(
 	function (name, mime, content) {
 		return A2(
 			$elm$core$Task$perform,
 			$elm$core$Basics$never,
 			A3(_File_download, name, mime, content));
+	});
+var $elm$file$File$toString = _File_toString;
+var $author$project$Assignment$update = F2(
+	function (msg, model) {
+		var s = msg;
+		return _Utils_update(
+			model,
+			{ah: s});
 	});
 var $author$project$Event$EventsChanged = 0;
 var $author$project$Event$FormChanged = 1;
@@ -5558,7 +5587,7 @@ var $author$project$Event$updateFormdata = F2(
 			var name = msg.a;
 			return _Utils_update(
 				formData,
-				{B: name});
+				{aD: name});
 		} else {
 			var capacity = msg.a;
 			return _Utils_update(
@@ -5589,11 +5618,11 @@ var $elm$core$List$any = F2(
 	});
 var $elm$core$String$trim = _String_trim;
 var $author$project$Event$validate = function (model) {
-	var name = $elm$core$String$trim(model.v.B);
+	var name = $elm$core$String$trim(model.v.aD);
 	return ((name === '') || ((model.v.t <= 0) || A2(
 		$elm$core$List$any,
 		function (e) {
-			return _Utils_eq(e.B, name);
+			return _Utils_eq(e.aD, name);
 		},
 		model.z))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
 		A3($author$project$Event$Obj, name, model.v.t, 0));
@@ -5608,7 +5637,7 @@ var $author$project$Event$update = F2(
 						model,
 						{
 							v: A2($author$project$Event$updateFormdata, data, model.v),
-							J: false
+							I: false
 						}),
 					1);
 			case 1:
@@ -5624,14 +5653,14 @@ var $author$project$Event$update = F2(
 									_List_fromArray(
 										[_new])),
 								v: $author$project$Event$emptyFormData,
-								J: false
+								I: false
 							}),
 						0);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{J: true}),
+							{I: true}),
 						1);
 				}
 			default:
@@ -5644,7 +5673,7 @@ var $author$project$Event$update = F2(
 								$elm$core$List$filter,
 								$elm$core$Basics$neq(obj),
 								model.z),
-							J: false
+							I: false
 						}),
 					0);
 		}
@@ -5659,12 +5688,12 @@ var $author$project$Pupil$changeChoice = F4(
 				return _Utils_eq(p, pupil) ? _Utils_update(
 					p,
 					{
-						a4: A2(
+						a6: A2(
 							$elm$core$List$map,
 							function (c) {
-								return _Utils_eq(c.ar, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
+								return _Utils_eq(c.at, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
 							},
-							p.a4)
+							p.a6)
 					}) : p;
 			},
 			pupils);
@@ -5703,7 +5732,7 @@ var $author$project$Pupil$savePupils = F4(
 						return (e || A2(
 							$elm$core$List$any,
 							function (p) {
-								return _Utils_eq(p.B, name) && _Utils_eq(p.u, _class);
+								return _Utils_eq(p.aD, name) && _Utils_eq(p.u, _class);
 							},
 							currentPupils)) ? _Utils_Tuple2(_List_Nil, true) : _Utils_Tuple2(
 							_Utils_ap(
@@ -5749,7 +5778,7 @@ var $author$project$Pupil$update = F3(
 						model,
 						{
 							v: A2($author$project$Pupil$updateFormdata, data, model.v),
-							J: false
+							I: false
 						}),
 					1);
 			case 1:
@@ -5759,13 +5788,13 @@ var $author$project$Pupil$update = F3(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{v: $author$project$Pupil$emptyFormData, J: false, q: pupils}),
+							{v: $author$project$Pupil$emptyFormData, I: false, q: pupils}),
 						0);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{J: true}),
+							{I: true}),
 						1);
 				}
 			case 2:
@@ -5774,7 +5803,7 @@ var $author$project$Pupil$update = F3(
 					_Utils_update(
 						model,
 						{
-							J: false,
+							I: false,
 							q: A2(
 								$elm$core$List$filter,
 								$elm$core$Basics$neq(pupil),
@@ -5789,7 +5818,7 @@ var $author$project$Pupil$update = F3(
 					_Utils_update(
 						model,
 						{
-							J: false,
+							I: false,
 							q: A4($author$project$Pupil$changeChoice, model.q, pupil, event, choice)
 						}),
 					0);
@@ -5807,7 +5836,7 @@ var $elm$core$List$member = F2(
 var $author$project$Pupil$updateEvents = F2(
 	function (events, model) {
 		var fn2 = function (c) {
-			return A2($elm$core$List$member, c.ar, events);
+			return A2($elm$core$List$member, c.at, events);
 		};
 		var fn1 = F2(
 			function (e, cl) {
@@ -5817,7 +5846,7 @@ var $author$project$Pupil$updateEvents = F2(
 					A2(
 						$elm$core$List$map,
 						function ($) {
-							return $.ar;
+							return $.at;
 						},
 						cl)) ? cl : A2(
 					$elm$core$List$cons,
@@ -5833,10 +5862,10 @@ var $author$project$Pupil$updateEvents = F2(
 						return _Utils_update(
 							p,
 							{
-								a4: A2(
+								a6: A2(
 									$elm$core$List$filter,
 									fn2,
-									A3($elm$core$List$foldl, fn1, p.a4, events))
+									A3($elm$core$List$foldl, fn1, p.a6, events))
 							});
 					},
 					model.q)
@@ -5892,9 +5921,18 @@ var $author$project$Main$update = F2(
 							{q: pupilsModel}));
 				}
 			case 2:
+				var innerMsg = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							M: A2($author$project$Assignment$update, innerMsg, model.M)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 3:
 				return s(
 					$author$project$Main$init('').a);
-			default:
+			case 4:
 				return _Utils_Tuple2(
 					model,
 					A3(
@@ -5905,16 +5943,40 @@ var $author$project$Main$update = F2(
 							$elm$json$Json$Encode$encode,
 							4,
 							$author$project$Main$modelToJSON(model))));
+			case 5:
+				return _Utils_Tuple2(
+					model,
+					A2(
+						$elm$file$File$Select$file,
+						_List_fromArray(
+							['application/json']),
+						$author$project$Main$ImportSelected));
+			case 6:
+				var file = msg.a;
+				return _Utils_Tuple2(
+					model,
+					A2(
+						$elm$core$Task$perform,
+						$author$project$Main$ImportLoaded,
+						$elm$file$File$toString(file)));
+			default:
+				var content = msg.a;
+				return s(
+					$author$project$Main$init(content).a);
 		}
 	});
+var $author$project$Main$AssignmentMsg = function (a) {
+	return {$: 2, a: a};
+};
 var $author$project$Main$EventMsg = function (a) {
 	return {$: 0, a: a};
 };
 var $author$project$Main$PupilMsg = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Main$DeleteAll = {$: 2};
-var $author$project$Main$Export = {$: 3};
+var $author$project$Main$DeleteAll = {$: 3};
+var $author$project$Main$Export = {$: 4};
+var $author$project$Main$ImportRequested = {$: 5};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5966,6 +6028,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -5980,6 +6043,13 @@ var $author$project$Main$admin = A2(
 			_List_fromArray(
 				[
 					$elm$html$Html$text('Administration')
+				])),
+			A2(
+			$elm$html$Html$p,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Hier kann man die eingegebenen Daten löschen oder exportieren. Beim Import werden alle bisherigen Eingaben überschrieben.')
 				])),
 			A2(
 			$elm$html$Html$button,
@@ -6004,15 +6074,28 @@ var $author$project$Main$admin = A2(
 			_List_fromArray(
 				[
 					$elm$html$Html$text('Export')
+				])),
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$author$project$Helpers$classes('btn btn-secondary ms-2'),
+					$elm$html$Html$Attributes$type_('button'),
+					$elm$html$Html$Events$onClick($author$project$Main$ImportRequested)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Import')
 				]))
 		]));
 var $elm$virtual_dom$VirtualDom$lazy = _VirtualDom_lazy;
 var $elm$html$Html$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
+var $elm$virtual_dom$VirtualDom$lazy2 = _VirtualDom_lazy2;
+var $elm$html$Html$Lazy$lazy2 = $elm$virtual_dom$VirtualDom$lazy2;
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $elm$html$Html$p = _VirtualDom_node('p');
 var $author$project$Main$readme = A2(
 	$elm$html$Html$div,
 	_List_fromArray(
@@ -6039,6 +6122,8 @@ var $author$project$Main$readme = A2(
 					$elm$html$Html$text('Dieses Tool speichert die Eingaben im Local Storage des Browsers. Es werden keine eigegebenen Daten über das Internet gesendet.')
 				]))
 		]));
+var $author$project$Assignment$EventSort = 1;
+var $author$project$Assignment$SortBy = $elm$core$Basics$identity;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
@@ -6053,14 +6138,14 @@ var $author$project$Pupil$eventGroup = F2(
 		return A2(
 			$elm$core$List$map,
 			function (c) {
-				return c.ar;
+				return c.at;
 			},
 			A2(
 				$elm$core$List$filter,
 				function (c) {
-					return _Utils_eq(c.by, choiceType);
+					return _Utils_eq(c.bA, choiceType);
 				},
-				pupil.a4));
+				pupil.a6));
 	});
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $elm$html$Html$li = _VirtualDom_node('li');
@@ -6187,7 +6272,7 @@ var $author$project$Algo$extend = F4(
 	});
 var $author$project$Algo$IntermediateResult = F2(
 	function (paths, free) {
-		return {Z: free, ad: paths};
+		return {Z: free, ae: paths};
 	});
 var $author$project$Algo$getFromMatching = F2(
 	function (vertex, matching) {
@@ -6257,7 +6342,7 @@ var $author$project$Algo$update = F2(
 							A2(
 								$elm$core$List$cons,
 								A2($elm$core$List$cons, left, firstPath),
-								res.ad),
+								res.ae),
 							$elm$core$Maybe$Nothing);
 					}
 				}
@@ -6283,7 +6368,7 @@ var $author$project$Algo$find = F3(
 						$elm$core$List$foldl,
 						A2($author$project$Algo$extend, graph, paths),
 						_List_Nil,
-						res.ad));
+						res.ae));
 			}
 		}
 	});
@@ -6358,7 +6443,7 @@ var $author$project$Event$extendToCapacity = function (event) {
 					$elm$core$List$cons,
 					_Utils_update(
 						e,
-						{ax: newIndex}),
+						{aa: newIndex}),
 					t.b));
 		});
 	return A3(
@@ -6367,7 +6452,7 @@ var $author$project$Event$extendToCapacity = function (event) {
 		_Utils_Tuple2(event.t + 1, _List_Nil),
 		A2($elm$core$List$repeat, event.t, event)).b;
 };
-var $author$project$Main$toGraphFromGreen = function (pupils) {
+var $author$project$Assignment$toGraphFromGreen = function (pupils) {
 	var fn = F2(
 		function (pupil, graph) {
 			var v = A2(
@@ -6392,7 +6477,7 @@ var $author$project$Main$toGraphFromGreen = function (pupils) {
 	var emptyGraph = _List_Nil;
 	return A3($elm$core$List$foldl, fn, emptyGraph, pupils);
 };
-var $author$project$Main$toGraphFromGreenAndYellow = function (pupils) {
+var $author$project$Assignment$toGraphFromGreenAndYellow = function (pupils) {
 	var fn = F2(
 		function (pupil, graph) {
 			var k = $author$project$Algo$Left(pupil);
@@ -6420,7 +6505,7 @@ var $author$project$Main$toGraphFromGreenAndYellow = function (pupils) {
 	var emptyGraph = _List_Nil;
 	return A3($elm$core$List$foldl, fn, emptyGraph, pupils);
 };
-var $author$project$Main$toGraphFromYellowWithoutMatched = F2(
+var $author$project$Assignment$toGraphFromYellowWithoutMatched = F2(
 	function (pupils, matching) {
 		var onlyUnmatchedVertices = function (vertex) {
 			return !A2(
@@ -6476,22 +6561,22 @@ var $author$project$Main$toGraphFromYellowWithoutMatched = F2(
 			emptyGraph,
 			A2($elm$core$List$filter, onlyRemaining, pupils));
 	});
-var $author$project$Main$finalize = function (pupils) {
+var $author$project$Assignment$finalize = function (pupils) {
 	var step3 = $author$project$Algo$run(
-		$author$project$Main$toGraphFromGreenAndYellow(pupils));
+		$author$project$Assignment$toGraphFromGreenAndYellow(pupils));
 	var step1 = A2(
 		$author$project$Algo$run,
-		$author$project$Main$toGraphFromGreen(pupils),
+		$author$project$Assignment$toGraphFromGreen(pupils),
 		_List_Nil);
 	var step2 = A2(
 		$author$project$Algo$run,
-		A2($author$project$Main$toGraphFromYellowWithoutMatched, pupils, step1),
+		A2($author$project$Assignment$toGraphFromYellowWithoutMatched, pupils, step1),
 		_List_Nil);
 	return step3(
 		_Utils_ap(step1, step2));
 };
-var $author$project$Main$matchedAndUnmatchedPupils = function (pupils) {
-	var matched = $author$project$Main$finalize(pupils);
+var $author$project$Assignment$matchedAndUnmatchedPupils = function (pupils) {
+	var matched = $author$project$Assignment$finalize(pupils);
 	return _Utils_Tuple2(
 		matched,
 		A2(
@@ -6510,7 +6595,7 @@ var $author$project$Main$matchedAndUnmatchedPupils = function (pupils) {
 			pupils));
 };
 var $elm$html$Html$ol = _VirtualDom_node('ol');
-var $author$project$Main$onColor = F2(
+var $author$project$Assignment$onColor = F2(
 	function (color, matching) {
 		var fn = function (_v0) {
 			var left = _v0.a;
@@ -6522,7 +6607,7 @@ var $author$project$Main$onColor = F2(
 				return A2(
 					$elm$core$List$any,
 					function (c) {
-						var _v2 = _Utils_Tuple2(c.by, color);
+						var _v2 = _Utils_Tuple2(c.bA, color);
 						_v2$2:
 						while (true) {
 							switch (_v2.a) {
@@ -6533,8 +6618,8 @@ var $author$project$Main$onColor = F2(
 										return _Utils_eq(
 											_Utils_update(
 												event,
-												{ax: 0}),
-											c.ar);
+												{aa: 0}),
+											c.at);
 									} else {
 										break _v2$2;
 									}
@@ -6545,8 +6630,8 @@ var $author$project$Main$onColor = F2(
 										return _Utils_eq(
 											_Utils_update(
 												event,
-												{ax: 0}),
-											c.ar);
+												{aa: 0}),
+											c.at);
 									} else {
 										break _v2$2;
 									}
@@ -6556,7 +6641,7 @@ var $author$project$Main$onColor = F2(
 						}
 						return false;
 					},
-					pupil.a4);
+					pupil.a6);
 			} else {
 				return false;
 			}
@@ -6567,10 +6652,10 @@ var $author$project$Main$onColor = F2(
 			A2($elm$core$List$filter, fn, matching));
 	});
 var $author$project$Pupil$pupilDisplay = function (pupil) {
-	return pupil.B + (' (Klasse ' + (pupil.u + ')'));
+	return pupil.aD + (' (Klasse ' + (pupil.u + ')'));
 };
 var $author$project$Pupil$pupilSorting = function (pupil) {
-	return _Utils_ap(pupil.u, pupil.B);
+	return _Utils_ap(pupil.u, pupil.aD);
 };
 var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
 var $elm$core$List$sortBy = _List_sortBy;
@@ -6627,348 +6712,359 @@ var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Main$result = function (pupils) {
-	var tableRow = F2(
-		function (p, e) {
-			return A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Pupil$pupilDisplay(p))
-							])),
-						A2(
-						$elm$html$Html$td,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$author$project$Helpers$classes(
-										A2(
-											$elm$core$List$member,
-											_Utils_update(
-												e,
-												{ax: 0}),
-											A2($author$project$Pupil$eventGroup, 0, p)) ? 'badge text-bg-success' : 'badge text-bg-warning')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(e.B)
-									]))
-							]))
-					]));
-		});
-	var _v0 = $author$project$Main$matchedAndUnmatchedPupils(pupils);
-	var matched = _v0.a;
-	var unmatched = _v0.b;
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('mb-5')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$h2,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Ergebnis')
-					])),
-				A2(
-				$elm$html$Html$p,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen.')
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('col-md-8')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h3,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Zugeteilte Schüler/Schülerinnen')
-							])),
-						$elm$core$List$isEmpty(matched) ? A2(
-						$elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('keine')
-							])) : A2(
-						$elm$html$Html$table,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('table')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$thead,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$tr,
-										_List_Nil,
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$th,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$scope('col')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Name und Klasse'),
-														A2(
-														$elm$html$Html$a,
-														_List_fromArray(
-															[
-																$author$project$Helpers$classes('link-primary ms-2'),
-																$elm$html$Html$Attributes$title('Nach Name und Klasse aufsteigend sortieren'),
-																$elm$html$Html$Attributes$tabindex(0),
-																A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
-																A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Name und Klasse aufsteigend sortieren')
-															]),
-														_List_fromArray(
-															[$author$project$Helpers$svgIconSortAlphaDown]))
-													])),
-												A2(
-												$elm$html$Html$th,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$scope('col')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Gruppe'),
-														A2(
-														$elm$html$Html$a,
-														_List_fromArray(
-															[
-																$author$project$Helpers$classes('link-primary ms-2'),
-																$elm$html$Html$Attributes$title('Nach Gruppe aufsteigend sortieren'),
-																$elm$html$Html$Attributes$tabindex(0),
-																A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
-																A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Gruppe aufsteigend sortieren')
-															]),
-														_List_fromArray(
-															[$author$project$Helpers$svgIconSortAlphaDown]))
-													]))
-											]))
-									])),
-								A2(
-								$elm$html$Html$tbody,
-								_List_Nil,
-								A2(
-									$elm$core$List$map,
-									function (_v3) {
-										var k = _v3.a;
-										var v = _v3.b;
-										var _v4 = _Utils_Tuple2(k, v);
-										if ((!_v4.a.$) && (_v4.b.$ === 1)) {
-											var p = _v4.a.a;
-											var e = _v4.b.a;
-											return A2(tableRow, p, e);
-										} else {
-											return A2($elm$html$Html$tr, _List_Nil, _List_Nil);
-										}
-									},
+var $author$project$Assignment$view = F2(
+	function (model, pupils) {
+		var tableRow = F2(
+			function (p, e) {
+				return A2(
+					$elm$html$Html$tr,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$td,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$author$project$Pupil$pupilDisplay(p))
+								])),
+							A2(
+							$elm$html$Html$td,
+							_List_Nil,
+							_List_fromArray(
+								[
 									A2(
-										$elm$core$List$sortBy,
-										function (_v1) {
-											var k = _v1.a;
-											if (!k.$) {
-												var p = k.a;
-												return $author$project$Pupil$pupilSorting(p);
-											} else {
-												return '';
-											}
-										},
-										matched)))
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('col-md-8')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h3,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Schüler/Schülerinnen ohne Platz')
-							])),
-						$elm$core$List$isEmpty(unmatched) ? A2(
-						$elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Keine')
-							])) : A2(
-						$elm$html$Html$ol,
-						_List_fromArray(
-							[
-								$author$project$Helpers$classes('list-group list-group-flush list-group-numbered')
-							]),
-						A2(
-							$elm$core$List$map,
-							function (p) {
-								return A2(
-									$elm$html$Html$li,
+									$elm$html$Html$span,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('list-group-item')
+											$author$project$Helpers$classes(
+											A2(
+												$elm$core$List$member,
+												_Utils_update(
+													e,
+													{aa: 0}),
+												A2($author$project$Pupil$eventGroup, 0, p)) ? 'badge text-bg-success' : 'badge text-bg-warning')
 										]),
 									_List_fromArray(
 										[
+											$elm$html$Html$text(e.aD)
+										]))
+								]))
+						]));
+			});
+		var _v0 = $author$project$Assignment$matchedAndUnmatchedPupils(pupils);
+		var matched = _v0.a;
+		var unmatched = _v0.b;
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('mb-5')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h2,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Ergebnis')
+						])),
+					A2(
+					$elm$html$Html$p,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen.')
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('col-md-8')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h3,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Zugeteilte Schüler/Schülerinnen')
+								])),
+							$elm$core$List$isEmpty(matched) ? A2(
+							$elm$html$Html$p,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('keine')
+								])) : A2(
+							$elm$html$Html$table,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('table')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$thead,
+									_List_Nil,
+									_List_fromArray(
+										[
 											A2(
-											$elm$html$Html$span,
+											$elm$html$Html$tr,
+											_List_Nil,
 											_List_fromArray(
 												[
-													$elm$html$Html$Attributes$class('ms-2')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text(
-													$author$project$Pupil$pupilDisplay(p))
+													A2(
+													$elm$html$Html$th,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$scope('col')
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Name und Klasse'),
+															A2(
+															$elm$html$Html$a,
+															_List_fromArray(
+																[
+																	$author$project$Helpers$classes('link-primary ms-2'),
+																	$elm$html$Html$Attributes$title('Nach Name und Klasse aufsteigend sortieren'),
+																	$elm$html$Html$Attributes$tabindex(0),
+																	A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+																	A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Name und Klasse aufsteigend sortieren'),
+																	$elm$html$Html$Events$onClick(0)
+																]),
+															_List_fromArray(
+																[$author$project$Helpers$svgIconSortAlphaDown]))
+														])),
+													A2(
+													$elm$html$Html$th,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$scope('col')
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Gruppe'),
+															A2(
+															$elm$html$Html$a,
+															_List_fromArray(
+																[
+																	$author$project$Helpers$classes('link-primary ms-2'),
+																	$elm$html$Html$Attributes$title('Nach Gruppe aufsteigend sortieren'),
+																	$elm$html$Html$Attributes$tabindex(0),
+																	A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+																	A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Gruppe aufsteigend sortieren'),
+																	$elm$html$Html$Events$onClick(1)
+																]),
+															_List_fromArray(
+																[$author$project$Helpers$svgIconSortAlphaDown]))
+														]))
 												]))
-										]));
-							},
-							A2($elm$core$List$sortBy, $author$project$Pupil$pupilSorting, unmatched)))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('col-md-8')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h3,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Statistik')
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$author$project$Helpers$classes('badge text-bg-secondary me-2'),
-										$elm$html$Html$Attributes$title('Gesamt')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										$elm$core$String$fromInt(
-											$elm$core$List$length(matched) + $elm$core$List$length(unmatched)))
-									])),
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('me-2')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('=')
-									])),
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$author$project$Helpers$classes('badge text-bg-success me-2'),
-										$elm$html$Html$Attributes$title('Grün')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										$elm$core$String$fromInt(
-											$elm$core$List$length(
-												A2($author$project$Main$onColor, 0, matched))))
-									])),
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('me-2')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('+')
-									])),
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$author$project$Helpers$classes('badge text-bg-warning me-2'),
-										$elm$html$Html$Attributes$title('Gelb')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										$elm$core$String$fromInt(
-											$elm$core$List$length(
-												A2($author$project$Main$onColor, 1, matched))))
-									])),
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('me-2')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('+')
-									])),
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$author$project$Helpers$classes('badge text-bg-danger'),
-										$elm$html$Html$Attributes$title('Rot')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										$elm$core$String$fromInt(
-											$elm$core$List$length(unmatched)))
-									]))
-							]))
-					]))
-			]));
-};
+										])),
+									A2(
+									$elm$html$Html$tbody,
+									_List_Nil,
+									A2(
+										$elm$core$List$map,
+										function (_v4) {
+											var k = _v4.a;
+											var v = _v4.b;
+											var _v5 = _Utils_Tuple2(k, v);
+											if ((!_v5.a.$) && (_v5.b.$ === 1)) {
+												var p = _v5.a.a;
+												var e = _v5.b.a;
+												return A2(tableRow, p, e);
+											} else {
+												return A2($elm$html$Html$tr, _List_Nil, _List_Nil);
+											}
+										},
+										A2(
+											$elm$core$List$sortBy,
+											function (_v1) {
+												var k = _v1.a;
+												var v = _v1.b;
+												var _v2 = _Utils_Tuple2(k, v);
+												if ((!_v2.a.$) && (_v2.b.$ === 1)) {
+													var p = _v2.a.a;
+													var e = _v2.b.a;
+													var _v3 = model.ah;
+													if (!_v3) {
+														return $author$project$Pupil$pupilSorting(p);
+													} else {
+														return e.aD;
+													}
+												} else {
+													return '';
+												}
+											},
+											matched)))
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('col-md-8')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h3,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Schüler/Schülerinnen ohne Platz')
+								])),
+							$elm$core$List$isEmpty(unmatched) ? A2(
+							$elm$html$Html$p,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Keine')
+								])) : A2(
+							$elm$html$Html$ol,
+							_List_fromArray(
+								[
+									$author$project$Helpers$classes('list-group list-group-flush list-group-numbered')
+								]),
+							A2(
+								$elm$core$List$map,
+								function (p) {
+									return A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('list-group-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('ms-2')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														$author$project$Pupil$pupilDisplay(p))
+													]))
+											]));
+								},
+								A2($elm$core$List$sortBy, $author$project$Pupil$pupilSorting, unmatched)))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('col-md-8')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h3,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Statistik')
+								])),
+							A2(
+							$elm$html$Html$p,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$author$project$Helpers$classes('badge text-bg-secondary me-2'),
+											$elm$html$Html$Attributes$title('Gesamt')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											$elm$core$String$fromInt(
+												$elm$core$List$length(matched) + $elm$core$List$length(unmatched)))
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('me-2')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('=')
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$author$project$Helpers$classes('badge text-bg-success me-2'),
+											$elm$html$Html$Attributes$title('Grün')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											$elm$core$String$fromInt(
+												$elm$core$List$length(
+													A2($author$project$Assignment$onColor, 0, matched))))
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('me-2')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('+')
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$author$project$Helpers$classes('badge text-bg-warning me-2'),
+											$elm$html$Html$Attributes$title('Gelb')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											$elm$core$String$fromInt(
+												$elm$core$List$length(
+													A2($author$project$Assignment$onColor, 1, matched))))
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('me-2')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('+')
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$author$project$Helpers$classes('badge text-bg-danger'),
+											$elm$html$Html$Attributes$title('Rot')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											$elm$core$String$fromInt(
+												$elm$core$List$length(unmatched)))
+										]))
+								]))
+						]))
+				]));
+	});
 var $author$project$Event$Capacity = function (a) {
 	return {$: 1, a: a};
 };
@@ -7029,7 +7125,7 @@ var $author$project$Event$oneEventLi = function (event) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(event.B),
+						$elm$html$Html$text(event.aD),
 						A2(
 						$elm$html$Html$span,
 						_List_fromArray(
@@ -7082,7 +7178,7 @@ var $author$project$Event$allEvents = function (events) {
 			A2(
 				$elm$core$List$sortBy,
 				function ($) {
-					return $.B;
+					return $.aD;
 				},
 				events)));
 };
@@ -7242,11 +7338,11 @@ var $author$project$Event$view = function (model) {
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeR, $author$project$Event$Name, $author$project$Event$FormDataMsg)),
-											$elm$html$Html$Attributes$value(model.v.B)
+											$elm$html$Html$Attributes$value(model.v.aD)
 										]),
 									'newGroupName',
 									'Gruppe ist bereits vorhanden',
-									model.J)),
+									model.I)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -7397,7 +7493,7 @@ var $author$project$Pupil$innerTable = function (pupil) {
 					function (c) {
 						var radioGroup = _Utils_ap(
 							$author$project$Pupil$pupilDisplay(pupil),
-							c.ar.B);
+							c.at.aD);
 						return A2(
 							$elm$html$Html$tr,
 							_List_Nil,
@@ -7411,7 +7507,7 @@ var $author$project$Pupil$innerTable = function (pupil) {
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text(c.ar.B)
+											$elm$html$Html$text(c.at.aD)
 										])),
 									A2(
 									$elm$html$Html$td,
@@ -7434,9 +7530,9 @@ var $author$project$Pupil$innerTable = function (pupil) {
 															$elm$html$Html$Attributes$type_('radio'),
 															$elm$html$Html$Attributes$name(radioGroup),
 															$elm$html$Html$Attributes$id(radioGroup + 'Green'),
-															$elm$html$Html$Attributes$checked(!c.by),
+															$elm$html$Html$Attributes$checked(!c.bA),
 															$elm$html$Html$Events$onClick(
-															A3($author$project$Pupil$ChangeChoice, pupil, c.ar, 0))
+															A3($author$project$Pupil$ChangeChoice, pupil, c.at, 0))
 														]),
 													_List_Nil),
 													A2(
@@ -7476,9 +7572,9 @@ var $author$project$Pupil$innerTable = function (pupil) {
 															$elm$html$Html$Attributes$type_('radio'),
 															$elm$html$Html$Attributes$name(radioGroup),
 															$elm$html$Html$Attributes$id(radioGroup + 'Yellow'),
-															$elm$html$Html$Attributes$checked(c.by === 1),
+															$elm$html$Html$Attributes$checked(c.bA === 1),
 															$elm$html$Html$Events$onClick(
-															A3($author$project$Pupil$ChangeChoice, pupil, c.ar, 1))
+															A3($author$project$Pupil$ChangeChoice, pupil, c.at, 1))
 														]),
 													_List_Nil),
 													A2(
@@ -7518,9 +7614,9 @@ var $author$project$Pupil$innerTable = function (pupil) {
 															$elm$html$Html$Attributes$type_('radio'),
 															$elm$html$Html$Attributes$name(radioGroup),
 															$elm$html$Html$Attributes$id(radioGroup + 'Red'),
-															$elm$html$Html$Attributes$checked(c.by === 2),
+															$elm$html$Html$Attributes$checked(c.bA === 2),
 															$elm$html$Html$Events$onClick(
-															A3($author$project$Pupil$ChangeChoice, pupil, c.ar, 2))
+															A3($author$project$Pupil$ChangeChoice, pupil, c.at, 2))
 														]),
 													_List_Nil),
 													A2(
@@ -7547,7 +7643,17 @@ var $author$project$Pupil$innerTable = function (pupil) {
 										]))
 								]));
 					},
-					pupil.a4))
+					A2(
+						$elm$core$List$sortBy,
+						A2(
+							$elm$core$Basics$composeR,
+							function ($) {
+								return $.at;
+							},
+							function ($) {
+								return $.aD;
+							}),
+						pupil.a6)))
 			]));
 };
 var $author$project$Pupil$onePupilLi = function (pupil) {
@@ -7686,7 +7792,7 @@ var $author$project$Pupil$view = function (model) {
 										]),
 									'newPupilNames',
 									'Schüler/Schülerin ist in dieser Klasse bereits vorhanden oder sonst ungültige Eingabe',
-									model.J)),
+									model.I)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -7774,18 +7880,21 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$map,
 						$author$project$Main$PupilMsg,
 						A2($elm$html$Html$Lazy$lazy, $author$project$Pupil$view, model.q)),
-						A2($elm$html$Html$Lazy$lazy, $author$project$Main$result, model.q.q),
+						A2(
+						$elm$html$Html$map,
+						$author$project$Main$AssignmentMsg,
+						A3($elm$html$Html$Lazy$lazy2, $author$project$Assignment$view, model.M, model.q.q)),
 						$author$project$Main$admin
 					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{
-		be: $author$project$Main$init,
-		bu: function (_v0) {
+		bg: $author$project$Main$init,
+		bw: function (_v0) {
 			return $elm$core$Platform$Sub$none;
 		},
-		bz: $author$project$Main$update,
-		bA: $author$project$Main$view
+		bB: $author$project$Main$update,
+		bC: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main($elm$json$Json$Decode$string)(0)}});}(this));

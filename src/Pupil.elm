@@ -1,11 +1,11 @@
 module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, pupilDisplay, pupilSorting, update, updateEvents, view)
 
 import Event
-import Helpers exposing (classes, svgIconArrowDown, svgIconArrowUp, svgIconXLg, tagWithInvalidFeedback)
+import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, checked, class, for, hidden, id, name, placeholder, required, rows, scope, tabindex, title, type_, value)
-import Html.Events exposing (onCheck, onClick, onInput, onSubmit)
-import Html.Lazy exposing (lazy, lazy3)
+import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Lazy exposing (lazy)
 import Json.Decode as D
 import Json.Encode as E
 
@@ -374,6 +374,7 @@ innerTable pupil =
             ]
         , tbody []
             (pupil.choices
+                |> List.sortBy (.event >> .name)
                 |> List.map
                     (\c ->
                         let
