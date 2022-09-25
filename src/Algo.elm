@@ -1,11 +1,14 @@
-module Algo exposing (Graph, Matching, Vertex(..), getFromMatching, run)
+module Algo exposing (Graph, Matching, VertexLeft(..), VertexRight(..), getFromMatchingLeft, run)
 
 import List
 
 
-type Vertex a b
-    = Left a
-    | Right b
+type VertexLeft a
+    = VertexLeft a
+
+
+type VertexRight b
+    = VertexRight b
 
 
 {-| We construct the bipartite graph with all vertices on the left side and
@@ -13,15 +16,20 @@ their edges to vertices on the right side. Isolated vertices on the right
 side are ignored.
 -}
 type alias Graph a b =
-    List ( Vertex a b, List (Vertex a b) )
+    List ( VertexLeft a, List (VertexRight b) )
 
 
 type alias Matching a b =
-    List ( Vertex a b, Vertex a b )
+    List ( VertexLeft a, VertexRight b )
+
+
+type PathElement a b
+    = PathElementLeft (VertexLeft a)
+    | PathElementRight (VertexRight b)
 
 
 type alias Path a b =
-    List (Vertex a b)
+    List (PathElement a b)
 
 
 type alias IntermediateResult a b =
@@ -36,7 +44,7 @@ run graph initialMatching =
         |> List.map Tuple.first
         |> List.filter
             (\left ->
-                case initialMatching |> getFromMatching left of
+                case initialMatching |> getFromMatchingLeft left of
                     Nothing ->
                         True
 
@@ -45,7 +53,7 @@ run graph initialMatching =
             )
         |> List.foldl
             (\left matching ->
-                case find graph matching (extend graph [] [ left ] []) of
+                case find graph matching (extend graph [] [ PathElementLeft left ] []) of
                     Nothing ->
                         matching
 
@@ -88,29 +96,47 @@ update matching paths =
                     IntermediateResult [] Nothing
 
                 Just headOfPath ->
-                    case matching |> getFromMatching headOfPath of
-                        Nothing ->
-                            IntermediateResult [] (Just firstPath)
+                    case headOfPath of
+                        PathElementLeft _ ->
+                            IntermediateResult [] Nothing
 
-                        Just left ->
-                            let
-                                res : IntermediateResult a b
-                                res =
-                                    update matching remainingPaths
-                            in
-                            case res.free of
-                                Just path ->
-                                    IntermediateResult [] (Just path)
-
+                        PathElementRight right ->
+                            case matching |> getFromMatchingRight right of
                                 Nothing ->
-                                    IntermediateResult ((left :: firstPath) :: res.paths) Nothing
+                                    IntermediateResult [] (Just firstPath)
+
+                                Just left ->
+                                    let
+                                        res : IntermediateResult a b
+                                        res =
+                                            update matching remainingPaths
+                                    in
+                                    case res.free of
+                                        Just path ->
+                                            IntermediateResult [] (Just path)
+
+                                        Nothing ->
+                                            IntermediateResult ((PathElementLeft left :: firstPath) :: res.paths) Nothing
 
 
 extend : Graph a b -> List (Path a b) -> Path a b -> List (Path a b) -> List (Path a b)
 extend graph old path new =
-    List.head path
-        |> Maybe.andThen (\left -> graph |> getFromGraph left |> Just)
-        |> Maybe.withDefault []
+    let
+        verticesRight : List (PathElement a b)
+        verticesRight =
+            case List.head path of
+                Nothing ->
+                    []
+
+                Just elem ->
+                    case elem of
+                        PathElementLeft l ->
+                            graph |> getFromGraph l |> List.map PathElementRight
+
+                        PathElementRight _ ->
+                            []
+    in
+    verticesRight
         |> List.filter (\right -> old |> List.any (\p -> List.member right p) |> not)
         |> List.map (\right -> right :: path)
         |> List.append new
@@ -119,33 +145,38 @@ extend graph old path new =
 apply : Path a b -> Matching a b -> Matching a b
 apply path matching =
     case path of
-        right :: left :: rest ->
-            matching
-                |> List.filter (\( l, _ ) -> l /= left)
-                |> (::) ( left, right )
-                |> apply rest
+        rightElem :: leftElem :: rest ->
+            case ( rightElem, leftElem ) of
+                ( PathElementRight right, PathElementLeft left ) ->
+                    matching
+                        |> List.filter (\( l, _ ) -> l /= left)
+                        |> (::) ( left, right )
+                        |> apply rest
+
+                _ ->
+                    matching
 
         _ ->
             matching
 
 
-getFromMatching : Vertex a b -> Matching a b -> Maybe (Vertex a b)
-getFromMatching vertex matching =
-    case vertex of
-        Left _ ->
-            matching
-                |> List.filter (\( a, _ ) -> vertex == a)
-                |> List.head
-                |> Maybe.andThen (\( _, b ) -> Just b)
-
-        Right _ ->
-            matching
-                |> List.filter (\( _, b ) -> vertex == b)
-                |> List.head
-                |> Maybe.andThen (\( a, _ ) -> Just a)
+getFromMatchingLeft : VertexLeft a -> Matching a b -> Maybe (VertexRight b)
+getFromMatchingLeft left matching =
+    matching
+        |> List.filter (\( a, _ ) -> left == a)
+        |> List.head
+        |> Maybe.andThen (\( _, b ) -> Just b)
 
 
-getFromGraph : Vertex a b -> Graph a b -> List (Vertex a b)
+getFromMatchingRight : VertexRight b -> Matching a b -> Maybe (VertexLeft a)
+getFromMatchingRight right matching =
+    matching
+        |> List.filter (\( _, b ) -> right == b)
+        |> List.head
+        |> Maybe.andThen (\( a, _ ) -> Just a)
+
+
+getFromGraph : VertexLeft a -> Graph a b -> List (VertexRight b)
 getFromGraph left graph =
     graph
         |> List.filter (Tuple.first >> (==) left)

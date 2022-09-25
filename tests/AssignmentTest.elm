@@ -67,16 +67,16 @@ suite =
                     Assignment.finalize pupils
                         |> Expect.all
                             [ Expect.equalLists
-                                [ ( Algo.Left p1, Algo.Right { e1 | internalID = 2 } )
-                                , ( Algo.Left p2, Algo.Right { e2 | internalID = 2 } )
-                                , ( Algo.Left p3, Algo.Right { e2 | internalID = 1 } )
-                                , ( Algo.Left p4, Algo.Right { e1 | internalID = 1 } )
-                                , ( Algo.Left p6, Algo.Right { e3 | internalID = 2 } )
-                                , ( Algo.Left p7, Algo.Right { e4 | internalID = 2 } )
-                                , ( Algo.Left p8, Algo.Right { e3 | internalID = 1 } )
-                                , ( Algo.Left p9, Algo.Right { e4 | internalID = 1 } )
-                                , ( Algo.Left p5, Algo.Right { e5 | internalID = 2 } )
-                                , ( Algo.Left p10, Algo.Right { e5 | internalID = 1 } )
+                                [ ( Algo.VertexLeft p1, Algo.VertexRight { e1 | internalID = 2 } )
+                                , ( Algo.VertexLeft p2, Algo.VertexRight { e2 | internalID = 2 } )
+                                , ( Algo.VertexLeft p3, Algo.VertexRight { e2 | internalID = 1 } )
+                                , ( Algo.VertexLeft p4, Algo.VertexRight { e1 | internalID = 1 } )
+                                , ( Algo.VertexLeft p6, Algo.VertexRight { e3 | internalID = 2 } )
+                                , ( Algo.VertexLeft p7, Algo.VertexRight { e4 | internalID = 2 } )
+                                , ( Algo.VertexLeft p8, Algo.VertexRight { e3 | internalID = 1 } )
+                                , ( Algo.VertexLeft p9, Algo.VertexRight { e4 | internalID = 1 } )
+                                , ( Algo.VertexLeft p5, Algo.VertexRight { e5 | internalID = 2 } )
+                                , ( Algo.VertexLeft p10, Algo.VertexRight { e5 | internalID = 1 } )
                                 ]
                             , List.length >> Expect.equal 10
                             , howManyGreens pupils >> Expect.equal 8
@@ -95,16 +95,16 @@ suite =
                     Assignment.finalize pupils
                         |> Expect.all
                             [ Expect.equalLists
-                                [ ( Algo.Left p10a, Algo.Right { e4 | internalID = 1 } )
-                                , ( Algo.Left p9, Algo.Right { e5 | internalID = 2 } )
-                                , ( Algo.Left p1, Algo.Right { e1 | internalID = 2 } )
-                                , ( Algo.Left p2, Algo.Right { e2 | internalID = 2 } )
-                                , ( Algo.Left p3, Algo.Right { e2 | internalID = 1 } )
-                                , ( Algo.Left p4, Algo.Right { e1 | internalID = 1 } )
-                                , ( Algo.Left p6, Algo.Right { e3 | internalID = 2 } )
-                                , ( Algo.Left p7, Algo.Right { e4 | internalID = 2 } )
-                                , ( Algo.Left p8, Algo.Right { e3 | internalID = 1 } )
-                                , ( Algo.Left p5, Algo.Right { e5 | internalID = 1 } )
+                                [ ( Algo.VertexLeft p10a, Algo.VertexRight { e4 | internalID = 1 } )
+                                , ( Algo.VertexLeft p9, Algo.VertexRight { e5 | internalID = 2 } )
+                                , ( Algo.VertexLeft p1, Algo.VertexRight { e1 | internalID = 2 } )
+                                , ( Algo.VertexLeft p2, Algo.VertexRight { e2 | internalID = 2 } )
+                                , ( Algo.VertexLeft p3, Algo.VertexRight { e2 | internalID = 1 } )
+                                , ( Algo.VertexLeft p4, Algo.VertexRight { e1 | internalID = 1 } )
+                                , ( Algo.VertexLeft p6, Algo.VertexRight { e3 | internalID = 2 } )
+                                , ( Algo.VertexLeft p7, Algo.VertexRight { e4 | internalID = 2 } )
+                                , ( Algo.VertexLeft p8, Algo.VertexRight { e3 | internalID = 1 } )
+                                , ( Algo.VertexLeft p5, Algo.VertexRight { e5 | internalID = 1 } )
                                 ]
 
                             -- [ ( "Ali (1a)", "Theater-1" )
@@ -171,7 +171,7 @@ howManyGreens pupils matching =
     pupils
         |> List.foldl
             (\pupil count ->
-                case matching |> Algo.getFromMatching (Algo.Left pupil) of
+                case matching |> Algo.getFromMatchingLeft (Algo.VertexLeft pupil) of
                     Nothing ->
                         count
 
@@ -180,7 +180,7 @@ howManyGreens pupils matching =
                             pupil
                                 |> Pupil.eventGroup Pupil.Green
                                 |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
-                                |> List.map Algo.Right
+                                |> List.map Algo.VertexRight
                                 |> List.member vertex
                         then
                             count + 1

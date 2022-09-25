@@ -6149,31 +6149,50 @@ var $author$project$Pupil$eventGroup = F2(
 	});
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $elm$html$Html$li = _VirtualDom_node('li');
-var $author$project$Algo$Left = function (a) {
+var $author$project$Algo$VertexLeft = $elm$core$Basics$identity;
+var $author$project$Algo$PathElementLeft = function (a) {
 	return {$: 0, a: a};
 };
 var $author$project$Algo$apply = F2(
 	function (path, matching) {
 		if (path.b && path.b.b) {
-			var right = path.a;
+			var rightElem = path.a;
 			var _v1 = path.b;
-			var left = _v1.a;
+			var leftElem = _v1.a;
 			var rest = _v1.b;
-			return A2(
-				$author$project$Algo$apply,
-				rest,
-				A2(
-					$elm$core$List$cons,
-					_Utils_Tuple2(left, right),
+			var _v2 = _Utils_Tuple2(rightElem, leftElem);
+			if ((_v2.a.$ === 1) && (!_v2.b.$)) {
+				var right = _v2.a.a;
+				var left = _v2.b.a;
+				return A2(
+					$author$project$Algo$apply,
+					rest,
 					A2(
-						$elm$core$List$filter,
-						function (_v2) {
-							var l = _v2.a;
-							return !_Utils_eq(l, left);
-						},
-						matching)));
+						$elm$core$List$cons,
+						_Utils_Tuple2(left, right),
+						A2(
+							$elm$core$List$filter,
+							function (_v3) {
+								var l = _v3.a;
+								return !_Utils_eq(l, left);
+							},
+							matching)));
+			} else {
+				return matching;
+			}
 		} else {
 			return matching;
+		}
+	});
+var $author$project$Algo$PathElementRight = function (a) {
+	return {$: 1, a: a};
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
 var $elm$core$Maybe$andThen = F2(
@@ -6183,14 +6202,6 @@ var $elm$core$Maybe$andThen = F2(
 			return callback(value);
 		} else {
 			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
 var $elm$core$Basics$composeL = F3(
@@ -6241,6 +6252,23 @@ var $author$project$Algo$getFromGraph = F2(
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Algo$extend = F4(
 	function (graph, old, path, _new) {
+		var verticesRight = function () {
+			var _v0 = $elm$core$List$head(path);
+			if (_v0.$ === 1) {
+				return _List_Nil;
+			} else {
+				var elem = _v0.a;
+				if (!elem.$) {
+					var l = elem.a;
+					return A2(
+						$elm$core$List$map,
+						$author$project$Algo$PathElementRight,
+						A2($author$project$Algo$getFromGraph, l, graph));
+				} else {
+					return _List_Nil;
+				}
+			}
+		}();
 		return A2(
 			$elm$core$List$append,
 			_new,
@@ -6259,54 +6287,28 @@ var $author$project$Algo$extend = F4(
 							},
 							old);
 					},
-					A2(
-						$elm$core$Maybe$withDefault,
-						_List_Nil,
-						A2(
-							$elm$core$Maybe$andThen,
-							function (left) {
-								return $elm$core$Maybe$Just(
-									A2($author$project$Algo$getFromGraph, left, graph));
-							},
-							$elm$core$List$head(path))))));
+					verticesRight)));
 	});
 var $author$project$Algo$IntermediateResult = F2(
 	function (paths, free) {
 		return {Z: free, ae: paths};
 	});
-var $author$project$Algo$getFromMatching = F2(
-	function (vertex, matching) {
-		if (!vertex.$) {
-			return A2(
-				$elm$core$Maybe$andThen,
-				function (_v2) {
-					var b = _v2.b;
-					return $elm$core$Maybe$Just(b);
-				},
-				$elm$core$List$head(
-					A2(
-						$elm$core$List$filter,
-						function (_v1) {
-							var a = _v1.a;
-							return _Utils_eq(vertex, a);
-						},
-						matching)));
-		} else {
-			return A2(
-				$elm$core$Maybe$andThen,
-				function (_v4) {
-					var a = _v4.a;
-					return $elm$core$Maybe$Just(a);
-				},
-				$elm$core$List$head(
-					A2(
-						$elm$core$List$filter,
-						function (_v3) {
-							var b = _v3.b;
-							return _Utils_eq(vertex, b);
-						},
-						matching)));
-		}
+var $author$project$Algo$getFromMatchingRight = F2(
+	function (right, matching) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			function (_v1) {
+				var a = _v1.a;
+				return $elm$core$Maybe$Just(a);
+			},
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$filter,
+					function (_v0) {
+						var b = _v0.b;
+						return _Utils_eq(right, b);
+					},
+					matching)));
 	});
 var $author$project$Algo$update = F2(
 	function (matching, paths) {
@@ -6320,30 +6322,38 @@ var $author$project$Algo$update = F2(
 				return A2($author$project$Algo$IntermediateResult, _List_Nil, $elm$core$Maybe$Nothing);
 			} else {
 				var headOfPath = _v1.a;
-				var _v2 = A2($author$project$Algo$getFromMatching, headOfPath, matching);
-				if (_v2.$ === 1) {
-					return A2(
-						$author$project$Algo$IntermediateResult,
-						_List_Nil,
-						$elm$core$Maybe$Just(firstPath));
+				if (!headOfPath.$) {
+					return A2($author$project$Algo$IntermediateResult, _List_Nil, $elm$core$Maybe$Nothing);
 				} else {
-					var left = _v2.a;
-					var res = A2($author$project$Algo$update, matching, remainingPaths);
-					var _v3 = res.Z;
-					if (!_v3.$) {
-						var path = _v3.a;
+					var right = headOfPath.a;
+					var _v3 = A2($author$project$Algo$getFromMatchingRight, right, matching);
+					if (_v3.$ === 1) {
 						return A2(
 							$author$project$Algo$IntermediateResult,
 							_List_Nil,
-							$elm$core$Maybe$Just(path));
+							$elm$core$Maybe$Just(firstPath));
 					} else {
-						return A2(
-							$author$project$Algo$IntermediateResult,
-							A2(
-								$elm$core$List$cons,
-								A2($elm$core$List$cons, left, firstPath),
-								res.ae),
-							$elm$core$Maybe$Nothing);
+						var left = _v3.a;
+						var res = A2($author$project$Algo$update, matching, remainingPaths);
+						var _v4 = res.Z;
+						if (!_v4.$) {
+							var path = _v4.a;
+							return A2(
+								$author$project$Algo$IntermediateResult,
+								_List_Nil,
+								$elm$core$Maybe$Just(path));
+						} else {
+							return A2(
+								$author$project$Algo$IntermediateResult,
+								A2(
+									$elm$core$List$cons,
+									A2(
+										$elm$core$List$cons,
+										$author$project$Algo$PathElementLeft(left),
+										firstPath),
+									res.ae),
+								$elm$core$Maybe$Nothing);
+						}
 					}
 				}
 			}
@@ -6372,6 +6382,23 @@ var $author$project$Algo$find = F3(
 			}
 		}
 	});
+var $author$project$Algo$getFromMatchingLeft = F2(
+	function (left, matching) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			function (_v1) {
+				var b = _v1.b;
+				return $elm$core$Maybe$Just(b);
+			},
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$filter,
+					function (_v0) {
+						var a = _v0.a;
+						return _Utils_eq(left, a);
+					},
+					matching)));
+	});
 var $author$project$Algo$run = F2(
 	function (graph, initialMatching) {
 		return A3(
@@ -6387,7 +6414,9 @@ var $author$project$Algo$run = F2(
 							graph,
 							_List_Nil,
 							_List_fromArray(
-								[left]),
+								[
+									$author$project$Algo$PathElementLeft(left)
+								]),
 							_List_Nil));
 					if (_v1.$ === 1) {
 						return matching;
@@ -6400,7 +6429,7 @@ var $author$project$Algo$run = F2(
 			A2(
 				$elm$core$List$filter,
 				function (left) {
-					var _v0 = A2($author$project$Algo$getFromMatching, left, initialMatching);
+					var _v0 = A2($author$project$Algo$getFromMatchingLeft, left, initialMatching);
 					if (_v0.$ === 1) {
 						return true;
 					} else {
@@ -6409,9 +6438,7 @@ var $author$project$Algo$run = F2(
 				},
 				A2($elm$core$List$map, $elm$core$Tuple$first, graph)));
 	});
-var $author$project$Algo$Right = function (a) {
-	return {$: 1, a: a};
-};
+var $author$project$Algo$VertexRight = $elm$core$Basics$identity;
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
 		repeatHelp:
@@ -6457,7 +6484,7 @@ var $author$project$Assignment$toGraphFromGreen = function (pupils) {
 		function (pupil, graph) {
 			var v = A2(
 				$elm$core$List$map,
-				$author$project$Algo$Right,
+				$elm$core$Basics$identity,
 				A3(
 					$elm$core$List$foldl,
 					F2(
@@ -6468,7 +6495,7 @@ var $author$project$Assignment$toGraphFromGreen = function (pupils) {
 						}),
 					_List_Nil,
 					A2($author$project$Pupil$eventGroup, 0, pupil)));
-			var k = $author$project$Algo$Left(pupil);
+			var k = pupil;
 			return A2(
 				$elm$core$List$cons,
 				_Utils_Tuple2(k, v),
@@ -6480,13 +6507,13 @@ var $author$project$Assignment$toGraphFromGreen = function (pupils) {
 var $author$project$Assignment$toGraphFromGreenAndYellow = function (pupils) {
 	var fn = F2(
 		function (pupil, graph) {
-			var k = $author$project$Algo$Left(pupil);
+			var k = pupil;
 			var events = _Utils_ap(
 				A2($author$project$Pupil$eventGroup, 0, pupil),
 				A2($author$project$Pupil$eventGroup, 1, pupil));
 			var v = A2(
 				$elm$core$List$map,
-				$author$project$Algo$Right,
+				$elm$core$Basics$identity,
 				A3(
 					$elm$core$List$foldl,
 					F2(
@@ -6520,13 +6547,8 @@ var $author$project$Assignment$toGraphFromYellowWithoutMatched = F2(
 			return !A2(
 				$elm$core$List$any,
 				function (_v0) {
-					var k = _v0.a;
-					if (!k.$) {
-						var p = k.a;
-						return _Utils_eq(p, pupil);
-					} else {
-						return false;
-					}
+					var p = _v0.a;
+					return _Utils_eq(p, pupil);
 				},
 				matching);
 		};
@@ -6537,7 +6559,7 @@ var $author$project$Assignment$toGraphFromYellowWithoutMatched = F2(
 					onlyUnmatchedVertices,
 					A2(
 						$elm$core$List$map,
-						$author$project$Algo$Right,
+						$elm$core$Basics$identity,
 						A3(
 							$elm$core$List$foldl,
 							F2(
@@ -6548,7 +6570,7 @@ var $author$project$Assignment$toGraphFromYellowWithoutMatched = F2(
 								}),
 							_List_Nil,
 							A2($author$project$Pupil$eventGroup, 1, pupil))));
-				var k = $author$project$Algo$Left(pupil);
+				var k = pupil;
 				return A2(
 					$elm$core$List$cons,
 					_Utils_Tuple2(k, v),
@@ -6577,15 +6599,20 @@ var $author$project$Assignment$finalize = function (pupils) {
 };
 var $author$project$Assignment$matchedAndUnmatchedPupils = function (pupils) {
 	var matched = $author$project$Assignment$finalize(pupils);
+	var matchedTransformed = A2(
+		$elm$core$List$map,
+		function (_v1) {
+			var p = _v1.a;
+			var e = _v1.b;
+			return _Utils_Tuple2(p, e);
+		},
+		matched);
 	return _Utils_Tuple2(
-		matched,
+		matchedTransformed,
 		A2(
 			$elm$core$List$filter,
 			function (p) {
-				var _v0 = A2(
-					$author$project$Algo$getFromMatching,
-					$author$project$Algo$Left(p),
-					matched);
+				var _v0 = A2($author$project$Algo$getFromMatchingLeft, p, matched);
 				if (_v0.$ === 1) {
 					return true;
 				} else {
@@ -6598,53 +6625,46 @@ var $elm$html$Html$ol = _VirtualDom_node('ol');
 var $author$project$Assignment$onColor = F2(
 	function (color, matching) {
 		var fn = function (_v0) {
-			var left = _v0.a;
-			var right = _v0.b;
-			var _v1 = _Utils_Tuple2(left, right);
-			if ((!_v1.a.$) && (_v1.b.$ === 1)) {
-				var pupil = _v1.a.a;
-				var event = _v1.b.a;
-				return A2(
-					$elm$core$List$any,
-					function (c) {
-						var _v2 = _Utils_Tuple2(c.bA, color);
-						_v2$2:
-						while (true) {
-							switch (_v2.a) {
-								case 0:
-									if (!_v2.b) {
-										var _v3 = _v2.a;
-										var _v4 = _v2.b;
-										return _Utils_eq(
-											_Utils_update(
-												event,
-												{aa: 0}),
-											c.at);
-									} else {
-										break _v2$2;
-									}
-								case 1:
-									if (_v2.b === 1) {
-										var _v5 = _v2.a;
-										var _v6 = _v2.b;
-										return _Utils_eq(
-											_Utils_update(
-												event,
-												{aa: 0}),
-											c.at);
-									} else {
-										break _v2$2;
-									}
-								default:
-									break _v2$2;
-							}
+			var pupil = _v0.a;
+			var event = _v0.b;
+			return A2(
+				$elm$core$List$any,
+				function (c) {
+					var _v1 = _Utils_Tuple2(c.bA, color);
+					_v1$2:
+					while (true) {
+						switch (_v1.a) {
+							case 0:
+								if (!_v1.b) {
+									var _v2 = _v1.a;
+									var _v3 = _v1.b;
+									return _Utils_eq(
+										_Utils_update(
+											event,
+											{aa: 0}),
+										c.at);
+								} else {
+									break _v1$2;
+								}
+							case 1:
+								if (_v1.b === 1) {
+									var _v4 = _v1.a;
+									var _v5 = _v1.b;
+									return _Utils_eq(
+										_Utils_update(
+											event,
+											{aa: 0}),
+										c.at);
+								} else {
+									break _v1$2;
+								}
+							default:
+								break _v1$2;
 						}
-						return false;
-					},
-					pupil.a6);
-			} else {
-				return false;
-			}
+					}
+					return false;
+				},
+				pupil.a6);
 		};
 		return A2(
 			$elm$core$List$map,
@@ -6870,35 +6890,21 @@ var $author$project$Assignment$view = F2(
 									_List_Nil,
 									A2(
 										$elm$core$List$map,
-										function (_v4) {
-											var k = _v4.a;
-											var v = _v4.b;
-											var _v5 = _Utils_Tuple2(k, v);
-											if ((!_v5.a.$) && (_v5.b.$ === 1)) {
-												var p = _v5.a.a;
-												var e = _v5.b.a;
-												return A2(tableRow, p, e);
-											} else {
-												return A2($elm$html$Html$tr, _List_Nil, _List_Nil);
-											}
+										function (_v3) {
+											var p = _v3.a;
+											var e = _v3.b;
+											return A2(tableRow, p, e);
 										},
 										A2(
 											$elm$core$List$sortBy,
 											function (_v1) {
-												var k = _v1.a;
-												var v = _v1.b;
-												var _v2 = _Utils_Tuple2(k, v);
-												if ((!_v2.a.$) && (_v2.b.$ === 1)) {
-													var p = _v2.a.a;
-													var e = _v2.b.a;
-													var _v3 = model.ah;
-													if (!_v3) {
-														return $author$project$Pupil$pupilSorting(p);
-													} else {
-														return e.aD;
-													}
+												var p = _v1.a;
+												var e = _v1.b;
+												var _v2 = model.ah;
+												if (!_v2) {
+													return $author$project$Pupil$pupilSorting(p);
 												} else {
-													return '';
+													return e.aD;
 												}
 											},
 											matched)))

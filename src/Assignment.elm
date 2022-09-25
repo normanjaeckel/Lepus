@@ -114,28 +114,15 @@ view model pupils =
                     , tbody []
                         (matched
                             |> List.sortBy
-                                (\( k, v ) ->
-                                    case ( k, v ) of
-                                        ( Algo.Left p, Algo.Right e ) ->
-                                            case model.sortBy of
-                                                NameSort ->
-                                                    Pupil.pupilSorting p
+                                (\( p, e ) ->
+                                    case model.sortBy of
+                                        NameSort ->
+                                            Pupil.pupilSorting p
 
-                                                EventSort ->
-                                                    e.name
-
-                                        _ ->
-                                            ""
+                                        EventSort ->
+                                            e.name
                                 )
-                            |> List.map
-                                (\( k, v ) ->
-                                    case ( k, v ) of
-                                        ( Algo.Left p, Algo.Right e ) ->
-                                            tableRow p e
-
-                                        _ ->
-                                            tr [] []
-                                )
+                            |> List.map (\( p, e ) -> tableRow p e)
                         )
                     ]
             ]
@@ -166,30 +153,25 @@ view model pupils =
         ]
 
 
-onColor : Pupil.ChoiceType -> Algo.Matching Pupil.Obj Event.Obj -> List (Algo.Vertex Pupil.Obj Event.Obj)
+onColor : Pupil.ChoiceType -> List ( Pupil.Obj, Event.Obj ) -> List Pupil.Obj
 onColor color matching =
     let
-        fn : ( Algo.Vertex Pupil.Obj Event.Obj, Algo.Vertex Pupil.Obj Event.Obj ) -> Bool
+        fn : ( Pupil.Obj, Event.Obj ) -> Bool
         fn =
-            \( left, right ) ->
-                case ( left, right ) of
-                    ( Algo.Left pupil, Algo.Right event ) ->
-                        pupil.choices
-                            |> List.any
-                                (\c ->
-                                    case ( c.type_, color ) of
-                                        ( Pupil.Green, Pupil.Green ) ->
-                                            { event | internalID = 0 } == c.event
+            \( pupil, event ) ->
+                pupil.choices
+                    |> List.any
+                        (\c ->
+                            case ( c.type_, color ) of
+                                ( Pupil.Green, Pupil.Green ) ->
+                                    { event | internalID = 0 } == c.event
 
-                                        ( Pupil.Yellow, Pupil.Yellow ) ->
-                                            { event | internalID = 0 } == c.event
+                                ( Pupil.Yellow, Pupil.Yellow ) ->
+                                    { event | internalID = 0 } == c.event
 
-                                        _ ->
-                                            False
-                                )
-
-                    _ ->
-                        False
+                                _ ->
+                                    False
+                        )
     in
     matching
         |> List.filter fn
@@ -200,18 +182,21 @@ onColor color matching =
 -- LOGIC
 
 
-matchedAndUnmatchedPupils : List Pupil.Obj -> ( Algo.Matching Pupil.Obj Event.Obj, List Pupil.Obj )
+matchedAndUnmatchedPupils : List Pupil.Obj -> ( List ( Pupil.Obj, Event.Obj ), List Pupil.Obj )
 matchedAndUnmatchedPupils pupils =
     let
         matched : Algo.Matching Pupil.Obj Event.Obj
         matched =
             finalize pupils
+
+        matchedTransformed =
+            matched |> List.map (\( Algo.VertexLeft p, Algo.VertexRight e ) -> ( p, e ))
     in
-    ( matched
+    ( matchedTransformed
     , pupils
         |> List.filter
             (\p ->
-                case matched |> Algo.getFromMatching (Algo.Left p) of
+                case matched |> Algo.getFromMatchingLeft (Algo.VertexLeft p) of
                     Nothing ->
                         True
 
@@ -250,16 +235,16 @@ toGraphFromGreen pupils =
         fn =
             \pupil graph ->
                 let
-                    k : Algo.Vertex Pupil.Obj Event.Obj
+                    k : Algo.VertexLeft Pupil.Obj
                     k =
-                        Algo.Left pupil
+                        Algo.VertexLeft pupil
 
-                    v : List (Algo.Vertex Pupil.Obj Event.Obj)
+                    v : List (Algo.VertexRight Event.Obj)
                     v =
                         pupil
                             |> Pupil.eventGroup Pupil.Green
                             |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
-                            |> List.map Algo.Right
+                            |> List.map Algo.VertexRight
                 in
                 ( k, v ) :: graph
     in
@@ -274,18 +259,10 @@ toGraphFromYellowWithoutMatched pupils matching =
         onlyRemaining =
             \pupil ->
                 matching
-                    |> List.any
-                        (\( k, _ ) ->
-                            case k of
-                                Algo.Left p ->
-                                    p == pupil
-
-                                _ ->
-                                    False
-                        )
+                    |> List.any (\( Algo.VertexLeft p, _ ) -> p == pupil)
                     |> not
 
-        onlyUnmatchedVertices : Algo.Vertex Pupil.Obj Event.Obj -> Bool
+        onlyUnmatchedVertices : Algo.VertexRight Event.Obj -> Bool
         onlyUnmatchedVertices =
             \vertex -> matching |> List.any (Tuple.second >> (==) vertex) |> not
 
@@ -297,16 +274,16 @@ toGraphFromYellowWithoutMatched pupils matching =
         fn =
             \pupil graph ->
                 let
-                    k : Algo.Vertex Pupil.Obj Event.Obj
+                    k : Algo.VertexLeft Pupil.Obj
                     k =
-                        Algo.Left pupil
+                        Algo.VertexLeft pupil
 
-                    v : List (Algo.Vertex Pupil.Obj Event.Obj)
+                    v : List (Algo.VertexRight Event.Obj)
                     v =
                         pupil
                             |> Pupil.eventGroup Pupil.Yellow
                             |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
-                            |> List.map Algo.Right
+                            |> List.map Algo.VertexRight
                             |> List.filter onlyUnmatchedVertices
                 in
                 ( k, v ) :: graph
@@ -331,15 +308,15 @@ toGraphFromGreenAndYellow pupils =
                     events =
                         (pupil |> Pupil.eventGroup Pupil.Green) ++ (pupil |> Pupil.eventGroup Pupil.Yellow)
 
-                    k : Algo.Vertex Pupil.Obj Event.Obj
+                    k : Algo.VertexLeft Pupil.Obj
                     k =
-                        Algo.Left pupil
+                        Algo.VertexLeft pupil
 
-                    v : List (Algo.Vertex Pupil.Obj Event.Obj)
+                    v : List (Algo.VertexRight Event.Obj)
                     v =
                         events
                             |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
-                            |> List.map Algo.Right
+                            |> List.map Algo.VertexRight
                 in
                 ( k, v ) :: graph
     in
