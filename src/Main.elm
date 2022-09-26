@@ -8,7 +8,7 @@ import File.Download
 import File.Select
 import Helpers exposing (classes)
 import Html exposing (..)
-import Html.Attributes exposing (class, type_)
+import Html.Attributes exposing (attribute, class, href, id, type_)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy, lazy2)
 import Json.Decode as D
@@ -116,7 +116,11 @@ update msg model =
                     { model | pupils = pupilsModel } |> s
 
         AssignmentMsg innerMsg ->
-            ( { model | assignment = Assignment.update innerMsg model.assignment }, Cmd.none )
+            let
+                ( assignmentModel, cmd ) =
+                    Assignment.update innerMsg model.assignment
+            in
+            ( { model | assignment = assignmentModel }, cmd |> Cmd.map AssignmentMsg )
 
         DeleteAll ->
             (init "" |> Tuple.first) |> s
@@ -140,13 +144,44 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ classes "container p-3 py-md-5" ]
-        [ main_ []
-            [ readme
-            , lazy Event.view model.events |> map EventMsg
-            , lazy Pupil.view model.pupils |> map PupilMsg
-            , lazy2 Assignment.view model.assignment model.pupils.pupils |> map AssignmentMsg
-            , admin
+    div []
+        [ navbar
+        , div [ classes "container p-3 pb-5" ]
+            [ main_ []
+                [ readme
+                , lazy Event.view model.events |> map EventMsg
+                , lazy Pupil.view model.pupils |> map PupilMsg
+                , lazy2 Assignment.view model.assignment model.pupils.pupils |> map AssignmentMsg
+                , admin
+                ]
+            ]
+        ]
+
+
+navbar : Html Msg
+navbar =
+    nav [ classes "navbar navbar-expand-md navbar-dark fixed-top bg-primary" ]
+        [ div [ class "container-fluid" ]
+            [ a [ class "navbar-brand", href "#" ] [ text "Home" ]
+            , button
+                [ class "navbar-toggler"
+                , type_ "button"
+                , attribute "data-bs-toggle" "collapse"
+                , attribute "data-bs-target" "#navbarCollapse"
+                , attribute "aria-controls" "navbarCollapse"
+                , attribute "aria-expanded" "false"
+                , attribute "aria-label" "Toggle navigation"
+                ]
+                [ span [ class "navbar-toggler-icon" ] []
+                ]
+            , div [ classes "collapse navbar-collapse", id "navbarCollapse" ]
+                [ ul [ classes "navbar-nav me-auto mb-2 mb-md-0" ]
+                    [ li [ class "nav-item" ] [ a [ classes "nav-link", href "#events" ] [ text "Projektgruppen" ] ]
+                    , li [ class "nav-item" ] [ a [ classes "nav-link", href "#pupils" ] [ text "Schüler/Schülerinnen" ] ]
+                    , li [ class "nav-item" ] [ a [ classes "nav-link", href "#result" ] [ text "Ergebnis" ] ]
+                    , li [ class "nav-item" ] [ a [ classes "nav-link", href "#admin" ] [ text "Administration" ] ]
+                    ]
+                ]
             ]
         ]
 
@@ -162,7 +197,7 @@ readme =
 admin : Html Msg
 admin =
     div []
-        [ h2 [] [ text "Administration" ]
+        [ h2 [ id "admin", class "nav-anchor" ] [ text "Administration" ]
         , p [] [ text "Hier kann man die eingegebenen Daten löschen oder exportieren. Beim Import werden alle bisherigen Eingaben überschrieben." ]
         , button [ classes "btn btn-danger", type_ "button", onClick DeleteAll ] [ text "Alle Daten löschen" ]
         , button [ classes "btn btn-secondary ms-2", type_ "button", onClick Export ] [ text "Export" ]

@@ -4,9 +4,11 @@ import Algo
 import Event
 import Helpers exposing (classes, svgIconSortAlphaDown)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, scope, tabindex, title)
+import Html.Attributes exposing (attribute, class, id, scope, tabindex, title)
 import Html.Events exposing (onClick)
+import Process
 import Pupil
+import Task
 
 
 
@@ -15,17 +17,24 @@ import Pupil
 
 type alias Model =
     { sortBy : SortBy
+    , visibility : Visibility
     }
 
 
 init : Model
 init =
-    Model NameSort
+    Model NameSort Hidden
 
 
 type SortBy
     = NameSort
     | EventSort
+
+
+type Visibility
+    = Hidden
+    | Loading
+    | Visible
 
 
 
@@ -34,13 +43,29 @@ type SortBy
 
 type Msg
     = SortBy SortBy
+    | SetVisibility Visibility
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SortBy s ->
-            { model | sortBy = s }
+            ( { model | sortBy = s }, Cmd.none )
+
+        SetVisibility v ->
+            ( { model | visibility = v }
+            , case v of
+                Hidden ->
+                    Cmd.none
+
+                Loading ->
+                    Process.sleep 50
+                        |> Task.andThen (\_ -> Task.succeed Visible)
+                        |> Task.perform SetVisibility
+
+                Visible ->
+                    Cmd.none
+            )
 
 
 
@@ -49,6 +74,28 @@ update msg model =
 
 view : Model -> List Pupil.Obj -> Html Msg
 view model pupils =
+    div [ class "mb-5" ]
+        [ h2 [ id "result", class "nav-anchor" ] [ text "Ergebnis" ]
+        , case model.visibility of
+            Hidden ->
+                button [ classes "btn btn-primary", onClick <| SetVisibility Loading ]
+                    [ text "Ergebnis berechnen und anzeigen" ]
+
+            Loading ->
+                div [ classes "spinner-border text-primary", attribute "role" "status" ]
+                    [ span [ class "visually-hidden" ] [ text "Loading..." ] ]
+
+            Visible ->
+                div []
+                    [ button [ classes "btn btn-primary mb-3", onClick <| SetVisibility Hidden ]
+                        [ text "Ergebnis ausblenden" ]
+                    , innerView model pupils
+                    ]
+        ]
+
+
+innerView : Model -> List Pupil.Obj -> Html Msg
+innerView model pupils =
     let
         ( matched, unmatched ) =
             matchedAndUnmatchedPupils pupils
@@ -71,9 +118,8 @@ view model pupils =
                         ]
                     ]
     in
-    div [ class "mb-5" ]
-        [ h2 [] [ text "Ergebnis" ]
-        , p [] [ text "Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen." ]
+    div []
+        [ p [] [ text "Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen." ]
         , div [ class "col-md-8" ]
             [ h3 []
                 [ text "Zugeteilte Schüler/Schülerinnen" ]

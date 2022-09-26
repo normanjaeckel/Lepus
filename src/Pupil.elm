@@ -294,7 +294,7 @@ updateEvents events model =
 view : Model -> Html Msg
 view model =
     div [ class "mb-5" ]
-        [ h2 [] [ text "Schüler/Schülerinnen" ]
+        [ h2 [ id "pupils", class "nav-anchor" ] [ text "Schüler/Schülerinnen" ]
         , form [ class "mb-3", onSubmit Save ]
             [ h3 [ hidden True ] [ text "Schüler und Schülerinnen der gleichen Klasse hinzufügen" ]
             , div [ classes "row g-3" ]

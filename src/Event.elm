@@ -2,7 +2,7 @@ module Event exposing (Action(..), Model, Msg, Obj, decoder, decoderEvent, event
 
 import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, hidden, placeholder, required, tabindex, title, type_, value)
+import Html.Attributes exposing (attribute, class, hidden, id, placeholder, required, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Lazy exposing (lazy)
 import Json.Decode as D
@@ -163,7 +163,7 @@ validate model =
 view : Model -> Html Msg
 view model =
     div [ class "mb-5" ]
-        [ h2 [] [ text "Projektgruppen" ]
+        [ h2 [ id "events", class "nav-anchor" ] [ text "Projektgruppen" ]
         , form [ class "mb-3", onSubmit Save ]
             [ h3 [ hidden True ] [ text "Neue Gruppe hinzufügen" ]
             , div [ classes "row g-3" ]
