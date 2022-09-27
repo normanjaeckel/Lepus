@@ -2,6 +2,7 @@ module AssignmentTest exposing (suite)
 
 import Algo
 import Assignment
+import Class
 import Event
 import Expect
 import Pupil
@@ -167,7 +168,7 @@ setupPupil green yellow red pupil =
     { pupil | choices = g ++ y ++ r }
 
 
-howManyGreens : List Pupil.Obj -> Set.Set String -> Algo.Matching Pupil.Obj Event.Obj -> Int
+howManyGreens : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Matching Pupil.Obj Event.Obj -> Int
 howManyGreens pupils cls matching =
     pupils
         |> List.foldl

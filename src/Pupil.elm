@@ -1,5 +1,6 @@
 module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, pupilDisplay, pupilSorting, update, updateEvents, view)
 
+import Class
 import Event
 import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
@@ -40,7 +41,7 @@ emptyFormData =
 
 type alias Obj =
     { name : String
-    , class : String
+    , class : Class.Classname
     , choices : List Choice
     }
 
@@ -170,7 +171,7 @@ type FormDataInput
     | Class String
 
 
-update : Msg -> Model -> List Event.Obj -> Set.Set String -> ( Model, Action )
+update : Msg -> Model -> List Event.Obj -> Set.Set Class.Classname -> ( Model, Action )
 update msg model events classes =
     case msg of
         FormDataMsg data ->
@@ -201,10 +202,10 @@ updateFormdata msg formData =
             { formData | class = c }
 
 
-savePupils : Model -> List Event.Obj -> Set.Set String -> String -> String -> Maybe (List Obj)
+savePupils : Model -> List Event.Obj -> Set.Set Class.Classname -> String -> String -> Maybe (List Obj)
 savePupils model events cls namesRaw classRaw =
     let
-        cl : String
+        cl : Class.Classname
         cl =
             String.trim classRaw
 

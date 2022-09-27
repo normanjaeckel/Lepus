@@ -1,6 +1,7 @@
 module Assignment exposing (Model, Msg, finalize, init, update, view)
 
 import Algo
+import Class
 import Event
 import Helpers exposing (classes, svgIconSortAlphaDown)
 import Html exposing (..)
@@ -73,7 +74,7 @@ update msg model =
 -- VIEW
 
 
-view : Model -> List Pupil.Obj -> Set.Set String -> Html Msg
+view : Model -> List Pupil.Obj -> Set.Set Class.Classname -> Html Msg
 view model pupils cls =
     div [ class "mb-5" ]
         [ h2 [ id "result", class "nav-anchor" ] [ text "Ergebnis" ]
@@ -95,7 +96,7 @@ view model pupils cls =
         ]
 
 
-innerView : Model -> List Pupil.Obj -> Set.Set String -> Html Msg
+innerView : Model -> List Pupil.Obj -> Set.Set Class.Classname -> Html Msg
 innerView model pupils cls =
     let
         ( matched, unmatched ) =
@@ -229,7 +230,7 @@ onColor color matching =
 -- LOGIC
 
 
-matchedAndUnmatchedPupils : List Pupil.Obj -> Set.Set String -> ( List ( Pupil.Obj, Event.Obj ), List Pupil.Obj )
+matchedAndUnmatchedPupils : List Pupil.Obj -> Set.Set Class.Classname -> ( List ( Pupil.Obj, Event.Obj ), List Pupil.Obj )
 matchedAndUnmatchedPupils pupils cls =
     let
         matched : Algo.Matching Pupil.Obj Event.Obj
@@ -253,7 +254,7 @@ matchedAndUnmatchedPupils pupils cls =
     )
 
 
-finalize : List Pupil.Obj -> Set.Set String -> Algo.Matching Pupil.Obj Event.Obj
+finalize : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Matching Pupil.Obj Event.Obj
 finalize pupils cls =
     let
         step1 : Algo.Matching Pupil.Obj Event.Obj
@@ -271,7 +272,7 @@ finalize pupils cls =
     (step1 ++ step2) |> step3
 
 
-toGraphFromGreen : List Pupil.Obj -> Set.Set String -> Algo.Graph Pupil.Obj Event.Obj
+toGraphFromGreen : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Graph Pupil.Obj Event.Obj
 toGraphFromGreen pupils cls =
     let
         emptyGraph : Algo.Graph Pupil.Obj Event.Obj
@@ -299,7 +300,7 @@ toGraphFromGreen pupils cls =
         |> List.foldl fn emptyGraph
 
 
-toGraphFromYellowWithoutMatched : List Pupil.Obj -> Set.Set String -> Algo.Matching Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
+toGraphFromYellowWithoutMatched : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Matching Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
 toGraphFromYellowWithoutMatched pupils cls matching =
     let
         onlyRemaining : Pupil.Obj -> Bool
@@ -340,7 +341,7 @@ toGraphFromYellowWithoutMatched pupils cls matching =
         |> List.foldl fn emptyGraph
 
 
-toGraphFromGreenAndYellow : List Pupil.Obj -> Set.Set String -> Algo.Graph Pupil.Obj Event.Obj
+toGraphFromGreenAndYellow : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Graph Pupil.Obj Event.Obj
 toGraphFromGreenAndYellow pupils cls =
     let
         emptyGraph : Algo.Graph Pupil.Obj Event.Obj

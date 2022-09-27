@@ -1,4 +1,4 @@
-module Class exposing (Action(..), Model, Msg, decoder, init, modelToJSON, update, view)
+module Class exposing (Action(..), Classname, Model, Msg, decoder, init, modelToJSON, update, view)
 
 import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
@@ -15,10 +15,14 @@ import Set
 
 
 type alias Model =
-    { classes : Set.Set String
-    , formData : String
+    { classes : Set.Set Classname
+    , formData : Classname
     , formInvalid : Bool
     }
+
+
+type alias Classname =
+    String
 
 
 init : Model
@@ -50,7 +54,7 @@ modelToJSON model =
 type Msg
     = FormDataMsg String
     | Save
-    | Delete String
+    | Delete Classname
 
 
 type Action
@@ -82,10 +86,10 @@ update msg model =
             ( { model | classes = Set.remove s model.classes, formInvalid = False }, ClassesChanged )
 
 
-validate : Model -> Maybe String
+validate : Model -> Maybe Classname
 validate model =
     let
-        c : String
+        c : Classname
         c =
             model.formData |> String.trim
     in
@@ -102,9 +106,6 @@ validate model =
 
 view : Model -> Html Msg
 view model =
-    -- div []
-    --     [ ul [] (model.classes |> Set.toList |> List.map (\c -> li [] [ text c ]))
-    --     ]
     div [ class "mb-5" ]
         [ h2 [ id "classes", class "nav-anchor" ] [ text "Klassen" ]
         , form [ class "mb-3", onSubmit Save ]
@@ -135,7 +136,7 @@ view model =
         ]
 
 
-allClasses : Set.Set String -> Html Msg
+allClasses : Set.Set Classname -> Html Msg
 allClasses c =
     if Set.isEmpty c then
         p [ hidden True ] [ text "Noch keine Klassen angelegt" ]
@@ -144,7 +145,7 @@ allClasses c =
         ul [ classes "list-group list-group-flush" ] (c |> Set.toList |> List.sort |> List.map (lazy oneClassLi))
 
 
-oneClassLi : String -> Html Msg
+oneClassLi : Classname -> Html Msg
 oneClassLi c =
     li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
         [ div [ classes "ms-2 me-auto" ] [ text c ]

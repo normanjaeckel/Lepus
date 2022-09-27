@@ -1,5 +1,6 @@
 module Event exposing (Action(..), Model, Msg, Obj, decoder, decoderEvent, eventToJSON, extendToCapacityAndRestrictByClass, init, modelToJSON, update, view)
 
+import Class
 import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, hidden, id, placeholder, required, tabindex, title, type_, value)
@@ -39,18 +40,18 @@ type alias Obj =
 
 
 type Seat
-    = Reserved Int String
+    = Reserved Int Class.Classname
     | Free Int
 
 
-extendToCapacityAndRestrictByClass : Obj -> Set.Set String -> String -> List Obj
+extendToCapacityAndRestrictByClass : Obj -> Set.Set Class.Classname -> Class.Classname -> List Obj
 extendToCapacityAndRestrictByClass event cls pupilsCl =
     let
         num : Int
         num =
             event.capacity // Set.size cls
 
-        fn : String -> ( Int, List Seat ) -> ( Int, List Seat )
+        fn : Class.Classname -> ( Int, List Seat ) -> ( Int, List Seat )
         fn =
             \cl ( i, l ) ->
                 let
