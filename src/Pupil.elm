@@ -1,8 +1,8 @@
-module Pupil exposing (Action(..), Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, pupilDisplay, pupilSorting, update, updateEvents, view)
+module Pupil exposing (Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, pupilDisplay, pupilSorting, update, updateEvents, view)
 
 import Class
 import Event
-import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
+import Helpers exposing (Persistence(..), classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, checked, class, for, hidden, id, name, placeholder, required, rows, scope, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -161,35 +161,30 @@ type Msg
     | ChangeChoice Obj Event.Obj ChoiceType
 
 
-type Action
-    = PupilsChanged
-    | FormChanged
-
-
 type FormDataInput
     = Names String
     | Class String
 
 
-update : Msg -> Model -> List Event.Obj -> Set.Set Class.Classname -> ( Model, Action )
+update : Msg -> Model -> List Event.Obj -> Set.Set Class.Classname -> ( Model, Persistence )
 update msg model events classes =
     case msg of
         FormDataMsg data ->
-            ( { model | formData = updateFormdata data model.formData, formInvalid = False }, FormChanged )
+            ( { model | formData = updateFormdata data model.formData, formInvalid = False }, DontSetStorage )
 
         Save ->
             case savePupils model events classes model.formData.names model.formData.class of
                 Just pupils ->
-                    ( { model | formData = emptyFormData, pupils = pupils, formInvalid = False }, PupilsChanged )
+                    ( { model | formData = emptyFormData, pupils = pupils, formInvalid = False }, SetStorage )
 
                 Nothing ->
-                    ( { model | formInvalid = True }, FormChanged )
+                    ( { model | formInvalid = True }, DontSetStorage )
 
         Delete pupil ->
-            ( { model | pupils = model.pupils |> List.filter ((/=) pupil), formInvalid = False }, PupilsChanged )
+            ( { model | pupils = model.pupils |> List.filter ((/=) pupil), formInvalid = False }, SetStorage )
 
         ChangeChoice pupil event choice ->
-            ( { model | pupils = changeChoice model.pupils pupil event choice, formInvalid = False }, PupilsChanged )
+            ( { model | pupils = changeChoice model.pupils pupil event choice, formInvalid = False }, SetStorage )
 
 
 updateFormdata : FormDataInput -> FormData -> FormData

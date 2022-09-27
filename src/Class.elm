@@ -1,6 +1,6 @@
-module Class exposing (Action(..), Classname, Model, Msg, decoder, init, modelToJSON, update, view)
+module Class exposing (Classname, Model, Msg, decoder, init, modelToJSON, update, view)
 
-import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
+import Helpers exposing (Persistence(..), classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, hidden, id, placeholder, required, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -57,16 +57,11 @@ type Msg
     | Delete Classname
 
 
-type Action
-    = FormChanged
-    | ClassesChanged
-
-
-update : Msg -> Model -> ( Model, Action )
+update : Msg -> Model -> ( Model, Persistence )
 update msg model =
     case msg of
         FormDataMsg s ->
-            ( { model | formData = s, formInvalid = False }, FormChanged )
+            ( { model | formData = s, formInvalid = False }, DontSetStorage )
 
         Save ->
             case validate model of
@@ -76,14 +71,14 @@ update msg model =
                         , formData = emptyFormData
                         , formInvalid = False
                       }
-                    , ClassesChanged
+                    , SetStorage
                     )
 
                 Nothing ->
-                    ( { model | formInvalid = True }, FormChanged )
+                    ( { model | formInvalid = True }, DontSetStorage )
 
         Delete s ->
-            ( { model | classes = Set.remove s model.classes, formInvalid = False }, ClassesChanged )
+            ( { model | classes = Set.remove s model.classes, formInvalid = False }, SetStorage )
 
 
 validate : Model -> Maybe Classname

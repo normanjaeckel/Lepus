@@ -7,7 +7,7 @@ import Event
 import File
 import File.Download
 import File.Select
-import Helpers exposing (classes)
+import Helpers exposing (Persistence(..), classes)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, href, id, type_)
 import Html.Events exposing (onClick)
@@ -21,7 +21,7 @@ import Task
 main : Program String Model Msg
 main =
     Browser.element
-        { init = init
+        { init = \flags -> ( init flags, Cmd.none )
         , view = view
         , update = update
         , subscriptions = \_ -> Sub.none
@@ -40,20 +40,18 @@ type alias Model =
     }
 
 
-init : String -> ( Model, Cmd Msg )
+init : String -> Model
 init s =
     case D.decodeString decoder s of
         Ok model ->
-            ( model, Cmd.none )
+            model
 
         Err _ ->
-            ( { classes = Class.init
-              , events = Event.init
-              , pupils = Pupil.init
-              , assignment = Assignment.init
-              }
-            , Cmd.none
-            )
+            { classes = Class.init
+            , events = Event.init
+            , pupils = Pupil.init
+            , assignment = Assignment.init
+            }
 
 
 decoder : D.Decoder Model
@@ -100,38 +98,38 @@ update msg model =
     case msg of
         ClassMsg innerMsg ->
             let
-                ( classesModel, action ) =
+                ( classesModel, pers ) =
                     Class.update innerMsg model.classes
             in
-            case action of
-                Class.FormChanged ->
+            case pers of
+                DontSetStorage ->
                     ( { model | classes = classesModel }, Cmd.none )
 
-                Class.ClassesChanged ->
+                SetStorage ->
                     { model | classes = classesModel } |> s
 
         EventMsg innerMsg ->
             let
-                ( eventsModel, action ) =
+                ( eventsModel, pers ) =
                     Event.update innerMsg model.events
             in
-            case action of
-                Event.FormChanged ->
+            case pers of
+                DontSetStorage ->
                     ( { model | events = eventsModel }, Cmd.none )
 
-                Event.EventsChanged ->
+                SetStorage ->
                     { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils } |> s
 
         PupilMsg innerMsg ->
             let
-                ( pupilsModel, action ) =
+                ( pupilsModel, pers ) =
                     Pupil.update innerMsg model.pupils model.events.events model.classes.classes
             in
-            case action of
-                Pupil.FormChanged ->
+            case pers of
+                DontSetStorage ->
                     ( { model | pupils = pupilsModel }, Cmd.none )
 
-                Pupil.PupilsChanged ->
+                SetStorage ->
                     { model | pupils = pupilsModel } |> s
 
         AssignmentMsg innerMsg ->
@@ -142,7 +140,7 @@ update msg model =
             ( { model | assignment = assignmentModel }, cmd |> Cmd.map AssignmentMsg )
 
         DeleteAll ->
-            (init "" |> Tuple.first) |> s
+            init "" |> s
 
         Export ->
             ( model, File.Download.string "export.json" "application/json" (modelToJSON model |> E.encode 4) )
@@ -154,7 +152,7 @@ update msg model =
             ( model, File.toString file |> Task.perform ImportLoaded )
 
         ImportLoaded content ->
-            (init content |> Tuple.first) |> s
+            init content |> s
 
 
 

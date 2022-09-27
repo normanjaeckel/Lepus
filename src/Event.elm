@@ -1,7 +1,7 @@
-module Event exposing (Action(..), Model, Msg, Obj, decoder, decoderEvent, eventToJSON, extendToCapacityAndRestrictByClass, init, modelToJSON, update, view)
+module Event exposing (Model, Msg, Obj, decoder, decoderEvent, eventToJSON, extendToCapacityAndRestrictByClass, init, modelToJSON, update, view)
 
 import Class
-import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
+import Helpers exposing (Persistence(..), classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, hidden, id, placeholder, required, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -134,21 +134,16 @@ type Msg
     | Delete Obj
 
 
-type Action
-    = EventsChanged
-    | FormChanged
-
-
 type FormDataInput
     = Name String
     | Capacity Int
 
 
-update : Msg -> Model -> ( Model, Action )
+update : Msg -> Model -> ( Model, Persistence )
 update msg model =
     case msg of
         FormDataMsg data ->
-            ( { model | formData = updateFormdata data model.formData, formInvalid = False }, FormChanged )
+            ( { model | formData = updateFormdata data model.formData, formInvalid = False }, DontSetStorage )
 
         Save ->
             case validate model of
@@ -158,14 +153,14 @@ update msg model =
                         , events = model.events ++ [ new ]
                         , formInvalid = False
                       }
-                    , EventsChanged
+                    , SetStorage
                     )
 
                 Nothing ->
-                    ( { model | formInvalid = True }, FormChanged )
+                    ( { model | formInvalid = True }, DontSetStorage )
 
         Delete obj ->
-            ( { model | events = model.events |> List.filter ((/=) obj), formInvalid = False }, EventsChanged )
+            ( { model | events = model.events |> List.filter ((/=) obj), formInvalid = False }, SetStorage )
 
 
 updateFormdata : FormDataInput -> Obj -> Obj

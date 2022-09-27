@@ -1,9 +1,16 @@
-module Helpers exposing (classes, svgIconSortAlphaDown, svgIconSortAlphaDownAlt, svgIconXLg, tagWithInvalidFeedback)
+module Helpers exposing (Persistence(..), classes, svgIconSortAlphaDown, svgIconSortAlphaDownAlt, svgIconXLg, tagWithInvalidFeedback)
 
 import Html
 import Html.Attributes
 import Svg exposing (path, svg)
 import Svg.Attributes exposing (class, d, fill, fillRule, height, viewBox, width)
+
+
+{-| Indicates whether an update should be stored or not.
+-}
+type Persistence
+    = SetStorage
+    | DontSetStorage
 
 
 {-| This helper takes a string with class names separated by one whitespace. All
