@@ -100,8 +100,23 @@ innerView : Model -> List Pupil.Obj -> Set.Set Class.Classname -> Html Msg
 innerView model pupils cls =
     let
         ( matched, unmatched ) =
-            matchedAndUnmatchedPupils pupils cls
+            pupils |> matchedAndUnmatchedPupils cls
 
+        ( matched2, unmatched2 ) =
+            pupils
+                |> applyMatchingToRedState matched
+                |> matchedAndUnmatchedPupils cls
+    in
+    div []
+        [ p [] [ text "Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen." ]
+        , day 1 model matched unmatched
+        , day 2 model matched2 unmatched2
+        ]
+
+
+day : Int -> Model -> List ( Pupil.Obj, Event.Obj ) -> List Pupil.Obj -> Html Msg
+day num model matched unmatched =
+    let
         tableRow : Pupil.Obj -> Event.Obj -> Html msg
         tableRow =
             \p e ->
@@ -110,7 +125,7 @@ innerView model pupils cls =
                     , td []
                         [ span
                             [ classes <|
-                                if p |> Pupil.eventGroup Pupil.Green |> List.member { e | internalID = 0 } then
+                                if p |> Pupil.eventGroup Pupil.Green |> List.member e then
                                     "badge text-bg-success"
 
                                 else
@@ -120,83 +135,77 @@ innerView model pupils cls =
                         ]
                     ]
     in
-    div []
-        [ p [] [ text "Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen." ]
-        , div [ class "col-md-8" ]
-            [ h3 []
-                [ text "Zugeteilte Schüler/Schülerinnen" ]
-            , if List.isEmpty matched then
-                p [] [ text "keine" ]
+    div [ classes "col-md-8 mb-4" ]
+        [ h3 [] [ text <| "Tag " ++ String.fromInt num ]
+        , h4 []
+            [ text "Zugeteilte Schüler/Schülerinnen" ]
+        , if List.isEmpty matched then
+            p [] [ text "keine" ]
 
-              else
-                table
-                    [ class "table" ]
-                    [ thead []
-                        [ tr []
-                            [ th [ scope "col" ]
-                                [ text "Name und Klasse"
-                                , a
-                                    [ classes "link-primary ms-2"
-                                    , title "Nach Name und Klasse aufsteigend sortieren"
-                                    , tabindex 0
-                                    , attribute "role" "button"
-                                    , attribute "aria-label" "Nach Name und Klasse aufsteigend sortieren"
-                                    , onClick <| SortBy NameSort
-                                    ]
-                                    [ svgIconSortAlphaDown ]
+          else
+            table
+                [ class "table" ]
+                [ thead []
+                    [ tr []
+                        [ th [ scope "col" ]
+                            [ text "Name und Klasse"
+                            , a
+                                [ classes "link-primary ms-2"
+                                , title "Nach Name und Klasse aufsteigend sortieren"
+                                , tabindex 0
+                                , attribute "role" "button"
+                                , attribute "aria-label" "Nach Name und Klasse aufsteigend sortieren"
+                                , onClick <| SortBy NameSort
                                 ]
-                            , th [ scope "col" ]
-                                [ text "Gruppe"
-                                , a
-                                    [ classes "link-primary ms-2"
-                                    , title "Nach Gruppe aufsteigend sortieren"
-                                    , tabindex 0
-                                    , attribute "role" "button"
-                                    , attribute "aria-label" "Nach Gruppe aufsteigend sortieren"
-                                    , onClick <| SortBy EventSort
-                                    ]
-                                    [ svgIconSortAlphaDown ]
+                                [ svgIconSortAlphaDown ]
+                            ]
+                        , th [ scope "col" ]
+                            [ text "Gruppe"
+                            , a
+                                [ classes "link-primary ms-2"
+                                , title "Nach Gruppe aufsteigend sortieren"
+                                , tabindex 0
+                                , attribute "role" "button"
+                                , attribute "aria-label" "Nach Gruppe aufsteigend sortieren"
+                                , onClick <| SortBy EventSort
                                 ]
+                                [ svgIconSortAlphaDown ]
                             ]
                         ]
-                    , tbody []
-                        (matched
-                            |> List.sortBy
-                                (\( p, e ) ->
-                                    case model.sortBy of
-                                        NameSort ->
-                                            Pupil.pupilSorting p
-
-                                        EventSort ->
-                                            e.name
-                                )
-                            |> List.map (\( p, e ) -> tableRow p e)
-                        )
                     ]
-            ]
-        , div [ class "col-md-8" ]
-            [ h3 [] [ text "Schüler/Schülerinnen ohne Platz" ]
-            , if List.isEmpty unmatched then
-                p [] [ text "Keine" ]
+                , tbody []
+                    (matched
+                        |> List.sortBy
+                            (\( p, e ) ->
+                                case model.sortBy of
+                                    NameSort ->
+                                        Pupil.pupilSorting p
 
-              else
-                ol [ classes "list-group list-group-flush list-group-numbered" ]
-                    (unmatched
-                        |> List.sortBy Pupil.pupilSorting
-                        |> List.map (\p -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text <| Pupil.pupilDisplay p ] ])
+                                    EventSort ->
+                                        e.name
+                            )
+                        |> List.map (\( p, e ) -> tableRow p e)
                     )
-            ]
-        , div [ class "col-md-8" ]
-            [ h3 [] [ text "Statistik" ]
-            , p []
-                [ span [ classes "badge text-bg-secondary me-2", title "Gesamt" ] [ text <| String.fromInt <| List.length matched + List.length unmatched ]
-                , span [ class "me-2" ] [ text "=" ]
-                , span [ classes "badge text-bg-success me-2", title "Grün" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Green matched ]
-                , span [ class "me-2" ] [ text "+" ]
-                , span [ classes "badge text-bg-warning me-2", title "Gelb" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Yellow matched ]
-                , span [ class "me-2" ] [ text "+" ]
-                , span [ classes "badge text-bg-danger", title "Rot" ] [ text <| String.fromInt <| List.length unmatched ]
                 ]
+        , h4 [] [ text "Schüler/Schülerinnen ohne Platz" ]
+        , if List.isEmpty unmatched then
+            p [] [ text "Keine" ]
+
+          else
+            ol [ classes "list-group list-group-flush list-group-numbered" ]
+                (unmatched
+                    |> List.sortBy Pupil.pupilSorting
+                    |> List.map (\p -> li [ class "list-group-item" ] [ span [ class "ms-2" ] [ text <| Pupil.pupilDisplay p ] ])
+                )
+        , h4 [] [ text "Statistik" ]
+        , p []
+            [ span [ classes "badge text-bg-secondary me-2", title "Gesamt" ] [ text <| String.fromInt <| List.length matched + List.length unmatched ]
+            , span [ class "me-2" ] [ text "=" ]
+            , span [ classes "badge text-bg-success me-2", title "Grün" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Green matched ]
+            , span [ class "me-2" ] [ text "+" ]
+            , span [ classes "badge text-bg-warning me-2", title "Gelb" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Yellow matched ]
+            , span [ class "me-2" ] [ text "+" ]
+            , span [ classes "badge text-bg-danger", title "Rot" ] [ text <| String.fromInt <| List.length unmatched ]
             ]
         ]
 
@@ -230,15 +239,15 @@ onColor color matching =
 -- LOGIC
 
 
-matchedAndUnmatchedPupils : List Pupil.Obj -> Set.Set Class.Classname -> ( List ( Pupil.Obj, Event.Obj ), List Pupil.Obj )
-matchedAndUnmatchedPupils pupils cls =
+matchedAndUnmatchedPupils : Set.Set Class.Classname -> List Pupil.Obj -> ( List ( Pupil.Obj, Event.Obj ), List Pupil.Obj )
+matchedAndUnmatchedPupils cls pupils =
     let
         matched : Algo.Matching Pupil.Obj Event.Obj
         matched =
             finalize pupils cls
 
         matchedTransformed =
-            matched |> List.map (\( Algo.VertexLeft p, Algo.VertexRight e ) -> ( p, e ))
+            matched |> List.map (\( Algo.VertexLeft p, Algo.VertexRight e ) -> ( p, { e | internalID = 0 } ))
     in
     ( matchedTransformed
     , pupils
@@ -252,6 +261,31 @@ matchedAndUnmatchedPupils pupils cls =
                         False
             )
     )
+
+
+applyMatchingToRedState : List ( Pupil.Obj, Event.Obj ) -> List Pupil.Obj -> List Pupil.Obj
+applyMatchingToRedState matching pupils =
+    pupils
+        |> List.map
+            (\pupil ->
+                case matching |> List.filter (\( p, _ ) -> pupil == p) |> List.head of
+                    Nothing ->
+                        pupil
+
+                    Just ( _, e ) ->
+                        { pupil
+                            | choices =
+                                pupil.choices
+                                    |> List.map
+                                        (\c ->
+                                            if c.event == e then
+                                                { c | type_ = Pupil.Red }
+
+                                            else
+                                                c
+                                        )
+                        }
+            )
 
 
 finalize : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Matching Pupil.Obj Event.Obj

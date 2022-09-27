@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.aj.N === region.au.N)
+	if (region.al.N === region.aw.N)
 	{
-		return 'on line ' + region.aj.N;
+		return 'on line ' + region.al.N;
 	}
-	return 'on lines ' + region.aj.N + ' through ' + region.au.N;
+	return 'on lines ' + region.al.N + ' through ' + region.aw.N;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bi,
+		impl.bj,
 		impl.bD,
-		impl.by,
+		impl.bz,
 		function() { return function() {} }
 	);
 });
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		z: func(record.z),
-		ak: record.ak,
-		ag: record.ag
+		am: record.am,
+		ai: record.ai
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.z;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ak;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.am;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ag) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ai) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,9 +3943,9 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bi,
+		impl.bj,
 		impl.bD,
-		impl.by,
+		impl.bz,
 		function(sendToApp, initialModel) {
 			var view = impl.bE;
 			/**/
@@ -3979,11 +3979,11 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.bi,
+		impl.bj,
 		impl.bD,
-		impl.by,
+		impl.bz,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.ah && impl.ah(sendToApp)
+			var divertHrefToApp = impl.aj && impl.aj(sendToApp)
 			var view = impl.bE;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.a4);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.a6);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.bB) && (_VirtualDom_doc.title = title = doc.bB);
+				(title !== doc.bC) && (_VirtualDom_doc.title = title = doc.bC);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.bs;
-	var onUrlRequest = impl.bt;
+	var onUrlChange = impl.bt;
+	var onUrlRequest = impl.bu;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		ah: function(sendToApp)
+		aj: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aN === next.aN
-							&& curr.aA === next.aA
-							&& curr.aK.a === next.aK.a
+							&& curr.aO === next.aO
+							&& curr.aB === next.aB
+							&& curr.aL.a === next.aL.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		bi: function(flags)
+		bj: function(flags)
 		{
-			return A3(impl.bi, flags, _Browser_getUrl(), key);
+			return A3(impl.bj, flags, _Browser_getUrl(), key);
 		},
 		bE: impl.bE,
 		bD: impl.bD,
-		by: impl.by
+		bz: impl.bz
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { bg: 'hidden', a6: 'visibilitychange' }
+		? { bh: 'hidden', a8: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { bg: 'mozHidden', a6: 'mozvisibilitychange' }
+		? { bh: 'mozHidden', a8: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { bg: 'msHidden', a6: 'msvisibilitychange' }
+		? { bh: 'msHidden', a8: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { bg: 'webkitHidden', a6: 'webkitvisibilitychange' }
-		: { bg: 'hidden', a6: 'visibilitychange' };
+		? { bh: 'webkitHidden', a8: 'webkitvisibilitychange' }
+		: { bh: 'hidden', a8: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aT: _Browser_getScene(),
-		aZ: {
-			a$: _Browser_window.pageXOffset,
-			a0: _Browser_window.pageYOffset,
-			a_: _Browser_doc.documentElement.clientWidth,
-			az: _Browser_doc.documentElement.clientHeight
+		aU: _Browser_getScene(),
+		a$: {
+			a1: _Browser_window.pageXOffset,
+			a2: _Browser_window.pageYOffset,
+			a0: _Browser_doc.documentElement.clientWidth,
+			aA: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		a_: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		az: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		a0: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		aA: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aT: {
-				a_: node.scrollWidth,
-				az: node.scrollHeight
+			aU: {
+				a0: node.scrollWidth,
+				aA: node.scrollHeight
 			},
-			aZ: {
-				a$: node.scrollLeft,
-				a0: node.scrollTop,
-				a_: node.clientWidth,
-				az: node.clientHeight
+			a$: {
+				a1: node.scrollLeft,
+				a2: node.scrollTop,
+				a0: node.clientWidth,
+				aA: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aT: _Browser_getScene(),
-			aZ: {
-				a$: x,
-				a0: y,
-				a_: _Browser_doc.documentElement.clientWidth,
-				az: _Browser_doc.documentElement.clientHeight
+			aU: _Browser_getScene(),
+			a$: {
+				a1: x,
+				a2: y,
+				a0: _Browser_doc.documentElement.clientWidth,
+				aA: _Browser_doc.documentElement.clientHeight
 			},
-			bb: {
-				a$: x + rect.left,
-				a0: y + rect.top,
-				a_: rect.width,
-				az: rect.height
+			bc: {
+				a1: x + rect.left,
+				a2: y + rect.top,
+				a0: rect.width,
+				aA: rect.height
 			}
 		};
 	});
@@ -5052,7 +5052,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aw: fragment, aA: host, aI: path, aK: port_, aN: protocol, aO: query};
+		return {ax: fragment, aB: host, aJ: path, aL: port_, aO: protocol, aP: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5480,7 +5480,7 @@ var $author$project$Event$Model = F3(
 	});
 var $author$project$Event$Obj = F3(
 	function (name, capacity, internalID) {
-		return {t: capacity, ab: internalID, aF: name};
+		return {t: capacity, ad: internalID, aG: name};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5505,11 +5505,11 @@ var $author$project$Pupil$Model = F3(
 	});
 var $author$project$Pupil$Obj = F3(
 	function (name, _class, choices) {
-		return {a8: choices, Y: _class, aF: name};
+		return {Y: choices, Z: _class, aG: name};
 	});
 var $author$project$Pupil$Choice = F2(
 	function (event, type_) {
-		return {av: event, bC: type_};
+		return {aa: event, a_: type_};
 	});
 var $author$project$Pupil$Green = 0;
 var $author$project$Pupil$Red = 2;
@@ -5531,7 +5531,7 @@ var $author$project$Pupil$decoderChoice = A3(
 			$elm$json$Json$Decode$string)));
 var $author$project$Pupil$FormData = F2(
 	function (names, _class) {
-		return {Y: _class, V: names};
+		return {Z: _class, V: names};
 	});
 var $author$project$Pupil$emptyFormData = A2($author$project$Pupil$FormData, '', '');
 var $elm$json$Json$Decode$map3 = _Json_map3;
@@ -5553,7 +5553,7 @@ var $author$project$Pupil$decoder = A2(
 var $author$project$Assignment$Hidden = 0;
 var $author$project$Assignment$Model = F2(
 	function (sortBy, visibility) {
-		return {ai: sortBy, an: visibility};
+		return {ak: sortBy, ap: visibility};
 	});
 var $author$project$Assignment$NameSort = 0;
 var $author$project$Assignment$init = A2($author$project$Assignment$Model, 0, 0);
@@ -5637,7 +5637,7 @@ var $author$project$Event$eventToJSON = function (e) {
 			[
 				_Utils_Tuple2(
 				'name',
-				$elm$json$Json$Encode$string(e.aF)),
+				$elm$json$Json$Encode$string(e.aG)),
 				_Utils_Tuple2(
 				'capacity',
 				$elm$json$Json$Encode$int(e.t))
@@ -5662,11 +5662,11 @@ var $author$project$Pupil$choiceToJSON = function (choice) {
 			[
 				_Utils_Tuple2(
 				'event',
-				$author$project$Event$eventToJSON(choice.av)),
+				$author$project$Event$eventToJSON(choice.aa)),
 				_Utils_Tuple2(
 				'type',
 				$elm$json$Json$Encode$string(
-					$author$project$Pupil$choiceTypeToString(choice.bC)))
+					$author$project$Pupil$choiceTypeToString(choice.a_)))
 			]));
 };
 var $author$project$Pupil$pupilToJSON = function (p) {
@@ -5675,13 +5675,13 @@ var $author$project$Pupil$pupilToJSON = function (p) {
 			[
 				_Utils_Tuple2(
 				'name',
-				$elm$json$Json$Encode$string(p.aF)),
+				$elm$json$Json$Encode$string(p.aG)),
 				_Utils_Tuple2(
 				'class',
-				$elm$json$Json$Encode$string(p.Y)),
+				$elm$json$Json$Encode$string(p.Z)),
 				_Utils_Tuple2(
 				'choices',
-				A2($elm$json$Json$Encode$list, $author$project$Pupil$choiceToJSON, p.a8))
+				A2($elm$json$Json$Encode$list, $author$project$Pupil$choiceToJSON, p.Y))
 			]));
 };
 var $author$project$Pupil$modelToJSON = function (model) {
@@ -5723,14 +5723,14 @@ var $author$project$Assignment$update = F2(
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{ai: s}),
+					{ak: s}),
 				$elm$core$Platform$Cmd$none);
 		} else {
 			var v = msg.a;
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{an: v}),
+					{ap: v}),
 				function () {
 					switch (v) {
 						case 0:
@@ -6230,7 +6230,7 @@ var $author$project$Event$updateFormdata = F2(
 			var name = msg.a;
 			return _Utils_update(
 				formData,
-				{aF: name});
+				{aG: name});
 		} else {
 			var capacity = msg.a;
 			return _Utils_update(
@@ -6260,11 +6260,11 @@ var $elm$core$List$any = F2(
 		}
 	});
 var $author$project$Event$validate = function (model) {
-	var name = $elm$core$String$trim(model.M.aF);
+	var name = $elm$core$String$trim(model.M.aG);
 	return ((name === '') || ((model.M.t <= 0) || A2(
 		$elm$core$List$any,
 		function (e) {
-			return _Utils_eq(e.aF, name);
+			return _Utils_eq(e.aG, name);
 		},
 		model.y))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
 		A3($author$project$Event$Obj, name, model.M.t, 0));
@@ -6328,12 +6328,12 @@ var $author$project$Pupil$changeChoice = F4(
 				return _Utils_eq(p, pupil) ? _Utils_update(
 					p,
 					{
-						a8: A2(
+						Y: A2(
 							$elm$core$List$map,
 							function (c) {
-								return _Utils_eq(c.av, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
+								return _Utils_eq(c.aa, event) ? A2($author$project$Pupil$Choice, event, newChoiceType) : c;
 							},
-							p.a8)
+							p.Y)
 					}) : p;
 			},
 			pupils);
@@ -6373,7 +6373,7 @@ var $author$project$Pupil$savePupils = F5(
 						return (e || A2(
 							$elm$core$List$any,
 							function (p) {
-								return _Utils_eq(p.aF, name) && _Utils_eq(p.Y, cl);
+								return _Utils_eq(p.aG, name) && _Utils_eq(p.Z, cl);
 							},
 							currentPupils)) ? _Utils_Tuple2(_List_Nil, true) : _Utils_Tuple2(
 							_Utils_ap(
@@ -6406,7 +6406,7 @@ var $author$project$Pupil$updateFormdata = F2(
 			var c = msg.a;
 			return _Utils_update(
 				formData,
-				{Y: c});
+				{Z: c});
 		}
 	});
 var $author$project$Pupil$update = F4(
@@ -6423,7 +6423,7 @@ var $author$project$Pupil$update = F4(
 						}),
 					1);
 			case 1:
-				var _v1 = A5($author$project$Pupil$savePupils, model, events, classes, model.M.V, model.M.Y);
+				var _v1 = A5($author$project$Pupil$savePupils, model, events, classes, model.M.V, model.M.Z);
 				if (!_v1.$) {
 					var pupils = _v1.a;
 					return _Utils_Tuple2(
@@ -6477,7 +6477,7 @@ var $elm$core$List$member = F2(
 var $author$project$Pupil$updateEvents = F2(
 	function (events, model) {
 		var fn2 = function (c) {
-			return A2($elm$core$List$member, c.av, events);
+			return A2($elm$core$List$member, c.aa, events);
 		};
 		var fn1 = F2(
 			function (e, cl) {
@@ -6487,7 +6487,7 @@ var $author$project$Pupil$updateEvents = F2(
 					A2(
 						$elm$core$List$map,
 						function ($) {
-							return $.av;
+							return $.aa;
 						},
 						cl)) ? cl : A2(
 					$elm$core$List$cons,
@@ -6503,10 +6503,10 @@ var $author$project$Pupil$updateEvents = F2(
 						return _Utils_update(
 							p,
 							{
-								a8: A2(
+								Y: A2(
 									$elm$core$List$filter,
 									fn2,
-									A3($elm$core$List$foldl, fn1, p.a8, events))
+									A3($elm$core$List$foldl, fn1, p.Y, events))
 							});
 					},
 					model.q)
@@ -6754,6 +6754,8 @@ var $author$project$Main$admin = A2(
 		]));
 var $elm$virtual_dom$VirtualDom$lazy = _VirtualDom_lazy;
 var $elm$html$Html$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
+var $elm$virtual_dom$VirtualDom$lazy2 = _VirtualDom_lazy2;
+var $elm$html$Html$Lazy$lazy2 = $elm$virtual_dom$VirtualDom$lazy2;
 var $elm$virtual_dom$VirtualDom$lazy3 = _VirtualDom_lazy3;
 var $elm$html$Html$Lazy$lazy3 = $elm$virtual_dom$VirtualDom$lazy3;
 var $elm$html$Html$main_ = _VirtualDom_node('main');
@@ -6782,7 +6784,7 @@ var $author$project$Main$navbar = A2(
 	$elm$html$Html$nav,
 	_List_fromArray(
 		[
-			$author$project$Helpers$classes('navbar navbar-expand-md navbar-dark fixed-top bg-primary')
+			$author$project$Helpers$classes('navbar navbar-expand-md navbar-dark fixed-top bg-dark')
 		]),
 	_List_fromArray(
 		[
@@ -6976,6 +6978,49 @@ var $author$project$Main$readme = A2(
 				]))
 		]));
 var $author$project$Assignment$Loading = 1;
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Assignment$applyMatchingToRedState = F2(
+	function (matching, pupils) {
+		return A2(
+			$elm$core$List$map,
+			function (pupil) {
+				var _v0 = $elm$core$List$head(
+					A2(
+						$elm$core$List$filter,
+						function (_v1) {
+							var p = _v1.a;
+							return _Utils_eq(pupil, p);
+						},
+						matching));
+				if (_v0.$ === 1) {
+					return pupil;
+				} else {
+					var _v2 = _v0.a;
+					var e = _v2.b;
+					return _Utils_update(
+						pupil,
+						{
+							Y: A2(
+								$elm$core$List$map,
+								function (c) {
+									return _Utils_eq(c.aa, e) ? _Utils_update(
+										c,
+										{a_: 2}) : c;
+								},
+								pupil.Y)
+						});
+				}
+			},
+			pupils);
+	});
 var $author$project$Assignment$EventSort = 1;
 var $author$project$Assignment$SortBy = function (a) {
 	return {$: 0, a: a};
@@ -6985,16 +7030,430 @@ var $author$project$Pupil$eventGroup = F2(
 		return A2(
 			$elm$core$List$map,
 			function (c) {
-				return c.av;
+				return c.aa;
 			},
 			A2(
 				$elm$core$List$filter,
 				function (c) {
-					return _Utils_eq(c.bC, choiceType);
+					return _Utils_eq(c.a_, choiceType);
 				},
-				pupil.a8));
+				pupil.Y));
 	});
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$html$Html$h4 = _VirtualDom_node('h4');
+var $elm$html$Html$ol = _VirtualDom_node('ol');
+var $author$project$Assignment$onColor = F2(
+	function (color, matching) {
+		var fn = function (_v0) {
+			var pupil = _v0.a;
+			var event = _v0.b;
+			return A2(
+				$elm$core$List$any,
+				function (c) {
+					var _v1 = _Utils_Tuple2(c.a_, color);
+					_v1$2:
+					while (true) {
+						switch (_v1.a) {
+							case 0:
+								if (!_v1.b) {
+									var _v2 = _v1.a;
+									var _v3 = _v1.b;
+									return _Utils_eq(
+										_Utils_update(
+											event,
+											{ad: 0}),
+										c.aa);
+								} else {
+									break _v1$2;
+								}
+							case 1:
+								if (_v1.b === 1) {
+									var _v4 = _v1.a;
+									var _v5 = _v1.b;
+									return _Utils_eq(
+										_Utils_update(
+											event,
+											{ad: 0}),
+										c.aa);
+								} else {
+									break _v1$2;
+								}
+							default:
+								break _v1$2;
+						}
+					}
+					return false;
+				},
+				pupil.Y);
+		};
+		return A2(
+			$elm$core$List$map,
+			$elm$core$Tuple$first,
+			A2($elm$core$List$filter, fn, matching));
+	});
+var $author$project$Pupil$pupilDisplay = function (pupil) {
+	return pupil.aG + (' (Klasse ' + (pupil.Z + ')'));
+};
+var $author$project$Pupil$pupilSorting = function (pupil) {
+	return _Utils_ap(pupil.Z, pupil.aG);
+};
+var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$fillRule = _VirtualDom_attribute('fill-rule');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $author$project$Helpers$svgIconSortAlphaDown = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$width('16'),
+			$elm$svg$Svg$Attributes$height('16'),
+			$elm$svg$Svg$Attributes$fill('currentColor'),
+			$elm$svg$Svg$Attributes$class('bi'),
+			$elm$svg$Svg$Attributes$class('bi-sort-alpha-down'),
+			$elm$svg$Svg$Attributes$viewBox('0 0 16 16')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$fillRule('evenodd'),
+					$elm$svg$Svg$Attributes$d('M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371h-1.781zm1.57-.785L11 2.687h-.047l-.652 2.157h1.351z')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$d('M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645V14zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293V2.5z')
+				]),
+			_List_Nil)
+		]));
+var $elm$html$Html$Attributes$tabindex = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'tabIndex',
+		$elm$core$String$fromInt(n));
+};
+var $elm$html$Html$table = _VirtualDom_node('table');
+var $elm$html$Html$tbody = _VirtualDom_node('tbody');
+var $elm$html$Html$td = _VirtualDom_node('td');
+var $elm$html$Html$th = _VirtualDom_node('th');
+var $elm$html$Html$thead = _VirtualDom_node('thead');
+var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $author$project$Assignment$day = F4(
+	function (num, model, matched, unmatched) {
+		var tableRow = F2(
+			function (p, e) {
+				return A2(
+					$elm$html$Html$tr,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$td,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$author$project$Pupil$pupilDisplay(p))
+								])),
+							A2(
+							$elm$html$Html$td,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$author$project$Helpers$classes(
+											A2(
+												$elm$core$List$member,
+												e,
+												A2($author$project$Pupil$eventGroup, 0, p)) ? 'badge text-bg-success' : 'badge text-bg-warning')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(e.aG)
+										]))
+								]))
+						]));
+			});
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$author$project$Helpers$classes('col-md-8 mb-4')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h3,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							'Tag ' + $elm$core$String$fromInt(num))
+						])),
+					A2(
+					$elm$html$Html$h4,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Zugeteilte Schüler/Schülerinnen')
+						])),
+					$elm$core$List$isEmpty(matched) ? A2(
+					$elm$html$Html$p,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('keine')
+						])) : A2(
+					$elm$html$Html$table,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('table')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$thead,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$tr,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$th,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$scope('col')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Name und Klasse'),
+													A2(
+													$elm$html$Html$a,
+													_List_fromArray(
+														[
+															$author$project$Helpers$classes('link-primary ms-2'),
+															$elm$html$Html$Attributes$title('Nach Name und Klasse aufsteigend sortieren'),
+															$elm$html$Html$Attributes$tabindex(0),
+															A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+															A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Name und Klasse aufsteigend sortieren'),
+															$elm$html$Html$Events$onClick(
+															$author$project$Assignment$SortBy(0))
+														]),
+													_List_fromArray(
+														[$author$project$Helpers$svgIconSortAlphaDown]))
+												])),
+											A2(
+											$elm$html$Html$th,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$scope('col')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Gruppe'),
+													A2(
+													$elm$html$Html$a,
+													_List_fromArray(
+														[
+															$author$project$Helpers$classes('link-primary ms-2'),
+															$elm$html$Html$Attributes$title('Nach Gruppe aufsteigend sortieren'),
+															$elm$html$Html$Attributes$tabindex(0),
+															A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+															A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Gruppe aufsteigend sortieren'),
+															$elm$html$Html$Events$onClick(
+															$author$project$Assignment$SortBy(1))
+														]),
+													_List_fromArray(
+														[$author$project$Helpers$svgIconSortAlphaDown]))
+												]))
+										]))
+								])),
+							A2(
+							$elm$html$Html$tbody,
+							_List_Nil,
+							A2(
+								$elm$core$List$map,
+								function (_v2) {
+									var p = _v2.a;
+									var e = _v2.b;
+									return A2(tableRow, p, e);
+								},
+								A2(
+									$elm$core$List$sortBy,
+									function (_v0) {
+										var p = _v0.a;
+										var e = _v0.b;
+										var _v1 = model.ak;
+										if (!_v1) {
+											return $author$project$Pupil$pupilSorting(p);
+										} else {
+											return e.aG;
+										}
+									},
+									matched)))
+						])),
+					A2(
+					$elm$html$Html$h4,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Schüler/Schülerinnen ohne Platz')
+						])),
+					$elm$core$List$isEmpty(unmatched) ? A2(
+					$elm$html$Html$p,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Keine')
+						])) : A2(
+					$elm$html$Html$ol,
+					_List_fromArray(
+						[
+							$author$project$Helpers$classes('list-group list-group-flush list-group-numbered')
+						]),
+					A2(
+						$elm$core$List$map,
+						function (p) {
+							return A2(
+								$elm$html$Html$li,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('list-group-item')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('ms-2')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												$author$project$Pupil$pupilDisplay(p))
+											]))
+									]));
+						},
+						A2($elm$core$List$sortBy, $author$project$Pupil$pupilSorting, unmatched))),
+					A2(
+					$elm$html$Html$h4,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Statistik')
+						])),
+					A2(
+					$elm$html$Html$p,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$author$project$Helpers$classes('badge text-bg-secondary me-2'),
+									$elm$html$Html$Attributes$title('Gesamt')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromInt(
+										$elm$core$List$length(matched) + $elm$core$List$length(unmatched)))
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('me-2')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('=')
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$author$project$Helpers$classes('badge text-bg-success me-2'),
+									$elm$html$Html$Attributes$title('Grün')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromInt(
+										$elm$core$List$length(
+											A2($author$project$Assignment$onColor, 0, matched))))
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('me-2')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('+')
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$author$project$Helpers$classes('badge text-bg-warning me-2'),
+									$elm$html$Html$Attributes$title('Gelb')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromInt(
+										$elm$core$List$length(
+											A2($author$project$Assignment$onColor, 1, matched))))
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('me-2')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('+')
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$author$project$Helpers$classes('badge text-bg-danger'),
+									$elm$html$Html$Attributes$title('Rot')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromInt(
+										$elm$core$List$length(unmatched)))
+								]))
+						]))
+				]));
+	});
 var $author$project$Algo$VertexLeft = $elm$core$Basics$identity;
 var $author$project$Algo$PathElementLeft = function (a) {
 	return {$: 0, a: a};
@@ -7060,15 +7519,6 @@ var $elm$core$Basics$composeR = F3(
 		return g(
 			f(x));
 	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (!maybe.$) {
@@ -7136,7 +7586,7 @@ var $author$project$Algo$extend = F4(
 	});
 var $author$project$Algo$IntermediateResult = F2(
 	function (paths, free) {
-		return {_: free, af: paths};
+		return {ab: free, ah: paths};
 	});
 var $author$project$Algo$getFromMatchingRight = F2(
 	function (right, matching) {
@@ -7180,7 +7630,7 @@ var $author$project$Algo$update = F2(
 					} else {
 						var left = _v3.a;
 						var res = A2($author$project$Algo$update, matching, remainingPaths);
-						var _v4 = res._;
+						var _v4 = res.ab;
 						if (!_v4.$) {
 							var path = _v4.a;
 							return A2(
@@ -7196,7 +7646,7 @@ var $author$project$Algo$update = F2(
 										$elm$core$List$cons,
 										$author$project$Algo$PathElementLeft(left),
 										firstPath),
-									res.af),
+									res.ah),
 								$elm$core$Maybe$Nothing);
 						}
 					}
@@ -7210,7 +7660,7 @@ var $author$project$Algo$find = F3(
 			return $elm$core$Maybe$Nothing;
 		} else {
 			var res = A2($author$project$Algo$update, matching, paths);
-			var _v0 = res._;
+			var _v0 = res.ab;
 			if (!_v0.$) {
 				var path = _v0.a;
 				return $elm$core$Maybe$Just(path);
@@ -7223,7 +7673,7 @@ var $author$project$Algo$find = F3(
 						$elm$core$List$foldl,
 						A2($author$project$Algo$extend, graph, paths),
 						_List_Nil,
-						res.af));
+						res.ah));
 			}
 		}
 	});
@@ -7359,7 +7809,7 @@ var $author$project$Event$extendToCapacityAndRestrictByClass = F3(
 				}();
 				return _Utils_update(
 					event,
-					{ab: i});
+					{ad: i});
 			},
 			A2(
 				$elm$core$List$filter,
@@ -7385,7 +7835,7 @@ var $author$project$Assignment$toGraphFromGreen = F2(
 						F2(
 							function (e, l) {
 								return _Utils_ap(
-									A3($author$project$Event$extendToCapacityAndRestrictByClass, e, cls, pupil.Y),
+									A3($author$project$Event$extendToCapacityAndRestrictByClass, e, cls, pupil.Z),
 									l);
 							}),
 						_List_Nil,
@@ -7415,7 +7865,7 @@ var $author$project$Assignment$toGraphFromGreenAndYellow = F2(
 						F2(
 							function (e, l) {
 								return _Utils_ap(
-									A3($author$project$Event$extendToCapacityAndRestrictByClass, e, cls, pupil.Y),
+									A3($author$project$Event$extendToCapacityAndRestrictByClass, e, cls, pupil.Z),
 									l);
 							}),
 						_List_Nil,
@@ -7461,7 +7911,7 @@ var $author$project$Assignment$toGraphFromYellowWithoutMatched = F3(
 							F2(
 								function (e, l) {
 									return _Utils_ap(
-										A3($author$project$Event$extendToCapacityAndRestrictByClass, e, cls, pupil.Y),
+										A3($author$project$Event$extendToCapacityAndRestrictByClass, e, cls, pupil.Z),
 										l);
 								}),
 							_List_Nil,
@@ -7495,14 +7945,18 @@ var $author$project$Assignment$finalize = F2(
 			_Utils_ap(step1, step2));
 	});
 var $author$project$Assignment$matchedAndUnmatchedPupils = F2(
-	function (pupils, cls) {
+	function (cls, pupils) {
 		var matched = A2($author$project$Assignment$finalize, pupils, cls);
 		var matchedTransformed = A2(
 			$elm$core$List$map,
 			function (_v1) {
 				var p = _v1.a;
 				var e = _v1.b;
-				return _Utils_Tuple2(p, e);
+				return _Utils_Tuple2(
+					p,
+					_Utils_update(
+						e,
+						{ad: 0}));
 			},
 			matched);
 		return _Utils_Tuple2(
@@ -7519,160 +7973,17 @@ var $author$project$Assignment$matchedAndUnmatchedPupils = F2(
 				},
 				pupils));
 	});
-var $elm$html$Html$ol = _VirtualDom_node('ol');
-var $author$project$Assignment$onColor = F2(
-	function (color, matching) {
-		var fn = function (_v0) {
-			var pupil = _v0.a;
-			var event = _v0.b;
-			return A2(
-				$elm$core$List$any,
-				function (c) {
-					var _v1 = _Utils_Tuple2(c.bC, color);
-					_v1$2:
-					while (true) {
-						switch (_v1.a) {
-							case 0:
-								if (!_v1.b) {
-									var _v2 = _v1.a;
-									var _v3 = _v1.b;
-									return _Utils_eq(
-										_Utils_update(
-											event,
-											{ab: 0}),
-										c.av);
-								} else {
-									break _v1$2;
-								}
-							case 1:
-								if (_v1.b === 1) {
-									var _v4 = _v1.a;
-									var _v5 = _v1.b;
-									return _Utils_eq(
-										_Utils_update(
-											event,
-											{ab: 0}),
-										c.av);
-								} else {
-									break _v1$2;
-								}
-							default:
-								break _v1$2;
-						}
-					}
-					return false;
-				},
-				pupil.a8);
-		};
-		return A2(
-			$elm$core$List$map,
-			$elm$core$Tuple$first,
-			A2($elm$core$List$filter, fn, matching));
-	});
-var $author$project$Pupil$pupilDisplay = function (pupil) {
-	return pupil.aF + (' (Klasse ' + (pupil.Y + ')'));
-};
-var $author$project$Pupil$pupilSorting = function (pupil) {
-	return _Utils_ap(pupil.Y, pupil.aF);
-};
-var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
-var $elm$core$List$sortBy = _List_sortBy;
-var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
-var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$svg$Svg$Attributes$fillRule = _VirtualDom_attribute('fill-rule');
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $author$project$Helpers$svgIconSortAlphaDown = A2(
-	$elm$svg$Svg$svg,
-	_List_fromArray(
-		[
-			$elm$svg$Svg$Attributes$width('16'),
-			$elm$svg$Svg$Attributes$height('16'),
-			$elm$svg$Svg$Attributes$fill('currentColor'),
-			$elm$svg$Svg$Attributes$class('bi'),
-			$elm$svg$Svg$Attributes$class('bi-sort-alpha-down'),
-			$elm$svg$Svg$Attributes$viewBox('0 0 16 16')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$svg$Svg$path,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$fillRule('evenodd'),
-					$elm$svg$Svg$Attributes$d('M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371h-1.781zm1.57-.785L11 2.687h-.047l-.652 2.157h1.351z')
-				]),
-			_List_Nil),
-			A2(
-			$elm$svg$Svg$path,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$d('M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645V14zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293V2.5z')
-				]),
-			_List_Nil)
-		]));
-var $elm$html$Html$Attributes$tabindex = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'tabIndex',
-		$elm$core$String$fromInt(n));
-};
-var $elm$html$Html$table = _VirtualDom_node('table');
-var $elm$html$Html$tbody = _VirtualDom_node('tbody');
-var $elm$html$Html$td = _VirtualDom_node('td');
-var $elm$html$Html$th = _VirtualDom_node('th');
-var $elm$html$Html$thead = _VirtualDom_node('thead');
-var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
-var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Assignment$innerView = F3(
 	function (model, pupils, cls) {
-		var tableRow = F2(
-			function (p, e) {
-				return A2(
-					$elm$html$Html$tr,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$td,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text(
-									$author$project$Pupil$pupilDisplay(p))
-								])),
-							A2(
-							$elm$html$Html$td,
-							_List_Nil,
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$span,
-									_List_fromArray(
-										[
-											$author$project$Helpers$classes(
-											A2(
-												$elm$core$List$member,
-												_Utils_update(
-													e,
-													{ab: 0}),
-												A2($author$project$Pupil$eventGroup, 0, p)) ? 'badge text-bg-success' : 'badge text-bg-warning')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(e.aF)
-										]))
-								]))
-						]));
-			});
-		var _v0 = A2($author$project$Assignment$matchedAndUnmatchedPupils, pupils, cls);
+		var _v0 = A2($author$project$Assignment$matchedAndUnmatchedPupils, cls, pupils);
 		var matched = _v0.a;
 		var unmatched = _v0.b;
+		var _v1 = A2(
+			$author$project$Assignment$matchedAndUnmatchedPupils,
+			cls,
+			A2($author$project$Assignment$applyMatchingToRedState, matched, pupils));
+		var matched2 = _v1.a;
+		var unmatched2 = _v1.b;
 		return A2(
 			$elm$html$Html$div,
 			_List_Nil,
@@ -7685,279 +7996,8 @@ var $author$project$Assignment$innerView = F3(
 						[
 							$elm$html$Html$text('Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen.')
 						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('col-md-8')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$h3,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Zugeteilte Schüler/Schülerinnen')
-								])),
-							$elm$core$List$isEmpty(matched) ? A2(
-							$elm$html$Html$p,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text('keine')
-								])) : A2(
-							$elm$html$Html$table,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('table')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$thead,
-									_List_Nil,
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$tr,
-											_List_Nil,
-											_List_fromArray(
-												[
-													A2(
-													$elm$html$Html$th,
-													_List_fromArray(
-														[
-															$elm$html$Html$Attributes$scope('col')
-														]),
-													_List_fromArray(
-														[
-															$elm$html$Html$text('Name und Klasse'),
-															A2(
-															$elm$html$Html$a,
-															_List_fromArray(
-																[
-																	$author$project$Helpers$classes('link-primary ms-2'),
-																	$elm$html$Html$Attributes$title('Nach Name und Klasse aufsteigend sortieren'),
-																	$elm$html$Html$Attributes$tabindex(0),
-																	A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
-																	A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Name und Klasse aufsteigend sortieren'),
-																	$elm$html$Html$Events$onClick(
-																	$author$project$Assignment$SortBy(0))
-																]),
-															_List_fromArray(
-																[$author$project$Helpers$svgIconSortAlphaDown]))
-														])),
-													A2(
-													$elm$html$Html$th,
-													_List_fromArray(
-														[
-															$elm$html$Html$Attributes$scope('col')
-														]),
-													_List_fromArray(
-														[
-															$elm$html$Html$text('Gruppe'),
-															A2(
-															$elm$html$Html$a,
-															_List_fromArray(
-																[
-																	$author$project$Helpers$classes('link-primary ms-2'),
-																	$elm$html$Html$Attributes$title('Nach Gruppe aufsteigend sortieren'),
-																	$elm$html$Html$Attributes$tabindex(0),
-																	A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
-																	A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Nach Gruppe aufsteigend sortieren'),
-																	$elm$html$Html$Events$onClick(
-																	$author$project$Assignment$SortBy(1))
-																]),
-															_List_fromArray(
-																[$author$project$Helpers$svgIconSortAlphaDown]))
-														]))
-												]))
-										])),
-									A2(
-									$elm$html$Html$tbody,
-									_List_Nil,
-									A2(
-										$elm$core$List$map,
-										function (_v3) {
-											var p = _v3.a;
-											var e = _v3.b;
-											return A2(tableRow, p, e);
-										},
-										A2(
-											$elm$core$List$sortBy,
-											function (_v1) {
-												var p = _v1.a;
-												var e = _v1.b;
-												var _v2 = model.ai;
-												if (!_v2) {
-													return $author$project$Pupil$pupilSorting(p);
-												} else {
-													return e.aF;
-												}
-											},
-											matched)))
-								]))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('col-md-8')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$h3,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Schüler/Schülerinnen ohne Platz')
-								])),
-							$elm$core$List$isEmpty(unmatched) ? A2(
-							$elm$html$Html$p,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Keine')
-								])) : A2(
-							$elm$html$Html$ol,
-							_List_fromArray(
-								[
-									$author$project$Helpers$classes('list-group list-group-flush list-group-numbered')
-								]),
-							A2(
-								$elm$core$List$map,
-								function (p) {
-									return A2(
-										$elm$html$Html$li,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('list-group-item')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$span,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('ms-2')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text(
-														$author$project$Pupil$pupilDisplay(p))
-													]))
-											]));
-								},
-								A2($elm$core$List$sortBy, $author$project$Pupil$pupilSorting, unmatched)))
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('col-md-8')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$h3,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Statistik')
-								])),
-							A2(
-							$elm$html$Html$p,
-							_List_Nil,
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$span,
-									_List_fromArray(
-										[
-											$author$project$Helpers$classes('badge text-bg-secondary me-2'),
-											$elm$html$Html$Attributes$title('Gesamt')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											$elm$core$String$fromInt(
-												$elm$core$List$length(matched) + $elm$core$List$length(unmatched)))
-										])),
-									A2(
-									$elm$html$Html$span,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('me-2')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('=')
-										])),
-									A2(
-									$elm$html$Html$span,
-									_List_fromArray(
-										[
-											$author$project$Helpers$classes('badge text-bg-success me-2'),
-											$elm$html$Html$Attributes$title('Grün')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											$elm$core$String$fromInt(
-												$elm$core$List$length(
-													A2($author$project$Assignment$onColor, 0, matched))))
-										])),
-									A2(
-									$elm$html$Html$span,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('me-2')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('+')
-										])),
-									A2(
-									$elm$html$Html$span,
-									_List_fromArray(
-										[
-											$author$project$Helpers$classes('badge text-bg-warning me-2'),
-											$elm$html$Html$Attributes$title('Gelb')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											$elm$core$String$fromInt(
-												$elm$core$List$length(
-													A2($author$project$Assignment$onColor, 1, matched))))
-										])),
-									A2(
-									$elm$html$Html$span,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('me-2')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('+')
-										])),
-									A2(
-									$elm$html$Html$span,
-									_List_fromArray(
-										[
-											$author$project$Helpers$classes('badge text-bg-danger'),
-											$elm$html$Html$Attributes$title('Rot')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											$elm$core$String$fromInt(
-												$elm$core$List$length(unmatched)))
-										]))
-								]))
-						]))
+					A4($author$project$Assignment$day, 1, model, matched, unmatched),
+					A4($author$project$Assignment$day, 2, model, matched2, unmatched2)
 				]));
 	});
 var $author$project$Assignment$view = F3(
@@ -7982,7 +8022,7 @@ var $author$project$Assignment$view = F3(
 							$elm$html$Html$text('Ergebnis')
 						])),
 					function () {
-					var _v0 = model.an;
+					var _v0 = model.ap;
 					switch (_v0) {
 						case 0:
 							return A2(
@@ -8383,7 +8423,7 @@ var $author$project$Event$oneEventLi = function (event) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(event.aF),
+						$elm$html$Html$text(event.aG),
 						A2(
 						$elm$html$Html$span,
 						_List_fromArray(
@@ -8436,7 +8476,7 @@ var $author$project$Event$allEvents = function (events) {
 			A2(
 				$elm$core$List$sortBy,
 				function ($) {
-					return $.aF;
+					return $.aG;
 				},
 				events)));
 };
@@ -8463,10 +8503,23 @@ var $author$project$Event$view = function (model) {
 					])),
 				A2(
 				$elm$html$Html$p,
-				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Abhängig von der Anzahl der Klassen und der Anzahl der Plätze in einer Gruppe gibt es feste Plätze\n                für Schüler/Schülerinnen aus bestimmten Klassen und freie Plätze. Es erfolgt eine ganzzahlige Teilung\n                der Plätze durch die Anzahl der Klassen. Der Rest gibt die freien Plätze an. Beispiel: Bei vier Klassen\n                und 13 Plätzen gibt es 3 feste Plätze pro Klasse und einen freien Platz, der von jedem beliebigen Schüler\n                besetzt werden kann.')
+						$elm$html$Html$Attributes$class('col-md-8')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Abhängig von der Anzahl der Klassen und der Anzahl der Plätze in einer Gruppe gibt es feste Plätze\n                für Schüler und Schülerinnen aus bestimmten Klassen und freie Plätze. Es erfolgt eine ganzzahlige Teilung\n                der Plätze durch die Anzahl der Klassen. Der Rest gibt die freien Plätze an.')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						$author$project$Helpers$classes('col-md-8 fst-italic pb-2')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Beispiel: Bei vier Klassen und 13 Plätzen gibt es 3 feste Plätze pro Klasse und einen freien\n                Platz, der von jedem beliebigen Schüler besetzt werden kann.')
 					])),
 				A2(
 				$elm$html$Html$form,
@@ -8513,7 +8566,7 @@ var $author$project$Event$view = function (model) {
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeR, $author$project$Event$Name, $author$project$Event$FormDataMsg)),
-											$elm$html$Html$Attributes$value(model.M.aF)
+											$elm$html$Html$Attributes$value(model.M.aG)
 										]),
 									'newGroupName',
 									'Gruppe ist bereits vorhanden',
@@ -8668,7 +8721,7 @@ var $author$project$Pupil$innerTable = function (pupil) {
 					function (c) {
 						var radioGroup = _Utils_ap(
 							$author$project$Pupil$pupilDisplay(pupil),
-							c.av.aF);
+							c.aa.aG);
 						return A2(
 							$elm$html$Html$tr,
 							_List_Nil,
@@ -8682,7 +8735,7 @@ var $author$project$Pupil$innerTable = function (pupil) {
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text(c.av.aF)
+											$elm$html$Html$text(c.aa.aG)
 										])),
 									A2(
 									$elm$html$Html$td,
@@ -8705,9 +8758,9 @@ var $author$project$Pupil$innerTable = function (pupil) {
 															$elm$html$Html$Attributes$type_('radio'),
 															$elm$html$Html$Attributes$name(radioGroup),
 															$elm$html$Html$Attributes$id(radioGroup + 'Green'),
-															$elm$html$Html$Attributes$checked(!c.bC),
+															$elm$html$Html$Attributes$checked(!c.a_),
 															$elm$html$Html$Events$onClick(
-															A3($author$project$Pupil$ChangeChoice, pupil, c.av, 0))
+															A3($author$project$Pupil$ChangeChoice, pupil, c.aa, 0))
 														]),
 													_List_Nil),
 													A2(
@@ -8747,9 +8800,9 @@ var $author$project$Pupil$innerTable = function (pupil) {
 															$elm$html$Html$Attributes$type_('radio'),
 															$elm$html$Html$Attributes$name(radioGroup),
 															$elm$html$Html$Attributes$id(radioGroup + 'Yellow'),
-															$elm$html$Html$Attributes$checked(c.bC === 1),
+															$elm$html$Html$Attributes$checked(c.a_ === 1),
 															$elm$html$Html$Events$onClick(
-															A3($author$project$Pupil$ChangeChoice, pupil, c.av, 1))
+															A3($author$project$Pupil$ChangeChoice, pupil, c.aa, 1))
 														]),
 													_List_Nil),
 													A2(
@@ -8789,9 +8842,9 @@ var $author$project$Pupil$innerTable = function (pupil) {
 															$elm$html$Html$Attributes$type_('radio'),
 															$elm$html$Html$Attributes$name(radioGroup),
 															$elm$html$Html$Attributes$id(radioGroup + 'Red'),
-															$elm$html$Html$Attributes$checked(c.bC === 2),
+															$elm$html$Html$Attributes$checked(c.a_ === 2),
 															$elm$html$Html$Events$onClick(
-															A3($author$project$Pupil$ChangeChoice, pupil, c.av, 2))
+															A3($author$project$Pupil$ChangeChoice, pupil, c.aa, 2))
 														]),
 													_List_Nil),
 													A2(
@@ -8823,12 +8876,12 @@ var $author$project$Pupil$innerTable = function (pupil) {
 						A2(
 							$elm$core$Basics$composeR,
 							function ($) {
-								return $.av;
+								return $.aa;
 							},
 							function ($) {
-								return $.aF;
+								return $.aG;
 							}),
-						pupil.a8)))
+						pupil.Y)))
 			]));
 };
 var $author$project$Pupil$onePupilLi = function (pupil) {
@@ -8895,147 +8948,174 @@ var $author$project$Pupil$allPupils = function (pupils) {
 			$elm$html$Html$Lazy$lazy($author$project$Pupil$onePupilLi),
 			A2($elm$core$List$sortBy, $author$project$Pupil$pupilSorting, pupils)));
 };
+var $elm$html$Html$option = _VirtualDom_node('option');
 var $elm$html$Html$Attributes$rows = function (n) {
 	return A2(
 		_VirtualDom_attribute,
 		'rows',
 		$elm$core$String$fromInt(n));
 };
+var $elm$html$Html$select = _VirtualDom_node('select');
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
-var $author$project$Pupil$view = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('mb-5')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$h2,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$id('pupils'),
-						$elm$html$Html$Attributes$class('nav-anchor')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Schüler/Schülerinnen')
-					])),
-				A2(
-				$elm$html$Html$form,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('mb-3'),
-						$elm$html$Html$Events$onSubmit($author$project$Pupil$Save)
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h3,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$hidden(true)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Schüler und Schülerinnen der gleichen Klasse hinzufügen')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$author$project$Helpers$classes('row g-3')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-md-3')
-									]),
-								A5(
-									$author$project$Helpers$tagWithInvalidFeedback,
-									$elm$html$Html$textarea,
+var $author$project$Pupil$view = F2(
+	function (model, cls) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('mb-5')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h2,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$id('pupils'),
+							$elm$html$Html$Attributes$class('nav-anchor')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Schüler/Schülerinnen')
+						])),
+					A2(
+					$elm$html$Html$form,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('mb-3'),
+							$elm$html$Html$Events$onSubmit($author$project$Pupil$Save)
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h3,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$hidden(true)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Schüler und Schülerinnen der gleichen Klasse hinzufügen')
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$author$project$Helpers$classes('row g-3')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('form-control'),
-											$elm$html$Html$Attributes$rows(1),
-											$elm$html$Html$Attributes$placeholder('Namen (mit Zeilenumbrüchen getrennt)'),
-											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Zeilenumbrüchen getrennt)'),
-											$elm$html$Html$Attributes$required(true),
-											$elm$html$Html$Events$onInput(
-											A2($elm$core$Basics$composeR, $author$project$Pupil$Names, $author$project$Pupil$FormDataMsg)),
-											$elm$html$Html$Attributes$value(model.M.V)
+											$elm$html$Html$Attributes$class('col-md-3')
 										]),
-									'newPupilNames',
-									'Schüler/Schülerin ist in dieser Klasse bereits vorhanden oder unbekannte Klasse oder sonst ungültige Eingabe',
-									model.H)),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-md-3')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$input,
+									A5(
+										$author$project$Helpers$tagWithInvalidFeedback,
+										$elm$html$Html$textarea,
 										_List_fromArray(
 											[
 												$elm$html$Html$Attributes$class('form-control'),
-												$elm$html$Html$Attributes$type_('text'),
-												$elm$html$Html$Attributes$placeholder('Klasse'),
-												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Klasse'),
+												$elm$html$Html$Attributes$rows(1),
+												$elm$html$Html$Attributes$placeholder('Namen (mit Zeilenumbrüchen getrennt)'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Zeilenumbrüchen getrennt)'),
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
-												A2($elm$core$Basics$composeR, $author$project$Pupil$Class, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.M.Y)
+												A2($elm$core$Basics$composeR, $author$project$Pupil$Names, $author$project$Pupil$FormDataMsg)),
+												$elm$html$Html$Attributes$value(model.M.V)
 											]),
-										_List_Nil)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('col-md-3')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$button,
-										_List_fromArray(
-											[
-												$author$project$Helpers$classes('btn btn-primary'),
-												$elm$html$Html$Attributes$type_('submit')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Hinzufügen')
-											]))
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h3,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$hidden(true)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Alle Schüler/Schülerinnen')
-							])),
-						A2($elm$html$Html$Lazy$lazy, $author$project$Pupil$allPupils, model.q)
-					]))
-			]));
-};
+										'newPupilNames',
+										'Schüler/Schülerin ist in dieser Klasse bereits vorhanden oder unbekannte Klasse oder sonst ungültige Eingabe',
+										model.H)),
+									A2(
+									$elm$html$Html$div,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('col-md-3')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$select,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('form-select'),
+													A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Klasse'),
+													$elm$html$Html$Attributes$required(true),
+													$elm$html$Html$Events$onInput(
+													A2($elm$core$Basics$composeR, $author$project$Pupil$Class, $author$project$Pupil$FormDataMsg))
+												]),
+											A2(
+												$elm$core$List$cons,
+												A2(
+													$elm$html$Html$option,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$value(''),
+															$elm$html$Html$Attributes$hidden(true)
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Klasse bitte auswählen')
+														])),
+												A2(
+													$elm$core$List$map,
+													function (c) {
+														return A2(
+															$elm$html$Html$option,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$value(c)
+																]),
+															_List_fromArray(
+																[
+																	$elm$html$Html$text(c)
+																]));
+													},
+													$elm$core$Set$toList(cls))))
+										])),
+									A2(
+									$elm$html$Html$div,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('col-md-3')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$author$project$Helpers$classes('btn btn-primary'),
+													$elm$html$Html$Attributes$type_('submit')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Hinzufügen')
+												]))
+										]))
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h3,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$hidden(true)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Alle Schüler/Schülerinnen')
+								])),
+							A2($elm$html$Html$Lazy$lazy, $author$project$Pupil$allPupils, model.q)
+						]))
+				]));
+	});
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -9068,7 +9148,7 @@ var $author$project$Main$view = function (model) {
 								A2(
 								$elm$html$Html$map,
 								$author$project$Main$PupilMsg,
-								A2($elm$html$Html$Lazy$lazy, $author$project$Pupil$view, model.q)),
+								A3($elm$html$Html$Lazy$lazy2, $author$project$Pupil$view, model.q, model.x.x)),
 								A2(
 								$elm$html$Html$map,
 								$author$project$Main$AssignmentMsg,
@@ -9080,12 +9160,12 @@ var $author$project$Main$view = function (model) {
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{
-		bi: function (flags) {
+		bj: function (flags) {
 			return _Utils_Tuple2(
 				$author$project$Main$init(flags),
 				$elm$core$Platform$Cmd$none);
 		},
-		by: function (_v0) {
+		bz: function (_v0) {
 			return $elm$core$Platform$Sub$none;
 		},
 		bD: $author$project$Main$update,

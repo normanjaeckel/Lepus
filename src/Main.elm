@@ -11,7 +11,7 @@ import Helpers exposing (Persistence(..), classes)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, href, id, type_)
 import Html.Events exposing (onClick)
-import Html.Lazy exposing (lazy, lazy3)
+import Html.Lazy exposing (lazy, lazy2, lazy3)
 import Json.Decode as D
 import Json.Encode as E
 import Pupil
@@ -168,7 +168,7 @@ view model =
                 [ readme
                 , lazy Class.view model.classes |> map ClassMsg
                 , lazy Event.view model.events |> map EventMsg
-                , lazy Pupil.view model.pupils |> map PupilMsg
+                , lazy2 Pupil.view model.pupils model.classes.classes |> map PupilMsg
                 , lazy3 Assignment.view model.assignment model.pupils.pupils model.classes.classes |> map AssignmentMsg
                 , admin
                 ]
@@ -178,7 +178,7 @@ view model =
 
 navbar : Html Msg
 navbar =
-    nav [ classes "navbar navbar-expand-md navbar-dark fixed-top bg-primary" ]
+    nav [ classes "navbar navbar-expand-md navbar-dark fixed-top bg-dark" ]
         [ div [ class "container-fluid" ]
             [ a [ class "navbar-brand", href "#" ] [ text "Home" ]
             , button

@@ -288,8 +288,8 @@ updateEvents events model =
 -- VIEW
 
 
-view : Model -> Html Msg
-view model =
+view : Model -> Set.Set Class.Classname -> Html Msg
+view model cls =
     div [ class "mb-5" ]
         [ h2 [ id "pupils", class "nav-anchor" ] [ text "Schüler/Schülerinnen" ]
         , form [ class "mb-3", onSubmit Save ]
@@ -311,16 +311,18 @@ view model =
                         model.formInvalid
                     )
                 , div [ class "col-md-3" ]
-                    [ input
-                        [ class "form-control"
-                        , type_ "text"
-                        , placeholder "Klasse"
+                    [ select
+                        [ class "form-select"
                         , attribute "aria-label" "Klasse"
                         , required True
                         , onInput (Class >> FormDataMsg)
-                        , value model.formData.class
                         ]
-                        []
+                        (option [ value "", hidden True ] [ text "Klasse bitte auswählen" ]
+                            :: (cls
+                                    |> Set.toList
+                                    |> List.map (\c -> option [ value c ] [ text c ])
+                               )
+                        )
                     ]
                 , div [ class "col-md-3" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Hinzufügen" ] ]
                 ]
