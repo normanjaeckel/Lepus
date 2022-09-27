@@ -8,6 +8,7 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Lazy exposing (lazy)
 import Json.Decode as D
 import Json.Encode as E
+import Set
 
 
 
@@ -169,14 +170,14 @@ type FormDataInput
     | Class String
 
 
-update : Msg -> Model -> List Event.Obj -> ( Model, Action )
-update msg model events =
+update : Msg -> Model -> List Event.Obj -> Set.Set String -> ( Model, Action )
+update msg model events classes =
     case msg of
         FormDataMsg data ->
             ( { model | formData = updateFormdata data model.formData, formInvalid = False }, FormChanged )
 
         Save ->
-            case savePupils model events model.formData.names model.formData.class of
+            case savePupils model events classes model.formData.names model.formData.class of
                 Just pupils ->
                     ( { model | formData = emptyFormData, pupils = pupils, formInvalid = False }, PupilsChanged )
 
@@ -200,18 +201,18 @@ updateFormdata msg formData =
             { formData | class = c }
 
 
-savePupils : Model -> List Event.Obj -> String -> String -> Maybe (List Obj)
-savePupils model events namesRaw classRaw =
+savePupils : Model -> List Event.Obj -> Set.Set String -> String -> String -> Maybe (List Obj)
+savePupils model events cls namesRaw classRaw =
     let
-        class : String
-        class =
+        cl : String
+        cl =
             String.trim classRaw
 
         names : List String
         names =
             namesRaw |> String.split "\n" |> List.map String.trim |> List.filter ((/=) "")
     in
-    if (class == "") || List.isEmpty names then
+    if (cl == "") || List.isEmpty names || (not <| Set.member cl cls) then
         Nothing
 
     else
@@ -225,11 +226,11 @@ savePupils model events namesRaw classRaw =
                     fn : String -> ( List Obj, Bool ) -> ( List Obj, Bool )
                     fn =
                         \name ( currentPupils, e ) ->
-                            if e || (currentPupils |> List.any (\p -> p.name == name && p.class == class)) then
+                            if e || (currentPupils |> List.any (\p -> p.name == name && p.class == cl)) then
                                 ( [], True )
 
                             else
-                                ( currentPupils ++ [ Obj name class yellowEvents ], False )
+                                ( currentPupils ++ [ Obj name cl yellowEvents ], False )
                 in
                 names |> List.foldl fn ( model.pupils, False )
         in
@@ -310,7 +311,7 @@ view model =
                         , value model.formData.names
                         ]
                         "newPupilNames"
-                        "Schüler/Schülerin ist in dieser Klasse bereits vorhanden oder sonst ungültige Eingabe"
+                        "Schüler/Schülerin ist in dieser Klasse bereits vorhanden oder unbekannte Klasse oder sonst ungültige Eingabe"
                         model.formInvalid
                     )
                 , div [ class "col-md-3" ]

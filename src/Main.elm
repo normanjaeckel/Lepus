@@ -2,6 +2,7 @@ port module Main exposing (main)
 
 import Assignment
 import Browser
+import Class
 import Event
 import File
 import File.Download
@@ -32,8 +33,9 @@ main =
 
 
 type alias Model =
-    { pupils : Pupil.Model
+    { classes : Class.Model
     , events : Event.Model
+    , pupils : Pupil.Model
     , assignment : Assignment.Model
     }
 
@@ -45,8 +47,9 @@ init s =
             ( model, Cmd.none )
 
         Err _ ->
-            ( { pupils = Pupil.init
+            ( { classes = Class.init
               , events = Event.init
+              , pupils = Pupil.init
               , assignment = Assignment.init
               }
             , Cmd.none
@@ -55,17 +58,20 @@ init s =
 
 decoder : D.Decoder Model
 decoder =
-    D.map2
-        (\p e -> Model p e Assignment.init)
-        (D.field "pupils" Pupil.decoder)
+    D.map3
+        (\c e p -> Model c e p Assignment.init)
+        (D.field "classes" Class.decoder)
         (D.field "events" Event.decoder)
+        -- TODO: Care about historical data with missing field classes.
+        (D.field "pupils" Pupil.decoder)
 
 
 modelToJSON : Model -> E.Value
 modelToJSON model =
     E.object
-        [ ( "pupils", Pupil.modelToJSON model.pupils )
+        [ ( "classes", Class.modelToJSON model.classes )
         , ( "events", Event.modelToJSON model.events )
+        , ( "pupils", Pupil.modelToJSON model.pupils )
         ]
 
 
@@ -74,7 +80,8 @@ modelToJSON model =
 
 
 type Msg
-    = EventMsg Event.Msg
+    = ClassMsg Class.Msg
+    | EventMsg Event.Msg
     | PupilMsg Pupil.Msg
     | AssignmentMsg Assignment.Msg
     | DeleteAll
@@ -91,6 +98,18 @@ update msg model =
             \updatedModel -> ( updatedModel, modelToJSON updatedModel |> E.encode 0 |> setStorage )
     in
     case msg of
+        ClassMsg innerMsg ->
+            let
+                ( classesModel, action ) =
+                    Class.update innerMsg model.classes
+            in
+            case action of
+                Class.FormChanged ->
+                    ( { model | classes = classesModel }, Cmd.none )
+
+                Class.ClassesChanged ->
+                    { model | classes = classesModel } |> s
+
         EventMsg innerMsg ->
             let
                 ( eventsModel, action ) =
@@ -106,7 +125,7 @@ update msg model =
         PupilMsg innerMsg ->
             let
                 ( pupilsModel, action ) =
-                    Pupil.update innerMsg model.pupils model.events.events
+                    Pupil.update innerMsg model.pupils model.events.events model.classes.classes
             in
             case action of
                 Pupil.FormChanged ->
@@ -149,6 +168,7 @@ view model =
         , div [ classes "container p-3 pb-5" ]
             [ main_ []
                 [ readme
+                , lazy Class.view model.classes |> map ClassMsg
                 , lazy Event.view model.events |> map EventMsg
                 , lazy Pupil.view model.pupils |> map PupilMsg
                 , lazy2 Assignment.view model.assignment model.pupils.pupils |> map AssignmentMsg
@@ -176,7 +196,8 @@ navbar =
                 ]
             , div [ classes "collapse navbar-collapse", id "navbarCollapse" ]
                 [ ul [ classes "navbar-nav me-auto mb-2 mb-md-0" ]
-                    [ li [ class "nav-item" ] [ a [ classes "nav-link", href "#events" ] [ text "Projektgruppen" ] ]
+                    [ li [ class "nav-item" ] [ a [ classes "nav-link", href "#classes" ] [ text "Klassen" ] ]
+                    , li [ class "nav-item" ] [ a [ classes "nav-link", href "#events" ] [ text "Projektgruppen" ] ]
                     , li [ class "nav-item" ] [ a [ classes "nav-link", href "#pupils" ] [ text "Schüler/Schülerinnen" ] ]
                     , li [ class "nav-item" ] [ a [ classes "nav-link", href "#result" ] [ text "Ergebnis" ] ]
                     , li [ class "nav-item" ] [ a [ classes "nav-link", href "#admin" ] [ text "Administration" ] ]

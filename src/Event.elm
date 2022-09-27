@@ -59,7 +59,7 @@ extendToCapacity event =
 decoder : D.Decoder Model
 decoder =
     D.map
-        (\p -> Model p emptyFormData False)
+        (\l -> Model l emptyFormData False)
         (D.list decoderEvent)
 
 
@@ -164,6 +164,14 @@ view : Model -> Html Msg
 view model =
     div [ class "mb-5" ]
         [ h2 [ id "events", class "nav-anchor" ] [ text "Projektgruppen" ]
+        , p []
+            [ text
+                """Abhängig von der Anzahl der Klassen und der Anzahl der Plätze in einer Gruppe gibt es feste Plätze
+                für Schüler/Schülerinnen aus bestimmten Klassen und freie Plätze. Es erfolgt eine ganzzahlige Teilung
+                der Plätze durch die Anzahl der Klassen. Der Rest gibt die freien Plätze an. Beispiel: Bei vier Klassen
+                und 13 Plätzen gibt es 3 feste Plätze pro Klasse und einen freien Platz, der von jedem beliebigen Schüler
+                besetzt werden kann."""
+            ]
         , form [ class "mb-3", onSubmit Save ]
             [ h3 [ hidden True ] [ text "Neue Gruppe hinzufügen" ]
             , div [ classes "row g-3" ]
