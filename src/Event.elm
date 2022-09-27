@@ -1,4 +1,4 @@
-module Event exposing (Action(..), Model, Msg, Obj, decoder, decoderEvent, eventToJSON, extendToCapacity, init, modelToJSON, update, view)
+module Event exposing (Action(..), Model, Msg, Obj, decoder, decoderEvent, eventToJSON, extendToCapacityAndRestrictByClass, init, modelToJSON, update, view)
 
 import Helpers exposing (classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
@@ -7,6 +7,7 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Lazy exposing (lazy)
 import Json.Decode as D
 import Json.Encode as E
+import Set
 
 
 
@@ -37,23 +38,61 @@ type alias Obj =
     }
 
 
-extendToCapacity : Obj -> List Obj
-extendToCapacity event =
+type Seat
+    = Reserved Int String
+    | Free Int
+
+
+extendToCapacityAndRestrictByClass : Obj -> Set.Set String -> String -> List Obj
+extendToCapacityAndRestrictByClass event cls pupilsCl =
     let
-        fn : Obj -> ( Int, List Obj ) -> ( Int, List Obj )
+        num : Int
+        num =
+            event.capacity // Set.size cls
+
+        fn : String -> ( Int, List Seat ) -> ( Int, List Seat )
         fn =
-            \e t ->
+            \cl ( i, l ) ->
                 let
                     newIndex : Int
                     newIndex =
-                        Tuple.first t - 1
+                        i + 1
                 in
-                ( newIndex, { e | internalID = newIndex } :: Tuple.second t )
+                ( newIndex + num - 1, l ++ (List.range newIndex (newIndex + num - 1) |> List.map (\n -> Reserved n cl)) )
+
+        seatsReserved : ( Int, List Seat )
+        seatsReserved =
+            cls
+                |> Set.toList
+                |> List.foldl fn ( 0, [] )
+
+        allSeats : List Seat
+        allSeats =
+            Tuple.second seatsReserved ++ (List.range (Tuple.first seatsReserved + 1) event.capacity |> List.map Free)
     in
-    event
-        |> List.repeat event.capacity
-        |> List.foldl fn ( event.capacity + 1, [] )
-        |> Tuple.second
+    allSeats
+        |> List.filter
+            (\s ->
+                case s of
+                    Free _ ->
+                        True
+
+                    Reserved _ c ->
+                        c == pupilsCl
+            )
+        |> List.map
+            (\s ->
+                let
+                    i =
+                        case s of
+                            Free j ->
+                                j
+
+                            Reserved j _ ->
+                                j
+                in
+                { event | internalID = i }
+            )
 
 
 decoder : D.Decoder Model

@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.aj.O === region.au.O)
+	if (region.aj.N === region.au.N)
 	{
-		return 'on line ' + region.aj.O;
+		return 'on line ' + region.aj.N;
 	}
-	return 'on lines ' + region.aj.O + ' through ' + region.au.O;
+	return 'on lines ' + region.aj.N + ' through ' + region.au.N;
 }
 
 
@@ -2719,7 +2719,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		A: func(record.A),
+		z: func(record.z),
 		ak: record.ak,
 		ag: record.ag
 	}
@@ -2989,7 +2989,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.A;
+		var message = !tag ? value : tag < 3 ? value.a : value.z;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ak;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5334,11 +5334,11 @@ var $elm$browser$Browser$element = _Browser_element;
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $author$project$Main$Model = F4(
 	function (classes, events, pupils, assignment) {
-		return {M: assignment, y: classes, z: events, q: pupils};
+		return {L: assignment, x: classes, y: events, q: pupils};
 	});
 var $author$project$Class$Model = F3(
 	function (classes, formData, formInvalid) {
-		return {y: classes, N: formData, I: formInvalid};
+		return {x: classes, M: formData, H: formInvalid};
 	});
 var $author$project$Class$emptyFormData = '';
 var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
@@ -5476,7 +5476,7 @@ var $author$project$Class$decoder = A2(
 	$elm$json$Json$Decode$list($elm$json$Json$Decode$string));
 var $author$project$Event$Model = F3(
 	function (events, formData, formInvalid) {
-		return {z: events, N: formData, I: formInvalid};
+		return {y: events, M: formData, H: formInvalid};
 	});
 var $author$project$Event$Obj = F3(
 	function (name, capacity, internalID) {
@@ -5501,11 +5501,11 @@ var $author$project$Event$decoder = A2(
 	$elm$json$Json$Decode$list($author$project$Event$decoderEvent));
 var $author$project$Pupil$Model = F3(
 	function (pupils, formData, formInvalid) {
-		return {N: formData, I: formInvalid, q: pupils};
+		return {M: formData, H: formInvalid, q: pupils};
 	});
 var $author$project$Pupil$Obj = F3(
 	function (name, _class, choices) {
-		return {a8: choices, u: _class, aF: name};
+		return {a8: choices, Y: _class, aF: name};
 	});
 var $author$project$Pupil$Choice = F2(
 	function (event, type_) {
@@ -5531,7 +5531,7 @@ var $author$project$Pupil$decoderChoice = A3(
 			$elm$json$Json$Decode$string)));
 var $author$project$Pupil$FormData = F2(
 	function (names, _class) {
-		return {u: _class, W: names};
+		return {Y: _class, V: names};
 	});
 var $author$project$Pupil$emptyFormData = A2($author$project$Pupil$FormData, '', '');
 var $elm$json$Json$Decode$map3 = _Json_map3;
@@ -5578,7 +5578,7 @@ var $author$project$Main$init = function (s) {
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	} else {
 		return _Utils_Tuple2(
-			{M: $author$project$Assignment$init, y: $author$project$Class$init, z: $author$project$Event$init, q: $author$project$Pupil$init},
+			{L: $author$project$Assignment$init, x: $author$project$Class$init, y: $author$project$Event$init, q: $author$project$Pupil$init},
 			$elm$core$Platform$Cmd$none);
 	}
 };
@@ -5617,7 +5617,7 @@ var $author$project$Class$modelToJSON = function (model) {
 	return A2(
 		$elm$json$Json$Encode$list,
 		$elm$json$Json$Encode$string,
-		$elm$core$Set$toList(model.y));
+		$elm$core$Set$toList(model.x));
 };
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
@@ -5646,7 +5646,7 @@ var $author$project$Event$eventToJSON = function (e) {
 			]));
 };
 var $author$project$Event$modelToJSON = function (model) {
-	return A2($elm$json$Json$Encode$list, $author$project$Event$eventToJSON, model.z);
+	return A2($elm$json$Json$Encode$list, $author$project$Event$eventToJSON, model.y);
 };
 var $author$project$Pupil$choiceTypeToString = function (c) {
 	switch (c) {
@@ -5680,7 +5680,7 @@ var $author$project$Pupil$pupilToJSON = function (p) {
 				$elm$json$Json$Encode$string(p.aF)),
 				_Utils_Tuple2(
 				'class',
-				$elm$json$Json$Encode$string(p.u)),
+				$elm$json$Json$Encode$string(p.Y)),
 				_Utils_Tuple2(
 				'choices',
 				A2($elm$json$Json$Encode$list, $author$project$Pupil$choiceToJSON, p.a8))
@@ -5695,10 +5695,10 @@ var $author$project$Main$modelToJSON = function (model) {
 			[
 				_Utils_Tuple2(
 				'classes',
-				$author$project$Class$modelToJSON(model.y)),
+				$author$project$Class$modelToJSON(model.x)),
 				_Utils_Tuple2(
 				'events',
-				$author$project$Event$modelToJSON(model.z)),
+				$author$project$Event$modelToJSON(model.y)),
 				_Utils_Tuple2(
 				'pupils',
 				$author$project$Pupil$modelToJSON(model.q))
@@ -6169,8 +6169,8 @@ var $elm$core$Set$member = F2(
 	});
 var $elm$core$String$trim = _String_trim;
 var $author$project$Class$validate = function (model) {
-	var c = $elm$core$String$trim(model.N);
-	return ((c === '') || A2($elm$core$Set$member, c, model.y)) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(c);
+	var c = $elm$core$String$trim(model.M);
+	return ((c === '') || A2($elm$core$Set$member, c, model.x)) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(c);
 };
 var $author$project$Class$update = F2(
 	function (msg, model) {
@@ -6180,7 +6180,7 @@ var $author$project$Class$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{N: s, I: false}),
+						{M: s, H: false}),
 					0);
 			case 1:
 				var _v1 = $author$project$Class$validate(model);
@@ -6190,16 +6190,16 @@ var $author$project$Class$update = F2(
 						_Utils_update(
 							model,
 							{
-								y: A2($elm$core$Set$insert, c, model.y),
-								N: $author$project$Class$emptyFormData,
-								I: false
+								x: A2($elm$core$Set$insert, c, model.x),
+								M: $author$project$Class$emptyFormData,
+								H: false
 							}),
 						1);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{I: true}),
+							{H: true}),
 						0);
 				}
 			default:
@@ -6208,8 +6208,8 @@ var $author$project$Class$update = F2(
 					_Utils_update(
 						model,
 						{
-							y: A2($elm$core$Set$remove, s, model.y),
-							I: false
+							x: A2($elm$core$Set$remove, s, model.x),
+							H: false
 						}),
 					1);
 		}
@@ -6264,14 +6264,14 @@ var $elm$core$List$any = F2(
 		}
 	});
 var $author$project$Event$validate = function (model) {
-	var name = $elm$core$String$trim(model.N.aF);
-	return ((name === '') || ((model.N.t <= 0) || A2(
+	var name = $elm$core$String$trim(model.M.aF);
+	return ((name === '') || ((model.M.t <= 0) || A2(
 		$elm$core$List$any,
 		function (e) {
 			return _Utils_eq(e.aF, name);
 		},
-		model.z))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-		A3($author$project$Event$Obj, name, model.N.t, 0));
+		model.y))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+		A3($author$project$Event$Obj, name, model.M.t, 0));
 };
 var $author$project$Event$update = F2(
 	function (msg, model) {
@@ -6282,8 +6282,8 @@ var $author$project$Event$update = F2(
 					_Utils_update(
 						model,
 						{
-							N: A2($author$project$Event$updateFormdata, data, model.N),
-							I: false
+							M: A2($author$project$Event$updateFormdata, data, model.M),
+							H: false
 						}),
 					1);
 			case 1:
@@ -6294,19 +6294,19 @@ var $author$project$Event$update = F2(
 						_Utils_update(
 							model,
 							{
-								z: _Utils_ap(
-									model.z,
+								y: _Utils_ap(
+									model.y,
 									_List_fromArray(
 										[_new])),
-								N: $author$project$Event$emptyFormData,
-								I: false
+								M: $author$project$Event$emptyFormData,
+								H: false
 							}),
 						0);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{I: true}),
+							{H: true}),
 						1);
 				}
 			default:
@@ -6315,11 +6315,11 @@ var $author$project$Event$update = F2(
 					_Utils_update(
 						model,
 						{
-							z: A2(
+							y: A2(
 								$elm$core$List$filter,
 								$elm$core$Basics$neq(obj),
-								model.z),
-							I: false
+								model.y),
+							H: false
 						}),
 					0);
 		}
@@ -6379,7 +6379,7 @@ var $author$project$Pupil$savePupils = F5(
 						return (e || A2(
 							$elm$core$List$any,
 							function (p) {
-								return _Utils_eq(p.aF, name) && _Utils_eq(p.u, cl);
+								return _Utils_eq(p.aF, name) && _Utils_eq(p.Y, cl);
 							},
 							currentPupils)) ? _Utils_Tuple2(_List_Nil, true) : _Utils_Tuple2(
 							_Utils_ap(
@@ -6407,12 +6407,12 @@ var $author$project$Pupil$updateFormdata = F2(
 			var n = msg.a;
 			return _Utils_update(
 				formData,
-				{W: n});
+				{V: n});
 		} else {
 			var c = msg.a;
 			return _Utils_update(
 				formData,
-				{u: c});
+				{Y: c});
 		}
 	});
 var $author$project$Pupil$update = F4(
@@ -6424,24 +6424,24 @@ var $author$project$Pupil$update = F4(
 					_Utils_update(
 						model,
 						{
-							N: A2($author$project$Pupil$updateFormdata, data, model.N),
-							I: false
+							M: A2($author$project$Pupil$updateFormdata, data, model.M),
+							H: false
 						}),
 					1);
 			case 1:
-				var _v1 = A5($author$project$Pupil$savePupils, model, events, classes, model.N.W, model.N.u);
+				var _v1 = A5($author$project$Pupil$savePupils, model, events, classes, model.M.V, model.M.Y);
 				if (!_v1.$) {
 					var pupils = _v1.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{N: $author$project$Pupil$emptyFormData, I: false, q: pupils}),
+							{M: $author$project$Pupil$emptyFormData, H: false, q: pupils}),
 						0);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{I: true}),
+							{H: true}),
 						1);
 				}
 			case 2:
@@ -6450,7 +6450,7 @@ var $author$project$Pupil$update = F4(
 					_Utils_update(
 						model,
 						{
-							I: false,
+							H: false,
 							q: A2(
 								$elm$core$List$filter,
 								$elm$core$Basics$neq(pupil),
@@ -6465,7 +6465,7 @@ var $author$project$Pupil$update = F4(
 					_Utils_update(
 						model,
 						{
-							I: false,
+							H: false,
 							q: A4($author$project$Pupil$changeChoice, model.q, pupil, event, choice)
 						}),
 					0);
@@ -6532,44 +6532,44 @@ var $author$project$Main$update = F2(
 		switch (msg.$) {
 			case 0:
 				var innerMsg = msg.a;
-				var _v1 = A2($author$project$Class$update, innerMsg, model.y);
+				var _v1 = A2($author$project$Class$update, innerMsg, model.x);
 				var classesModel = _v1.a;
 				var action = _v1.b;
 				if (!action) {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{y: classesModel}),
+							{x: classesModel}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return s(
 						_Utils_update(
 							model,
-							{y: classesModel}));
+							{x: classesModel}));
 				}
 			case 1:
 				var innerMsg = msg.a;
-				var _v3 = A2($author$project$Event$update, innerMsg, model.z);
+				var _v3 = A2($author$project$Event$update, innerMsg, model.y);
 				var eventsModel = _v3.a;
 				var action = _v3.b;
 				if (action === 1) {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{z: eventsModel}),
+							{y: eventsModel}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return s(
 						_Utils_update(
 							model,
 							{
-								z: eventsModel,
-								q: A2($author$project$Pupil$updateEvents, eventsModel.z, model.q)
+								y: eventsModel,
+								q: A2($author$project$Pupil$updateEvents, eventsModel.y, model.q)
 							}));
 				}
 			case 2:
 				var innerMsg = msg.a;
-				var _v5 = A4($author$project$Pupil$update, innerMsg, model.q, model.z.z, model.y.y);
+				var _v5 = A4($author$project$Pupil$update, innerMsg, model.q, model.y.y, model.x.x);
 				var pupilsModel = _v5.a;
 				var action = _v5.b;
 				if (action === 1) {
@@ -6586,13 +6586,13 @@ var $author$project$Main$update = F2(
 				}
 			case 3:
 				var innerMsg = msg.a;
-				var _v7 = A2($author$project$Assignment$update, innerMsg, model.M);
+				var _v7 = A2($author$project$Assignment$update, innerMsg, model.L);
 				var assignmentModel = _v7.a;
 				var cmd = _v7.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{M: assignmentModel}),
+						{L: assignmentModel}),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$AssignmentMsg, cmd));
 			case 4:
 				return s(
@@ -6760,8 +6760,8 @@ var $author$project$Main$admin = A2(
 		]));
 var $elm$virtual_dom$VirtualDom$lazy = _VirtualDom_lazy;
 var $elm$html$Html$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
-var $elm$virtual_dom$VirtualDom$lazy2 = _VirtualDom_lazy2;
-var $elm$html$Html$Lazy$lazy2 = $elm$virtual_dom$VirtualDom$lazy2;
+var $elm$virtual_dom$VirtualDom$lazy3 = _VirtualDom_lazy3;
+var $elm$html$Html$Lazy$lazy3 = $elm$virtual_dom$VirtualDom$lazy3;
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
@@ -7290,101 +7290,152 @@ var $author$project$Algo$run = F2(
 				A2($elm$core$List$map, $elm$core$Tuple$first, graph)));
 	});
 var $author$project$Algo$VertexRight = $elm$core$Basics$identity;
-var $elm$core$List$repeatHelp = F3(
-	function (result, n, value) {
-		repeatHelp:
+var $author$project$Event$Free = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Event$Reserved = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$core$Dict$sizeHelp = F2(
+	function (n, dict) {
+		sizeHelp:
 		while (true) {
-			if (n <= 0) {
-				return result;
+			if (dict.$ === -2) {
+				return n;
 			} else {
-				var $temp$result = A2($elm$core$List$cons, value, result),
-					$temp$n = n - 1,
-					$temp$value = value;
-				result = $temp$result;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
+					$temp$dict = left;
 				n = $temp$n;
-				value = $temp$value;
-				continue repeatHelp;
+				dict = $temp$dict;
+				continue sizeHelp;
 			}
 		}
 	});
-var $elm$core$List$repeat = F2(
-	function (n, value) {
-		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+var $elm$core$Dict$size = function (dict) {
+	return A2($elm$core$Dict$sizeHelp, 0, dict);
+};
+var $elm$core$Set$size = function (_v0) {
+	var dict = _v0;
+	return $elm$core$Dict$size(dict);
+};
+var $author$project$Event$extendToCapacityAndRestrictByClass = F3(
+	function (event, cls, pupilsCl) {
+		var num = (event.t / $elm$core$Set$size(cls)) | 0;
+		var fn = F2(
+			function (cl, _v2) {
+				var i = _v2.a;
+				var l = _v2.b;
+				var newIndex = i + 1;
+				return _Utils_Tuple2(
+					(newIndex + num) - 1,
+					_Utils_ap(
+						l,
+						A2(
+							$elm$core$List$map,
+							function (n) {
+								return A2($author$project$Event$Reserved, n, cl);
+							},
+							A2($elm$core$List$range, newIndex, (newIndex + num) - 1))));
+			});
+		var seatsReserved = A3(
+			$elm$core$List$foldl,
+			fn,
+			_Utils_Tuple2(0, _List_Nil),
+			$elm$core$Set$toList(cls));
+		var allSeats = _Utils_ap(
+			seatsReserved.b,
+			A2(
+				$elm$core$List$map,
+				$author$project$Event$Free,
+				A2($elm$core$List$range, seatsReserved.a + 1, event.t)));
+		return A2(
+			$elm$core$List$map,
+			function (s) {
+				var i = function () {
+					if (s.$ === 1) {
+						var j = s.a;
+						return j;
+					} else {
+						var j = s.a;
+						return j;
+					}
+				}();
+				return _Utils_update(
+					event,
+					{ab: i});
+			},
+			A2(
+				$elm$core$List$filter,
+				function (s) {
+					if (s.$ === 1) {
+						return true;
+					} else {
+						var c = s.b;
+						return _Utils_eq(c, pupilsCl);
+					}
+				},
+				allSeats));
 	});
-var $author$project$Event$extendToCapacity = function (event) {
-	var fn = F2(
-		function (e, t) {
-			var newIndex = t.a - 1;
-			return _Utils_Tuple2(
-				newIndex,
-				A2(
+var $author$project$Assignment$toGraphFromGreen = F2(
+	function (pupils, cls) {
+		var fn = F2(
+			function (pupil, graph) {
+				var v = A2(
+					$elm$core$List$map,
+					$elm$core$Basics$identity,
+					A3(
+						$elm$core$List$foldl,
+						F2(
+							function (e, l) {
+								return _Utils_ap(
+									A3($author$project$Event$extendToCapacityAndRestrictByClass, e, cls, pupil.Y),
+									l);
+							}),
+						_List_Nil,
+						A2($author$project$Pupil$eventGroup, 0, pupil)));
+				var k = pupil;
+				return A2(
 					$elm$core$List$cons,
-					_Utils_update(
-						e,
-						{ab: newIndex}),
-					t.b));
-		});
-	return A3(
-		$elm$core$List$foldl,
-		fn,
-		_Utils_Tuple2(event.t + 1, _List_Nil),
-		A2($elm$core$List$repeat, event.t, event)).b;
-};
-var $author$project$Assignment$toGraphFromGreen = function (pupils) {
-	var fn = F2(
-		function (pupil, graph) {
-			var v = A2(
-				$elm$core$List$map,
-				$elm$core$Basics$identity,
-				A3(
-					$elm$core$List$foldl,
-					F2(
-						function (e, l) {
-							return _Utils_ap(
-								$author$project$Event$extendToCapacity(e),
-								l);
-						}),
-					_List_Nil,
-					A2($author$project$Pupil$eventGroup, 0, pupil)));
-			var k = pupil;
-			return A2(
-				$elm$core$List$cons,
-				_Utils_Tuple2(k, v),
-				graph);
-		});
-	var emptyGraph = _List_Nil;
-	return A3($elm$core$List$foldl, fn, emptyGraph, pupils);
-};
-var $author$project$Assignment$toGraphFromGreenAndYellow = function (pupils) {
-	var fn = F2(
-		function (pupil, graph) {
-			var k = pupil;
-			var events = _Utils_ap(
-				A2($author$project$Pupil$eventGroup, 0, pupil),
-				A2($author$project$Pupil$eventGroup, 1, pupil));
-			var v = A2(
-				$elm$core$List$map,
-				$elm$core$Basics$identity,
-				A3(
-					$elm$core$List$foldl,
-					F2(
-						function (e, l) {
-							return _Utils_ap(
-								$author$project$Event$extendToCapacity(e),
-								l);
-						}),
-					_List_Nil,
-					events));
-			return A2(
-				$elm$core$List$cons,
-				_Utils_Tuple2(k, v),
-				graph);
-		});
-	var emptyGraph = _List_Nil;
-	return A3($elm$core$List$foldl, fn, emptyGraph, pupils);
-};
-var $author$project$Assignment$toGraphFromYellowWithoutMatched = F2(
-	function (pupils, matching) {
+					_Utils_Tuple2(k, v),
+					graph);
+			});
+		var emptyGraph = _List_Nil;
+		return A3($elm$core$List$foldl, fn, emptyGraph, pupils);
+	});
+var $author$project$Assignment$toGraphFromGreenAndYellow = F2(
+	function (pupils, cls) {
+		var fn = F2(
+			function (pupil, graph) {
+				var k = pupil;
+				var events = _Utils_ap(
+					A2($author$project$Pupil$eventGroup, 0, pupil),
+					A2($author$project$Pupil$eventGroup, 1, pupil));
+				var v = A2(
+					$elm$core$List$map,
+					$elm$core$Basics$identity,
+					A3(
+						$elm$core$List$foldl,
+						F2(
+							function (e, l) {
+								return _Utils_ap(
+									A3($author$project$Event$extendToCapacityAndRestrictByClass, e, cls, pupil.Y),
+									l);
+							}),
+						_List_Nil,
+						events));
+				return A2(
+					$elm$core$List$cons,
+					_Utils_Tuple2(k, v),
+					graph);
+			});
+		var emptyGraph = _List_Nil;
+		return A3($elm$core$List$foldl, fn, emptyGraph, pupils);
+	});
+var $author$project$Assignment$toGraphFromYellowWithoutMatched = F3(
+	function (pupils, cls, matching) {
 		var onlyUnmatchedVertices = function (vertex) {
 			return !A2(
 				$elm$core$List$any,
@@ -7416,7 +7467,7 @@ var $author$project$Assignment$toGraphFromYellowWithoutMatched = F2(
 							F2(
 								function (e, l) {
 									return _Utils_ap(
-										$author$project$Event$extendToCapacity(e),
+										A3($author$project$Event$extendToCapacityAndRestrictByClass, e, cls, pupil.Y),
 										l);
 								}),
 							_List_Nil,
@@ -7434,44 +7485,46 @@ var $author$project$Assignment$toGraphFromYellowWithoutMatched = F2(
 			emptyGraph,
 			A2($elm$core$List$filter, onlyRemaining, pupils));
 	});
-var $author$project$Assignment$finalize = function (pupils) {
-	var step3 = $author$project$Algo$run(
-		$author$project$Assignment$toGraphFromGreenAndYellow(pupils));
-	var step1 = A2(
-		$author$project$Algo$run,
-		$author$project$Assignment$toGraphFromGreen(pupils),
-		_List_Nil);
-	var step2 = A2(
-		$author$project$Algo$run,
-		A2($author$project$Assignment$toGraphFromYellowWithoutMatched, pupils, step1),
-		_List_Nil);
-	return step3(
-		_Utils_ap(step1, step2));
-};
-var $author$project$Assignment$matchedAndUnmatchedPupils = function (pupils) {
-	var matched = $author$project$Assignment$finalize(pupils);
-	var matchedTransformed = A2(
-		$elm$core$List$map,
-		function (_v1) {
-			var p = _v1.a;
-			var e = _v1.b;
-			return _Utils_Tuple2(p, e);
-		},
-		matched);
-	return _Utils_Tuple2(
-		matchedTransformed,
-		A2(
-			$elm$core$List$filter,
-			function (p) {
-				var _v0 = A2($author$project$Algo$getFromMatchingLeft, p, matched);
-				if (_v0.$ === 1) {
-					return true;
-				} else {
-					return false;
-				}
+var $author$project$Assignment$finalize = F2(
+	function (pupils, cls) {
+		var step3 = $author$project$Algo$run(
+			A2($author$project$Assignment$toGraphFromGreenAndYellow, pupils, cls));
+		var step1 = A2(
+			$author$project$Algo$run,
+			A2($author$project$Assignment$toGraphFromGreen, pupils, cls),
+			_List_Nil);
+		var step2 = A2(
+			$author$project$Algo$run,
+			A3($author$project$Assignment$toGraphFromYellowWithoutMatched, pupils, cls, step1),
+			_List_Nil);
+		return step3(
+			_Utils_ap(step1, step2));
+	});
+var $author$project$Assignment$matchedAndUnmatchedPupils = F2(
+	function (pupils, cls) {
+		var matched = A2($author$project$Assignment$finalize, pupils, cls);
+		var matchedTransformed = A2(
+			$elm$core$List$map,
+			function (_v1) {
+				var p = _v1.a;
+				var e = _v1.b;
+				return _Utils_Tuple2(p, e);
 			},
-			pupils));
-};
+			matched);
+		return _Utils_Tuple2(
+			matchedTransformed,
+			A2(
+				$elm$core$List$filter,
+				function (p) {
+					var _v0 = A2($author$project$Algo$getFromMatchingLeft, p, matched);
+					if (_v0.$ === 1) {
+						return true;
+					} else {
+						return false;
+					}
+				},
+				pupils));
+	});
 var $elm$html$Html$ol = _VirtualDom_node('ol');
 var $author$project$Assignment$onColor = F2(
 	function (color, matching) {
@@ -7523,10 +7576,10 @@ var $author$project$Assignment$onColor = F2(
 			A2($elm$core$List$filter, fn, matching));
 	});
 var $author$project$Pupil$pupilDisplay = function (pupil) {
-	return pupil.aF + (' (Klasse ' + (pupil.u + ')'));
+	return pupil.aF + (' (Klasse ' + (pupil.Y + ')'));
 };
 var $author$project$Pupil$pupilSorting = function (pupil) {
-	return _Utils_ap(pupil.u, pupil.aF);
+	return _Utils_ap(pupil.Y, pupil.aF);
 };
 var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
 var $elm$core$List$sortBy = _List_sortBy;
@@ -7582,8 +7635,8 @@ var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Assignment$innerView = F2(
-	function (model, pupils) {
+var $author$project$Assignment$innerView = F3(
+	function (model, pupils, cls) {
 		var tableRow = F2(
 			function (p, e) {
 				return A2(
@@ -7623,7 +7676,7 @@ var $author$project$Assignment$innerView = F2(
 								]))
 						]));
 			});
-		var _v0 = $author$project$Assignment$matchedAndUnmatchedPupils(pupils);
+		var _v0 = A2($author$project$Assignment$matchedAndUnmatchedPupils, pupils, cls);
 		var matched = _v0.a;
 		var unmatched = _v0.b;
 		return A2(
@@ -7913,8 +7966,8 @@ var $author$project$Assignment$innerView = F2(
 						]))
 				]));
 	});
-var $author$project$Assignment$view = F2(
-	function (model, pupils) {
+var $author$project$Assignment$view = F3(
+	function (model, pupils, cls) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -7989,7 +8042,7 @@ var $author$project$Assignment$view = F2(
 											[
 												$elm$html$Html$text('Ergebnis ausblenden')
 											])),
-										A2($author$project$Assignment$innerView, model, pupils)
+										A3($author$project$Assignment$innerView, model, pupils, cls)
 									]));
 					}
 				}()
@@ -8260,11 +8313,11 @@ var $author$project$Class$view = function (model) {
 											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Bezeichner'),
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput($author$project$Class$FormDataMsg),
-											$elm$html$Html$Attributes$value(model.N)
+											$elm$html$Html$Attributes$value(model.M)
 										]),
 									'newClassName',
 									'Klasse ist bereits vorhanden',
-									model.I)),
+									model.H)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -8302,7 +8355,7 @@ var $author$project$Class$view = function (model) {
 							[
 								$elm$html$Html$text('Alle Klassen')
 							])),
-						A2($elm$html$Html$Lazy$lazy, $author$project$Class$allClasses, model.y)
+						A2($elm$html$Html$Lazy$lazy, $author$project$Class$allClasses, model.x)
 					]))
 			]));
 };
@@ -8466,11 +8519,11 @@ var $author$project$Event$view = function (model) {
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeR, $author$project$Event$Name, $author$project$Event$FormDataMsg)),
-											$elm$html$Html$Attributes$value(model.N.aF)
+											$elm$html$Html$Attributes$value(model.M.aF)
 										]),
 									'newGroupName',
 									'Gruppe ist bereits vorhanden',
-									model.I)),
+									model.H)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -8496,7 +8549,7 @@ var $author$project$Event$view = function (model) {
 														$elm$core$Maybe$withDefault(0),
 														A2($elm$core$Basics$composeR, $author$project$Event$Capacity, $author$project$Event$FormDataMsg)))),
 												$elm$html$Html$Attributes$value(
-												$elm$core$String$fromInt(model.N.t))
+												$elm$core$String$fromInt(model.M.t))
 											]),
 										_List_Nil),
 										A2(
@@ -8547,7 +8600,7 @@ var $author$project$Event$view = function (model) {
 							[
 								$elm$html$Html$text('Alle Gruppen')
 							])),
-						A2($elm$html$Html$Lazy$lazy, $author$project$Event$allEvents, model.z)
+						A2($elm$html$Html$Lazy$lazy, $author$project$Event$allEvents, model.y)
 					]))
 			]));
 };
@@ -8920,11 +8973,11 @@ var $author$project$Pupil$view = function (model) {
 											$elm$html$Html$Attributes$required(true),
 											$elm$html$Html$Events$onInput(
 											A2($elm$core$Basics$composeR, $author$project$Pupil$Names, $author$project$Pupil$FormDataMsg)),
-											$elm$html$Html$Attributes$value(model.N.W)
+											$elm$html$Html$Attributes$value(model.M.V)
 										]),
 									'newPupilNames',
 									'Schüler/Schülerin ist in dieser Klasse bereits vorhanden oder unbekannte Klasse oder sonst ungültige Eingabe',
-									model.I)),
+									model.H)),
 								A2(
 								$elm$html$Html$div,
 								_List_fromArray(
@@ -8944,7 +8997,7 @@ var $author$project$Pupil$view = function (model) {
 												$elm$html$Html$Attributes$required(true),
 												$elm$html$Html$Events$onInput(
 												A2($elm$core$Basics$composeR, $author$project$Pupil$Class, $author$project$Pupil$FormDataMsg)),
-												$elm$html$Html$Attributes$value(model.N.u)
+												$elm$html$Html$Attributes$value(model.M.Y)
 											]),
 										_List_Nil)
 									])),
@@ -9013,11 +9066,11 @@ var $author$project$Main$view = function (model) {
 								A2(
 								$elm$html$Html$map,
 								$author$project$Main$ClassMsg,
-								A2($elm$html$Html$Lazy$lazy, $author$project$Class$view, model.y)),
+								A2($elm$html$Html$Lazy$lazy, $author$project$Class$view, model.x)),
 								A2(
 								$elm$html$Html$map,
 								$author$project$Main$EventMsg,
-								A2($elm$html$Html$Lazy$lazy, $author$project$Event$view, model.z)),
+								A2($elm$html$Html$Lazy$lazy, $author$project$Event$view, model.y)),
 								A2(
 								$elm$html$Html$map,
 								$author$project$Main$PupilMsg,
@@ -9025,7 +9078,7 @@ var $author$project$Main$view = function (model) {
 								A2(
 								$elm$html$Html$map,
 								$author$project$Main$AssignmentMsg,
-								A3($elm$html$Html$Lazy$lazy2, $author$project$Assignment$view, model.M, model.q.q)),
+								A4($elm$html$Html$Lazy$lazy3, $author$project$Assignment$view, model.L, model.q.q, model.x.x)),
 								$author$project$Main$admin
 							]))
 					]))

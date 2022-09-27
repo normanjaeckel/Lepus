@@ -5,6 +5,7 @@ import Assignment
 import Event
 import Expect
 import Pupil
+import Set
 import Test exposing (..)
 
 
@@ -64,7 +65,7 @@ suite =
                         pupils =
                             [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ]
                     in
-                    Assignment.finalize pupils
+                    Assignment.finalize pupils (Set.fromList (pupils |> List.map .class))
                         |> Expect.all
                             [ Expect.equalLists
                                 [ ( Algo.VertexLeft p1, Algo.VertexRight { e1 | internalID = 2 } )
@@ -79,7 +80,7 @@ suite =
                                 , ( Algo.VertexLeft p10, Algo.VertexRight { e5 | internalID = 1 } )
                                 ]
                             , List.length >> Expect.equal 10
-                            , howManyGreens pupils >> Expect.equal 8
+                            , howManyGreens pupils (Set.fromList (pupils |> List.map .class)) >> Expect.equal 8
                             ]
 
             -- Alternative mit alter Datenstruktur:  [ Assignment.Model e5 [ p10, p5 ], Assignment.Model e4 [ p7, p9 ], Assignment.Model e3 [ p8, p6 ], Assignment.Model e1 [ p1, p4 ], Assignment.Model e2 [ p2, p3 ]]
@@ -92,7 +93,7 @@ suite =
                         pupils =
                             [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10a ]
                     in
-                    Assignment.finalize pupils
+                    Assignment.finalize pupils (Set.fromList (pupils |> List.map .class))
                         |> Expect.all
                             [ Expect.equalLists
                                 [ ( Algo.VertexLeft p10a, Algo.VertexRight { e4 | internalID = 1 } )
@@ -119,7 +120,7 @@ suite =
                             -- , ( "Richard (1a)", "Song des Tages-2" )
                             -- ]
                             , List.length >> Expect.equal 10
-                            , howManyGreens pupils >> Expect.equal 7
+                            , howManyGreens pupils (Set.fromList (pupils |> List.map .class)) >> Expect.equal 7
                             ]
             , test "assign pupils in mini example" <|
                 \_ ->
@@ -134,17 +135,17 @@ suite =
                             Event.Obj "3" 1 0
 
                         j1 =
-                            Pupil.Obj "A" "" [] |> setupPupil [ i1 ] [ i2, i3 ] []
+                            Pupil.Obj "A" "1" [] |> setupPupil [ i1 ] [ i2, i3 ] []
 
                         j2 =
-                            Pupil.Obj "B" "" [] |> setupPupil [] [ i1, i2, i3 ] []
+                            Pupil.Obj "B" "1" [] |> setupPupil [] [ i1, i2, i3 ] []
 
                         j3 =
-                            Pupil.Obj "C" "" [] |> setupPupil [] [ i1, i2 ] [ i3 ]
+                            Pupil.Obj "C" "1" [] |> setupPupil [] [ i1, i2 ] [ i3 ]
                     in
-                    Assignment.finalize [ j1, j2, j3 ]
+                    Assignment.finalize [ j1, j2, j3 ] (Set.fromList [ "1" ])
                         |> Expect.all
-                            [ howManyGreens [ j1, j2, j3 ] >> Expect.equal 1
+                            [ howManyGreens [ j1, j2, j3 ] (Set.fromList [ "1" ]) >> Expect.equal 1
                             , List.length >> Expect.equal 3
                             ]
             ]
@@ -166,8 +167,8 @@ setupPupil green yellow red pupil =
     { pupil | choices = g ++ y ++ r }
 
 
-howManyGreens : List Pupil.Obj -> Algo.Matching Pupil.Obj Event.Obj -> Int
-howManyGreens pupils matching =
+howManyGreens : List Pupil.Obj -> Set.Set String -> Algo.Matching Pupil.Obj Event.Obj -> Int
+howManyGreens pupils cls matching =
     pupils
         |> List.foldl
             (\pupil count ->
@@ -179,7 +180,7 @@ howManyGreens pupils matching =
                         if
                             pupil
                                 |> Pupil.eventGroup Pupil.Green
-                                |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
+                                |> List.foldl (\e l -> Event.extendToCapacityAndRestrictByClass e cls pupil.class ++ l) []
                                 |> List.map Algo.VertexRight
                                 |> List.member vertex
                         then

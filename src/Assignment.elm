@@ -8,6 +8,7 @@ import Html.Attributes exposing (attribute, class, id, scope, tabindex, title)
 import Html.Events exposing (onClick)
 import Process
 import Pupil
+import Set
 import Task
 
 
@@ -72,8 +73,8 @@ update msg model =
 -- VIEW
 
 
-view : Model -> List Pupil.Obj -> Html Msg
-view model pupils =
+view : Model -> List Pupil.Obj -> Set.Set String -> Html Msg
+view model pupils cls =
     div [ class "mb-5" ]
         [ h2 [ id "result", class "nav-anchor" ] [ text "Ergebnis" ]
         , case model.visibility of
@@ -89,16 +90,16 @@ view model pupils =
                 div []
                     [ button [ classes "btn btn-primary mb-3", onClick <| SetVisibility Hidden ]
                         [ text "Ergebnis ausblenden" ]
-                    , innerView model pupils
+                    , innerView model pupils cls
                     ]
         ]
 
 
-innerView : Model -> List Pupil.Obj -> Html Msg
-innerView model pupils =
+innerView : Model -> List Pupil.Obj -> Set.Set String -> Html Msg
+innerView model pupils cls =
     let
         ( matched, unmatched ) =
-            matchedAndUnmatchedPupils pupils
+            matchedAndUnmatchedPupils pupils cls
 
         tableRow : Pupil.Obj -> Event.Obj -> Html msg
         tableRow =
@@ -228,12 +229,12 @@ onColor color matching =
 -- LOGIC
 
 
-matchedAndUnmatchedPupils : List Pupil.Obj -> ( List ( Pupil.Obj, Event.Obj ), List Pupil.Obj )
-matchedAndUnmatchedPupils pupils =
+matchedAndUnmatchedPupils : List Pupil.Obj -> Set.Set String -> ( List ( Pupil.Obj, Event.Obj ), List Pupil.Obj )
+matchedAndUnmatchedPupils pupils cls =
     let
         matched : Algo.Matching Pupil.Obj Event.Obj
         matched =
-            finalize pupils
+            finalize pupils cls
 
         matchedTransformed =
             matched |> List.map (\( Algo.VertexLeft p, Algo.VertexRight e ) -> ( p, e ))
@@ -252,26 +253,26 @@ matchedAndUnmatchedPupils pupils =
     )
 
 
-finalize : List Pupil.Obj -> Algo.Matching Pupil.Obj Event.Obj
-finalize pupils =
+finalize : List Pupil.Obj -> Set.Set String -> Algo.Matching Pupil.Obj Event.Obj
+finalize pupils cls =
     let
         step1 : Algo.Matching Pupil.Obj Event.Obj
         step1 =
-            [] |> Algo.run (toGraphFromGreen pupils)
+            [] |> Algo.run (toGraphFromGreen pupils cls)
 
         step2 : Algo.Matching Pupil.Obj Event.Obj
         step2 =
-            [] |> Algo.run (toGraphFromYellowWithoutMatched pupils step1)
+            [] |> Algo.run (toGraphFromYellowWithoutMatched pupils cls step1)
 
         step3 : Algo.Matching Pupil.Obj Event.Obj -> Algo.Matching Pupil.Obj Event.Obj
         step3 =
-            Algo.run (toGraphFromGreenAndYellow pupils)
+            Algo.run (toGraphFromGreenAndYellow pupils cls)
     in
     (step1 ++ step2) |> step3
 
 
-toGraphFromGreen : List Pupil.Obj -> Algo.Graph Pupil.Obj Event.Obj
-toGraphFromGreen pupils =
+toGraphFromGreen : List Pupil.Obj -> Set.Set String -> Algo.Graph Pupil.Obj Event.Obj
+toGraphFromGreen pupils cls =
     let
         emptyGraph : Algo.Graph Pupil.Obj Event.Obj
         emptyGraph =
@@ -289,7 +290,7 @@ toGraphFromGreen pupils =
                     v =
                         pupil
                             |> Pupil.eventGroup Pupil.Green
-                            |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
+                            |> List.foldl (\e l -> Event.extendToCapacityAndRestrictByClass e cls pupil.class ++ l) []
                             |> List.map Algo.VertexRight
                 in
                 ( k, v ) :: graph
@@ -298,8 +299,8 @@ toGraphFromGreen pupils =
         |> List.foldl fn emptyGraph
 
 
-toGraphFromYellowWithoutMatched : List Pupil.Obj -> Algo.Matching Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
-toGraphFromYellowWithoutMatched pupils matching =
+toGraphFromYellowWithoutMatched : List Pupil.Obj -> Set.Set String -> Algo.Matching Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
+toGraphFromYellowWithoutMatched pupils cls matching =
     let
         onlyRemaining : Pupil.Obj -> Bool
         onlyRemaining =
@@ -328,7 +329,7 @@ toGraphFromYellowWithoutMatched pupils matching =
                     v =
                         pupil
                             |> Pupil.eventGroup Pupil.Yellow
-                            |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
+                            |> List.foldl (\e l -> Event.extendToCapacityAndRestrictByClass e cls pupil.class ++ l) []
                             |> List.map Algo.VertexRight
                             |> List.filter onlyUnmatchedVertices
                 in
@@ -339,8 +340,8 @@ toGraphFromYellowWithoutMatched pupils matching =
         |> List.foldl fn emptyGraph
 
 
-toGraphFromGreenAndYellow : List Pupil.Obj -> Algo.Graph Pupil.Obj Event.Obj
-toGraphFromGreenAndYellow pupils =
+toGraphFromGreenAndYellow : List Pupil.Obj -> Set.Set String -> Algo.Graph Pupil.Obj Event.Obj
+toGraphFromGreenAndYellow pupils cls =
     let
         emptyGraph : Algo.Graph Pupil.Obj Event.Obj
         emptyGraph =
@@ -350,18 +351,18 @@ toGraphFromGreenAndYellow pupils =
         fn =
             \pupil graph ->
                 let
-                    events : List Event.Obj
-                    events =
-                        (pupil |> Pupil.eventGroup Pupil.Green) ++ (pupil |> Pupil.eventGroup Pupil.Yellow)
-
                     k : Algo.VertexLeft Pupil.Obj
                     k =
                         Algo.VertexLeft pupil
 
+                    events : List Event.Obj
+                    events =
+                        (pupil |> Pupil.eventGroup Pupil.Green) ++ (pupil |> Pupil.eventGroup Pupil.Yellow)
+
                     v : List (Algo.VertexRight Event.Obj)
                     v =
                         events
-                            |> List.foldl (\e l -> Event.extendToCapacity e ++ l) []
+                            |> List.foldl (\e l -> Event.extendToCapacityAndRestrictByClass e cls pupil.class ++ l) []
                             |> List.map Algo.VertexRight
                 in
                 ( k, v ) :: graph

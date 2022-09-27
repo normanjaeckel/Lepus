@@ -11,7 +11,7 @@ import Helpers exposing (classes)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, href, id, type_)
 import Html.Events exposing (onClick)
-import Html.Lazy exposing (lazy, lazy2)
+import Html.Lazy exposing (lazy, lazy3)
 import Json.Decode as D
 import Json.Encode as E
 import Pupil
@@ -171,7 +171,7 @@ view model =
                 , lazy Class.view model.classes |> map ClassMsg
                 , lazy Event.view model.events |> map EventMsg
                 , lazy Pupil.view model.pupils |> map PupilMsg
-                , lazy2 Assignment.view model.assignment model.pupils.pupils |> map AssignmentMsg
+                , lazy3 Assignment.view model.assignment model.pupils.pupils model.classes.classes |> map AssignmentMsg
                 , admin
                 ]
             ]
