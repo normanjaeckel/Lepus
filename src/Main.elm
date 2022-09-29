@@ -19,7 +19,7 @@ import Pupil
 import Task
 
 
-main : Program String Model Msg
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = \flags -> ( init flags, Cmd.none )
@@ -27,6 +27,11 @@ main =
         , update = update
         , subscriptions = \_ -> Sub.none
         }
+
+
+type alias Flags =
+    { data : String
+    }
 
 
 
@@ -41,9 +46,9 @@ type alias Model =
     }
 
 
-init : String -> Model
-init s =
-    case D.decodeString decoder s of
+init : Flags -> Model
+init flags =
+    case D.decodeString decoder flags.data of
         Ok model ->
             model
 
@@ -141,7 +146,7 @@ update msg model =
             ( { model | assignment = assignmentModel }, cmd |> Cmd.map AssignmentMsg )
 
         DeleteAll ->
-            init "" |> s
+            init (Flags "") |> s
 
         Export ->
             ( model, File.Download.string "export.json" "application/json" (modelToJSON model |> E.encode 4) )
@@ -153,7 +158,7 @@ update msg model =
             ( model, File.toString file |> Task.perform ImportLoaded )
 
         ImportLoaded content ->
-            init content |> s
+            init (Flags content) |> s
 
 
 

@@ -17,7 +17,7 @@ import Set
 
 
 type alias Model =
-    { events : Dict.Dict String Obj
+    { events : Dict.Dict Int Obj
     , formData : Obj
     , formInvalid : Bool
     , editMode : EditMode
@@ -30,12 +30,12 @@ init =
 
 
 type Id
-    = Id String
+    = Id Int
 
 
-toString : Id -> String
-toString (Id str) =
-    str
+toInt : Id -> Int
+toInt (Id i) =
+    i
 
 
 type alias Obj =
@@ -114,10 +114,19 @@ extendToCapacityAndRestrictByClass event cls pupilsCl =
 
 decoder : D.Decoder Model
 decoder =
-    -- TODO: Use random number here.
     D.map
-        (\l -> (l |> List.map (\e -> ( "---", e )) |> Dict.fromList |> Model) emptyFormData False Disabled)
-        (D.list decoderEvent)
+        (\d ->
+            (d
+                |> Dict.toList
+                |> List.map (\( k, v ) -> ( String.toInt k |> Maybe.withDefault 0, v ))
+                |> Dict.fromList
+                |> Model
+            )
+                emptyFormData
+                False
+                Disabled
+        )
+        (D.dict decoderEvent)
 
 
 decoderEvent : D.Decoder Obj
@@ -130,8 +139,7 @@ decoderEvent =
 
 modelToJSON : Model -> E.Value
 modelToJSON model =
-    -- TODO: Add ID to JSON output.
-    model.events |> Dict.values |> E.list eventToJSON
+    model.events |> E.dict String.fromInt eventToJSON
 
 
 eventToJSON : Obj -> E.Value
@@ -168,15 +176,20 @@ update msg model =
             ( { model | formData = updateFormdata data model.formData, formInvalid = False }, DontSetStorage )
 
         SaveForm ->
-            case validate model.formData.name model.formData.capacity (Dict.values model.events) of
+            case validate model.formData.name model.formData.capacity (Dict.values model.events) Nothing of
                 Just newObj ->
                     let
+                        newId : Id
                         newId =
-                            -- TODO: Use random number here.
-                            "HAHAHAHAHA"
+                            model.events
+                                |> Dict.keys
+                                |> List.maximum
+                                |> Maybe.withDefault 1
+                                |> (+) 1
+                                |> Id
                     in
                     ( { model
-                        | events = model.events |> Dict.insert newId newObj
+                        | events = model.events |> Dict.insert (newId |> toInt) newObj
                         , formData = emptyFormData
                         , formInvalid = False
                       }
@@ -187,7 +200,7 @@ update msg model =
                     ( { model | formInvalid = True }, DontSetStorage )
 
         Edit eId ->
-            case model.events |> Dict.get (eId |> toString) of
+            case model.events |> Dict.get (eId |> toInt) of
                 Just obj ->
                     ( { model | editMode = Editing eId obj }, DontSetStorage )
 
@@ -207,12 +220,20 @@ update msg model =
         SaveEdit ->
             case model.editMode of
                 Editing eId new ->
-                    case validate new.name new.capacity (Dict.values model.events) of
+                    case
+                        validate
+                            new.name
+                            new.capacity
+                            (Dict.values model.events)
+                            (Dict.get (eId |> toInt) model.events |> Maybe.andThen (.name >> Just))
+                    of
                         Just updated ->
                             ( { model
                                 | events =
                                     model.events
-                                        |> Dict.update (eId |> toString) (\_ -> Just updated)
+                                        |> Dict.update
+                                            (eId |> toInt)
+                                            (always (Just updated))
                                 , editMode = Disabled
                               }
                             , SetStorage
@@ -229,7 +250,7 @@ update msg model =
             ( { model | editMode = Disabled }, DontSetStorage )
 
         Delete eId ->
-            ( { model | events = model.events |> Dict.remove (eId |> toString), formInvalid = False, editMode = Disabled }, SetStorage )
+            ( { model | events = model.events |> Dict.remove (eId |> toInt), formInvalid = False, editMode = Disabled }, SetStorage )
 
 
 updateFormdata : FormDataInput -> Obj -> Obj
@@ -242,17 +263,25 @@ updateFormdata msg formData =
             { formData | capacity = capacity }
 
 
-validate : String -> Int -> List Obj -> Maybe Obj
-validate nameRaw capacity events =
+validate : String -> Int -> List Obj -> Maybe String -> Maybe Obj
+validate nameRaw capacity events allowedName =
     let
         name : String
         name =
             nameRaw |> String.trim
+
+        condition2 =
+            case allowedName of
+                Nothing ->
+                    True
+
+                Just n ->
+                    n /= name
     in
     if
         (name == "")
             || (capacity <= 0)
-            || (events |> List.any (\e -> e.name == name))
+            || (condition2 && (events |> List.any (\e -> e.name == name)))
     then
         Nothing
 
@@ -319,7 +348,7 @@ view model =
         ]
 
 
-allEvents : EditMode -> Dict.Dict String Obj -> Html Msg
+allEvents : EditMode -> Dict.Dict Int Obj -> Html Msg
 allEvents editMode events =
     if Dict.isEmpty events then
         p [ hidden True ] [ text "Noch keine Gruppen angelegt" ]

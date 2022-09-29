@@ -34,9 +34,10 @@
     <div id="app"></div>
     <script type="text/javascript">
         var storedData = localStorage.getItem("app-model") || "";
+        var flags = { data: storedData }
         var app = Elm.Main.init({
             node: document.getElementById("app"),
-            flags: storedData
+            flags: flags
         });
 
         app.ports.setStorage.subscribe(function (state) {
