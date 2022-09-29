@@ -23,19 +23,33 @@ type alias Matching a b =
     List ( VertexLeft a, VertexRight b )
 
 
-type PathElement a b
-    = PathElementLeft (VertexLeft a)
-    | PathElementRight (VertexRight b)
+{-| Augmenting path of vertices, always starting with a VertexLeft.
+The number of vertices is odd.
 
+Example: A path A -> 1 -> B -> 2 -> C is saved as
 
-type alias Path a b =
-    List (PathElement a b)
-
-
-type alias IntermediateResult a b =
-    { paths : List (Path a b)
-    , free : Maybe (Path a b)
+    { head = C
+    , tail = [ ( B, 2 ), ( A, 1 ) ]
     }
+
+-}
+type alias PathOdd a b =
+    { head : VertexLeft a
+    , tail : List ( VertexLeft a, VertexRight b )
+    }
+
+
+{-| Augmenting path with even number of vertices, like A -> 2 -> B -> 2.
+See also PathOdd.
+-}
+type alias PathEven a b =
+    { head : ( VertexLeft a, VertexRight b )
+    , tail : List ( VertexLeft a, VertexRight b )
+    }
+
+
+type alias Visited b =
+    List (VertexRight b)
 
 
 run : Graph a b -> Matching a b -> Matching a b
@@ -53,7 +67,15 @@ run graph initialMatching =
             )
         |> List.foldl
             (\left matching ->
-                case find graph matching (extend graph [] [ PathElementLeft left ] []) of
+                let
+                    newPath : VertexLeft a -> PathOdd a b
+                    newPath =
+                        \l ->
+                            { head = l
+                            , tail = []
+                            }
+                in
+                case find graph matching (extend graph (newPath left) ( [], [] )) of
                     Nothing ->
                         matching
 
@@ -63,14 +85,14 @@ run graph initialMatching =
             initialMatching
 
 
-find : Graph a b -> Matching a b -> List (Path a b) -> Maybe (Path a b)
-find graph matching paths =
+find : Graph a b -> Matching a b -> ( List (PathEven a b), Visited b ) -> Maybe (PathEven a b)
+find graph matching ( paths, visited ) =
     if paths |> List.isEmpty then
         Nothing
 
     else
         let
-            res : IntermediateResult a b
+            res : IntermediateUpdateResult a b
             res =
                 update matching paths
         in
@@ -80,84 +102,105 @@ find graph matching paths =
 
             Nothing ->
                 res.paths
-                    |> List.foldl (extend graph paths) []
+                    |> List.foldl (extend graph) ( [], visited )
                     |> find graph matching
 
 
-update : Matching a b -> List (Path a b) -> IntermediateResult a b
+type alias IntermediateUpdateResult a b =
+    { paths : List (PathOdd a b)
+    , free : Maybe (PathEven a b)
+    }
+
+
+update : Matching a b -> List (PathEven a b) -> IntermediateUpdateResult a b
 update matching paths =
     case paths of
         [] ->
-            IntermediateResult [] Nothing
+            IntermediateUpdateResult [] Nothing
 
-        firstPath :: remainingPaths ->
-            case List.head firstPath of
+        currentPath :: remainingPaths ->
+            let
+                right : VertexRight b
+                right =
+                    currentPath.head |> Tuple.second
+            in
+            case matching |> getFromMatchingRight right of
                 Nothing ->
-                    IntermediateResult [] Nothing
+                    -- The head of the path is free so we found a free path. Stop further searching.
+                    IntermediateUpdateResult [] (Just currentPath)
 
-                Just headOfPath ->
-                    case headOfPath of
-                        PathElementLeft _ ->
-                            IntermediateResult [] Nothing
+                Just left ->
+                    -- The head of the path is not free. So search in all others paths
+                    -- and if this does not fit update the paths.
+                    let
+                        res : IntermediateUpdateResult a b
+                        res =
+                            update matching remainingPaths
+                    in
+                    case res.free of
+                        Just path ->
+                            IntermediateUpdateResult [] (Just path)
 
-                        PathElementRight right ->
-                            case matching |> getFromMatchingRight right of
-                                Nothing ->
-                                    IntermediateResult [] (Just firstPath)
-
-                                Just left ->
-                                    let
-                                        res : IntermediateResult a b
-                                        res =
-                                            update matching remainingPaths
-                                    in
-                                    case res.free of
-                                        Just path ->
-                                            IntermediateResult [] (Just path)
-
-                                        Nothing ->
-                                            IntermediateResult ((PathElementLeft left :: firstPath) :: res.paths) Nothing
+                        Nothing ->
+                            let
+                                updatedPath : PathOdd a b
+                                updatedPath =
+                                    { head = left
+                                    , tail = currentPath.head :: currentPath.tail
+                                    }
+                            in
+                            IntermediateUpdateResult (updatedPath :: res.paths) Nothing
 
 
-extend : Graph a b -> List (Path a b) -> Path a b -> List (Path a b) -> List (Path a b)
-extend graph old path new =
+extend : Graph a b -> PathOdd a b -> ( List (PathEven a b), Visited b ) -> ( List (PathEven a b), Visited b )
+extend graph path acc =
     let
-        verticesRight : List (PathElement a b)
-        verticesRight =
-            case List.head path of
-                Nothing ->
-                    []
+        left : VertexLeft a
+        left =
+            path.head
 
-                Just elem ->
-                    case elem of
-                        PathElementLeft l ->
-                            graph |> getFromGraph l |> List.map PathElementRight
-
-                        PathElementRight _ ->
-                            []
+        newVertices : List (VertexRight b)
+        newVertices =
+            graph
+                |> getFromGraph left
+                |> List.filter (\right -> Tuple.second acc |> List.member right |> not)
     in
-    verticesRight
-        |> List.filter (\right -> old |> List.any (\p -> List.member right p) |> not)
-        |> List.map (\right -> right :: path)
-        |> List.append new
+    ( newVertices
+        |> List.map (\right -> { head = ( left, right ), tail = path.tail })
+        |> List.append (Tuple.first acc)
+    , newVertices |> List.append (Tuple.second acc)
+    )
 
 
-apply : Path a b -> Matching a b -> Matching a b
+apply : PathEven a b -> Matching a b -> Matching a b
 apply path matching =
-    case path of
-        rightElem :: leftElem :: rest ->
-            case ( rightElem, leftElem ) of
-                ( PathElementRight right, PathElementLeft left ) ->
-                    matching
-                        |> List.filter (\( l, _ ) -> l /= left)
-                        |> (::) ( left, right )
-                        |> apply rest
+    let
+        left =
+            path.head |> Tuple.first
 
-                _ ->
-                    matching
+        right =
+            path.head |> Tuple.second
 
-        _ ->
+        newMatching =
             matching
+                |> List.filter (\( l, _ ) -> l /= left)
+                |> (::) ( left, right )
+
+        splitFirstElem : List ( VertexLeft a, VertexRight b ) -> Maybe ( ( VertexLeft a, VertexRight b ), List ( VertexLeft a, VertexRight b ) )
+        splitFirstElem =
+            \l ->
+                List.head l |> Maybe.andThen (\h -> Just ( h, List.drop 1 l ))
+    in
+    case splitFirstElem path.tail of
+        Nothing ->
+            newMatching
+
+        Just ( h, t ) ->
+            newMatching |> apply { head = h, tail = t }
+
+
+
+-- HELPERS
 
 
 getFromMatchingLeft : VertexLeft a -> Matching a b -> Maybe (VertexRight b)
