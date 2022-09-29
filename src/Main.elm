@@ -3,6 +3,7 @@ port module Main exposing (main)
 import Assignment
 import Browser
 import Class
+import Dict
 import Event
 import File
 import File.Download
@@ -118,12 +119,12 @@ update msg model =
                     ( { model | events = eventsModel }, Cmd.none )
 
                 SetStorage ->
-                    { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils } |> s
+                    { model | events = eventsModel, pupils = Pupil.updateEvents (eventsModel.events |> Dict.values) model.pupils } |> s
 
         PupilMsg innerMsg ->
             let
                 ( pupilsModel, pers ) =
-                    Pupil.update innerMsg model.pupils model.events.events model.classes.classes
+                    Pupil.update innerMsg model.pupils (model.events.events |> Dict.values) model.classes.classes
             in
             case pers of
                 DontSetStorage ->

@@ -9,7 +9,7 @@ EVENTS = [
     {"name": "Wilde Tiere des Meeres", "capacity": 12},
     {"name": "Wattenmeer", "capacity": 12},
     {"name": "Wasserkraftwerk", "capacity": 12},
-    {"name": "Nachaltige Fischerei", "capacity": 12},
+    {"name": "Nachhaltige Fischerei", "capacity": 12},
     {"name": "Wasser in der Bibel", "capacity": 12},
 ]
 

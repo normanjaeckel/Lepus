@@ -1,11 +1,12 @@
 module Event exposing (Model, Msg, Obj, decoder, decoderEvent, eventToJSON, extendToCapacityAndRestrictByClass, init, modelToJSON, update, view)
 
 import Class
-import Helpers exposing (Persistence(..), classes, svgIconXLg, tagWithInvalidFeedback)
+import Dict
+import Helpers exposing (Persistence(..), classes, svgIconCheckLg, svgIconPencil, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, hidden, id, placeholder, required, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
-import Html.Lazy exposing (lazy)
+import Html.Lazy exposing (lazy, lazy2)
 import Json.Decode as D
 import Json.Encode as E
 import Set
@@ -16,20 +17,25 @@ import Set
 
 
 type alias Model =
-    { events : List Obj
+    { events : Dict.Dict String Obj
     , formData : Obj
     , formInvalid : Bool
+    , editMode : EditMode
     }
 
 
 init : Model
 init =
-    Model [] emptyFormData False
+    Model Dict.empty emptyFormData False Disabled
 
 
-emptyFormData : Obj
-emptyFormData =
-    Obj "" 1 0
+type Id
+    = Id String
+
+
+toString : Id -> String
+toString (Id str) =
+    str
 
 
 type alias Obj =
@@ -37,6 +43,16 @@ type alias Obj =
     , capacity : Int
     , internalID : Int
     }
+
+
+emptyFormData : Obj
+emptyFormData =
+    Obj "" 1 0
+
+
+type EditMode
+    = Disabled
+    | Editing Id Obj
 
 
 type Seat
@@ -98,8 +114,9 @@ extendToCapacityAndRestrictByClass event cls pupilsCl =
 
 decoder : D.Decoder Model
 decoder =
+    -- TODO: Use random number here.
     D.map
-        (\l -> Model l emptyFormData False)
+        (\l -> (l |> List.map (\e -> ( "---", e )) |> Dict.fromList |> Model) emptyFormData False Disabled)
         (D.list decoderEvent)
 
 
@@ -113,7 +130,8 @@ decoderEvent =
 
 modelToJSON : Model -> E.Value
 modelToJSON model =
-    model.events |> E.list eventToJSON
+    -- TODO: Add ID to JSON output.
+    model.events |> Dict.values |> E.list eventToJSON
 
 
 eventToJSON : Obj -> E.Value
@@ -130,8 +148,12 @@ eventToJSON e =
 
 type Msg
     = FormDataMsg FormDataInput
-    | Save
-    | Delete Obj
+    | SaveForm
+    | Edit Id
+    | EditFormMsg FormDataInput
+    | SaveEdit
+    | CancelEdit
+    | Delete Id
 
 
 type FormDataInput
@@ -145,12 +167,17 @@ update msg model =
         FormDataMsg data ->
             ( { model | formData = updateFormdata data model.formData, formInvalid = False }, DontSetStorage )
 
-        Save ->
-            case validate model of
-                Just new ->
+        SaveForm ->
+            case validate model.formData.name model.formData.capacity (Dict.values model.events) of
+                Just newObj ->
+                    let
+                        newId =
+                            -- TODO: Use random number here.
+                            "HAHAHAHAHA"
+                    in
                     ( { model
-                        | formData = emptyFormData
-                        , events = model.events ++ [ new ]
+                        | events = model.events |> Dict.insert newId newObj
+                        , formData = emptyFormData
                         , formInvalid = False
                       }
                     , SetStorage
@@ -159,8 +186,50 @@ update msg model =
                 Nothing ->
                     ( { model | formInvalid = True }, DontSetStorage )
 
-        Delete obj ->
-            ( { model | events = model.events |> List.filter ((/=) obj), formInvalid = False }, SetStorage )
+        Edit eId ->
+            case model.events |> Dict.get (eId |> toString) of
+                Just obj ->
+                    ( { model | editMode = Editing eId obj }, DontSetStorage )
+
+                Nothing ->
+                    -- Just ignore such a message when object does not exist.
+                    ( model, DontSetStorage )
+
+        EditFormMsg data ->
+            case model.editMode of
+                Editing eId new ->
+                    ( { model | editMode = Editing eId (updateFormdata data new) }, DontSetStorage )
+
+                Disabled ->
+                    -- Just ignore such a message when editing is disabled.
+                    ( model, DontSetStorage )
+
+        SaveEdit ->
+            case model.editMode of
+                Editing eId new ->
+                    case validate new.name new.capacity (Dict.values model.events) of
+                        Just updated ->
+                            ( { model
+                                | events =
+                                    model.events
+                                        |> Dict.update (eId |> toString) (\_ -> Just updated)
+                                , editMode = Disabled
+                              }
+                            , SetStorage
+                            )
+
+                        Nothing ->
+                            ( model, DontSetStorage )
+
+                Disabled ->
+                    -- Just ignore such a message when editing is disabled.
+                    ( model, DontSetStorage )
+
+        CancelEdit ->
+            ( { model | editMode = Disabled }, DontSetStorage )
+
+        Delete eId ->
+            ( { model | events = model.events |> Dict.remove (eId |> toString), formInvalid = False, editMode = Disabled }, SetStorage )
 
 
 updateFormdata : FormDataInput -> Obj -> Obj
@@ -173,22 +242,22 @@ updateFormdata msg formData =
             { formData | capacity = capacity }
 
 
-validate : Model -> Maybe Obj
-validate model =
+validate : String -> Int -> List Obj -> Maybe Obj
+validate nameRaw capacity events =
     let
         name : String
         name =
-            model.formData.name |> String.trim
+            nameRaw |> String.trim
     in
     if
         (name == "")
-            || (model.formData.capacity <= 0)
-            || (model.events |> List.any (\e -> e.name == name))
+            || (capacity <= 0)
+            || (events |> List.any (\e -> e.name == name))
     then
         Nothing
 
     else
-        Just (Obj name model.formData.capacity 0)
+        Just (Obj name capacity 0)
 
 
 
@@ -210,7 +279,7 @@ view model =
                 """Beispiel: Bei vier Klassen und 13 Plätzen gibt es 3 feste Plätze pro Klasse und einen freien
                 Platz, der von jedem beliebigen Schüler besetzt werden kann."""
             ]
-        , form [ class "mb-3", onSubmit Save ]
+        , form [ class "mb-3", onSubmit SaveForm ]
             [ h3 [ hidden True ] [ text "Neue Gruppe hinzufügen" ]
             , div [ classes "row g-3" ]
                 [ div [ class "col-md-3" ]
@@ -245,34 +314,108 @@ view model =
             ]
         , div []
             [ h3 [ hidden True ] [ text "Alle Gruppen" ]
-            , lazy allEvents model.events
+            , lazy2 allEvents model.editMode model.events
             ]
         ]
 
 
-allEvents : List Obj -> Html Msg
-allEvents events =
-    if List.isEmpty events then
+allEvents : EditMode -> Dict.Dict String Obj -> Html Msg
+allEvents editMode events =
+    if Dict.isEmpty events then
         p [ hidden True ] [ text "Noch keine Gruppen angelegt" ]
 
     else
-        ol [ classes "list-group list-group-flush list-group-numbered" ] (events |> List.sortBy .name |> List.map (lazy oneEventLi))
+        ol [ classes "list-group list-group-flush list-group-numbered" ]
+            (events
+                |> Dict.toList
+                |> List.map (\t -> ( Tuple.first t |> Id, Tuple.second t ))
+                |> List.sortBy (\t -> Tuple.second t |> .name)
+                |> List.map (lazy <| oneEventLi editMode)
+            )
 
 
-oneEventLi : Obj -> Html Msg
-oneEventLi event =
-    li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
-        [ div [ classes "ms-2 me-auto" ]
-            [ text event.name
-            , span [ classes "ms-2 badge bg-primary rounded-pill", title "Anzahl der Plätze", attribute "aria-label" "Anzahl der Plätze" ] [ text <| String.fromInt event.capacity ]
-            ]
-        , a
-            [ class "link-danger"
-            , title "Löschen"
-            , tabindex 0
-            , attribute "role" "button"
-            , attribute "aria-label" "Löschen"
-            , onClick <| Delete event
-            ]
-            [ svgIconXLg ]
-        ]
+oneEventLi : EditMode -> ( Id, Obj ) -> Html Msg
+oneEventLi editMode ( eId, event ) =
+    let
+        fixedLine : Html Msg
+        fixedLine =
+            li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
+                [ div [ classes "ms-2 me-auto" ]
+                    [ text event.name
+                    , span [ classes "ms-2 badge bg-primary rounded-pill", title "Anzahl der Plätze", attribute "aria-label" "Anzahl der Plätze" ] [ text <| String.fromInt event.capacity ]
+                    ]
+                , a
+                    [ class "link-secondary"
+                    , title "Bearbeiten"
+                    , tabindex 0
+                    , attribute "role" "button"
+                    , attribute "aria-label" "Bearbeiten"
+                    , onClick <| Edit eId
+                    ]
+                    [ svgIconPencil ]
+                , a
+                    [ classes "ms-3 link-secondary"
+                    , title "Löschen"
+                    , tabindex 0
+                    , attribute "role" "button"
+                    , attribute "aria-label" "Löschen"
+                    , onClick <| Delete eId
+                    ]
+                    [ svgIconXLg ]
+                ]
+    in
+    case editMode of
+        Disabled ->
+            fixedLine
+
+        Editing editingEId new ->
+            if editingEId /= eId then
+                fixedLine
+
+            else
+                li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
+                    [ form [ classes "ms-2 row g-1", onSubmit SaveEdit ]
+                        [ div [ class "col-7" ]
+                            [ input
+                                [ classes "form-control form-control-sm"
+                                , type_ "text"
+                                , placeholder "Name"
+                                , attribute "aria-label" "Name"
+                                , required True
+                                , onInput (Name >> EditFormMsg)
+                                , value new.name
+                                ]
+                                []
+                            ]
+                        , div [ class "col-3" ]
+                            [ input
+                                [ classes "form-control form-control-sm"
+                                , type_ "number"
+                                , Html.Attributes.min "1"
+                                , attribute "aria-label" "Anzahl der Plätze"
+                                , onInput (String.toInt >> Maybe.withDefault 0 >> Capacity >> EditFormMsg)
+                                , value (new.capacity |> String.fromInt)
+                                ]
+                                []
+                            ]
+                        , div [ class "col-1" ]
+                            [ button
+                                [ classes "btn btn-outline-success btn-sm"
+                                , type_ "submit"
+                                , title "Speichern"
+                                , attribute "aria-label" "Speichern"
+                                ]
+                                [ svgIconCheckLg ]
+                            ]
+                        , div [ class "col-1" ]
+                            [ button
+                                [ classes "btn btn-outline-danger btn-sm"
+                                , type_ "button"
+                                , title "Abbrechen"
+                                , attribute "aria-label" "Abbrechen"
+                                , onClick CancelEdit
+                                ]
+                                [ svgIconXLg ]
+                            ]
+                        ]
+                    ]
