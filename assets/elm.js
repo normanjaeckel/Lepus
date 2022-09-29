@@ -6312,20 +6312,6 @@ var $elm$core$Basics$always = F2(
 	function (a, _v0) {
 		return a;
 	});
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (!maybeValue.$) {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
 var $elm$core$List$maximum = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -6386,24 +6372,22 @@ var $elm$core$List$any = F2(
 			}
 		}
 	});
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Event$validate = F4(
-	function (nameRaw, capacity, events, allowedName) {
-		var name = $elm$core$String$trim(nameRaw);
-		var condition2 = function () {
-			if (allowedName.$ === 1) {
-				return true;
-			} else {
-				var n = allowedName.a;
-				return !_Utils_eq(n, name);
-			}
-		}();
-		return ((name === '') || ((capacity <= 0) || (condition2 && A2(
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
 			$elm$core$List$any,
-			function (e) {
-				return _Utils_eq(e.aJ, name);
+			function (a) {
+				return _Utils_eq(a, x);
 			},
-			events)))) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+			xs);
+	});
+var $author$project$Event$validate = F3(
+	function (nameRaw, capacity, forbiddenNames) {
+		var name = $elm$core$String$trim(nameRaw);
+		return (A2(
+			$elm$core$List$member,
+			name,
+			A2($elm$core$List$cons, '', forbiddenNames)) || (capacity <= 0)) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
 			A3($author$project$Event$Obj, name, capacity, 0));
 	});
 var $elm$core$Dict$values = function (dict) {
@@ -6430,12 +6414,16 @@ var $author$project$Event$update = F2(
 						}),
 					1);
 			case 1:
-				var _v1 = A4(
+				var _v1 = A3(
 					$author$project$Event$validate,
 					model.O.aJ,
 					model.O.s,
-					$elm$core$Dict$values(model.h),
-					$elm$core$Maybe$Nothing);
+					A2(
+						$elm$core$List$map,
+						function ($) {
+							return $.aJ;
+						},
+						$elm$core$Dict$values(model.h)));
 				if (!_v1.$) {
 					var newObj = _v1.a;
 					var newId = 1 + A2(
@@ -6505,23 +6493,20 @@ var $author$project$Event$update = F2(
 				if (_v4.$ === 1) {
 					var eId = _v4.a;
 					var _new = _v4.b;
-					var _v5 = A4(
+					var _v5 = A3(
 						$author$project$Event$validate,
 						_new.aJ,
 						_new.s,
-						$elm$core$Dict$values(model.h),
 						A2(
-							$elm$core$Maybe$andThen,
-							A2(
-								$elm$core$Basics$composeR,
-								function ($) {
-									return $.aJ;
-								},
-								$elm$core$Maybe$Just),
-							A2(
-								$elm$core$Dict$get,
-								$author$project$Event$toInt(eId),
-								model.h)));
+							$elm$core$List$map,
+							function ($) {
+								return $.aJ;
+							},
+							$elm$core$Dict$values(
+								A2(
+									$elm$core$Dict$remove,
+									$author$project$Event$toInt(eId),
+									model.h))));
 					if (!_v5.$) {
 						var updated = _v5.a;
 						return _Utils_Tuple2(
@@ -6594,6 +6579,7 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
+var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$List$isEmpty = function (xs) {
 	if (!xs.b) {
 		return true;
@@ -6720,15 +6706,6 @@ var $author$project$Pupil$update = F4(
 						}),
 					0);
 		}
-	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
 	});
 var $author$project$Pupil$updateEvents = F2(
 	function (events, model) {
@@ -7721,6 +7698,15 @@ var $author$project$Assignment$day = F4(
 				]));
 	});
 var $author$project$Algo$VertexLeft = $elm$core$Basics$identity;
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (!maybeValue.$) {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -7790,6 +7776,11 @@ var $elm$core$List$append = F2(
 	});
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
 		return g(
 			f(x));
 	});

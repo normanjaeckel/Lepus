@@ -176,7 +176,12 @@ update msg model =
             ( { model | formData = updateFormdata data model.formData, formInvalid = False }, DontSetStorage )
 
         SaveForm ->
-            case validate model.formData.name model.formData.capacity (Dict.values model.events) Nothing of
+            case
+                validate
+                    model.formData.name
+                    model.formData.capacity
+                    (Dict.values model.events |> List.map .name)
+            of
                 Just newObj ->
                     let
                         newId : Id
@@ -224,8 +229,7 @@ update msg model =
                         validate
                             new.name
                             new.capacity
-                            (Dict.values model.events)
-                            (Dict.get (eId |> toInt) model.events |> Maybe.andThen (.name >> Just))
+                            (model.events |> Dict.remove (eId |> toInt) |> Dict.values |> List.map .name)
                     of
                         Just updated ->
                             ( { model
@@ -263,26 +267,14 @@ updateFormdata msg formData =
             { formData | capacity = capacity }
 
 
-validate : String -> Int -> List Obj -> Maybe String -> Maybe Obj
-validate nameRaw capacity events allowedName =
+validate : String -> Int -> List String -> Maybe Obj
+validate nameRaw capacity forbiddenNames =
     let
         name : String
         name =
             nameRaw |> String.trim
-
-        condition2 =
-            case allowedName of
-                Nothing ->
-                    True
-
-                Just n ->
-                    n /= name
     in
-    if
-        (name == "")
-            || (capacity <= 0)
-            || (condition2 && (events |> List.any (\e -> e.name == name)))
-    then
+    if ("" :: forbiddenNames |> List.member name) || (capacity <= 0) then
         Nothing
 
     else
