@@ -3,7 +3,6 @@ port module Main exposing (main)
 import Assignment
 import Browser
 import Class
-import Dict
 import Event
 import File
 import File.Download
@@ -12,7 +11,7 @@ import Helpers exposing (Persistence(..), classes)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, href, id, type_)
 import Html.Events exposing (onClick)
-import Html.Lazy exposing (lazy, lazy2, lazy3)
+import Html.Lazy exposing (lazy, lazy3, lazy4)
 import Json.Decode as D
 import Json.Encode as E
 import Pupil
@@ -124,12 +123,12 @@ update msg model =
                     ( { model | events = eventsModel }, Cmd.none )
 
                 SetStorage ->
-                    { model | events = eventsModel, pupils = Pupil.updateEvents (eventsModel.events |> Dict.values) model.pupils } |> s
+                    { model | events = eventsModel, pupils = Pupil.updateEvents eventsModel.events model.pupils } |> s
 
         PupilMsg innerMsg ->
             let
                 ( pupilsModel, pers ) =
-                    Pupil.update innerMsg model.pupils (model.events.events |> Dict.values) model.classes.classes
+                    Pupil.update innerMsg model.pupils model.events.events model.classes.classes
             in
             case pers of
                 DontSetStorage ->
@@ -174,8 +173,8 @@ view model =
                 [ readme
                 , lazy Class.view model.classes |> map ClassMsg
                 , lazy Event.view model.events |> map EventMsg
-                , lazy2 Pupil.view model.pupils model.classes.classes |> map PupilMsg
-                , lazy3 Assignment.view model.assignment model.pupils.pupils model.classes.classes |> map AssignmentMsg
+                , lazy3 Pupil.view model.pupils model.classes.classes model.events.events |> map PupilMsg
+                , lazy4 Assignment.view model.assignment model.pupils.pupils model.classes.classes model.events.events |> map AssignmentMsg
                 , admin
                 ]
             ]

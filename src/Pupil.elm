@@ -1,6 +1,7 @@
 module Pupil exposing (Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, pupilDisplay, pupilSorting, update, updateEvents, view)
 
 import Class
+import Dict
 import Event
 import Helpers exposing (Persistence(..), classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
@@ -57,7 +58,7 @@ pupilSorting pupil =
 
 
 type alias Choice =
-    { event : Event.Obj
+    { event : Event.Id
     , type_ : ChoiceType
     }
 
@@ -81,7 +82,7 @@ choiceTypeToString c =
             "red"
 
 
-eventGroup : ChoiceType -> Obj -> List Event.Obj
+eventGroup : ChoiceType -> Obj -> List Event.Id
 eventGroup choiceType pupil =
     pupil.choices
         |> List.filter (\c -> c.type_ == choiceType)
@@ -106,7 +107,7 @@ decoderChoice : D.Decoder Choice
 decoderChoice =
     D.map2
         Choice
-        (D.field "event" Event.decoderEvent)
+        (D.field "event" (D.map Event.intToId D.int))
         (D.field "type"
             (D.string
                 |> D.andThen
@@ -145,7 +146,7 @@ pupilToJSON =
 choiceToJSON : Choice -> E.Value
 choiceToJSON choice =
     E.object
-        [ ( "event", Event.eventToJSON choice.event )
+        [ ( "event", choice.event |> Event.idToInt |> E.int )
         , ( "type", E.string <| choiceTypeToString choice.type_ )
         ]
 
@@ -158,7 +159,7 @@ type Msg
     = FormDataMsg FormDataInput
     | Save
     | Delete Obj
-    | ChangeChoice Obj Event.Obj ChoiceType
+    | ChangeChoice Obj Event.Id ChoiceType
 
 
 type FormDataInput
@@ -166,7 +167,7 @@ type FormDataInput
     | Class String
 
 
-update : Msg -> Model -> List Event.Obj -> Set.Set Class.Classname -> ( Model, Persistence )
+update : Msg -> Model -> Dict.Dict Int Event.Obj -> Set.Set Class.Classname -> ( Model, Persistence )
 update msg model events classes =
     case msg of
         FormDataMsg data ->
@@ -197,7 +198,7 @@ updateFormdata msg formData =
             { formData | class = c }
 
 
-savePupils : Model -> List Event.Obj -> Set.Set Class.Classname -> String -> String -> Maybe (List Obj)
+savePupils : Model -> Dict.Dict Int Event.Obj -> Set.Set Class.Classname -> String -> String -> Maybe (List Obj)
 savePupils model events cls namesRaw classRaw =
     let
         cl : Class.Classname
@@ -217,7 +218,7 @@ savePupils model events cls namesRaw classRaw =
                 let
                     yellowEvents : List Choice
                     yellowEvents =
-                        events |> List.map (\e -> Choice e Yellow)
+                        events |> Dict.keys |> List.map Event.intToId |> List.map (\i -> Choice i Yellow)
 
                     fn : String -> ( List Obj, Bool ) -> ( List Obj, Bool )
                     fn =
@@ -237,7 +238,7 @@ savePupils model events cls namesRaw classRaw =
             Just pupils
 
 
-changeChoice : List Obj -> Obj -> Event.Obj -> ChoiceType -> List Obj
+changeChoice : List Obj -> Obj -> Event.Id -> ChoiceType -> List Obj
 changeChoice pupils pupil event newChoiceType =
     pupils
         |> List.map
@@ -261,35 +262,31 @@ changeChoice pupils pupil event newChoiceType =
             )
 
 
-updateEvents : List Event.Obj -> Model -> Model
+updateEvents : Dict.Dict Int Event.Obj -> Model -> Model
 updateEvents events model =
     let
-        fn1 : Event.Obj -> List Choice -> List Choice
-        fn1 =
-            \e cl ->
-                if List.member e (cl |> List.map .event) then
-                    cl
-
-                else
-                    Choice e Yellow :: cl
-
-        fn2 : Choice -> Bool
-        fn2 =
-            \c -> List.member c.event events
+        newChoices : List Choice -> List Choice
+        newChoices =
+            \current ->
+                events
+                    |> Dict.keys
+                    |> List.map
+                        (\k ->
+                            current
+                                |> List.filter (\c -> k == (c.event |> Event.idToInt))
+                                |> List.head
+                                |> Maybe.withDefault (Choice (k |> Event.intToId) Yellow)
+                        )
     in
-    { model
-        | pupils =
-            model.pupils
-                |> List.map (\p -> { p | choices = events |> List.foldl fn1 p.choices |> List.filter fn2 })
-    }
+    { model | pupils = model.pupils |> List.map (\p -> { p | choices = newChoices p.choices }) }
 
 
 
 -- VIEW
 
 
-view : Model -> Set.Set Class.Classname -> Html Msg
-view model cls =
+view : Model -> Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> Html Msg
+view model cls events =
     div [ class "mb-5" ]
         [ h2 [ id "pupils", class "nav-anchor" ] [ text "Schüler/Schülerinnen" ]
         , form [ class "mb-3", onSubmit Save ]
@@ -329,26 +326,26 @@ view model cls =
             ]
         , div []
             [ h3 [ hidden True ] [ text "Alle Schüler/Schülerinnen" ]
-            , lazy allPupils model.pupils
+            , lazy (allPupils events) model.pupils
             ]
         ]
 
 
-allPupils : List Obj -> Html Msg
-allPupils pupils =
+allPupils : Dict.Dict Int Event.Obj -> List Obj -> Html Msg
+allPupils events pupils =
     if List.isEmpty pupils then
         p [ hidden True ] [ text "Noch keine Schüler oder Schülerinnen angelegt" ]
 
     else
-        ol [ classes "list-group list-group-flush list-group-numbered" ] (pupils |> List.sortBy pupilSorting |> List.map (lazy onePupilLi))
+        ol [ classes "list-group list-group-flush list-group-numbered" ] (pupils |> List.sortBy pupilSorting |> List.map (lazy <| onePupilLi events))
 
 
-onePupilLi : Obj -> Html Msg
-onePupilLi pupil =
+onePupilLi : Dict.Dict Int Event.Obj -> Obj -> Html Msg
+onePupilLi events pupil =
     li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5 pt-4 pb-2" ]
         [ div [ classes "ms-2 w-100" ]
             [ div [] [ text <| pupilDisplay pupil ]
-            , innerTable pupil
+            , innerTable events pupil
             ]
         , a
             [ class "link-danger"
@@ -362,8 +359,8 @@ onePupilLi pupil =
         ]
 
 
-innerTable : Obj -> Html Msg
-innerTable pupil =
+innerTable : Dict.Dict Int Event.Obj -> Obj -> Html Msg
+innerTable events pupil =
     table [ classes "table table-striped" ]
         [ thead []
             [ tr []
@@ -373,16 +370,22 @@ innerTable pupil =
             ]
         , tbody []
             (pupil.choices
-                |> List.sortBy (.event >> .name)
+                |> List.sortBy
+                    (\c ->
+                        events
+                            |> Dict.get (c.event |> Event.idToInt)
+                            |> Maybe.andThen (Just << .name)
+                            |> Maybe.withDefault ""
+                    )
                 |> List.map
                     (\c ->
                         let
                             radioGroup : String
                             radioGroup =
-                                pupilDisplay pupil ++ c.event.name
+                                pupilDisplay pupil ++ (c.event |> Event.idToInt |> String.fromInt)
                         in
                         tr []
-                            [ th [ scope "row" ] [ text c.event.name ]
+                            [ th [ scope "row" ] [ text "c.event.name" ]
                             , td []
                                 [ div [ class "form-check form-check-inline" ]
                                     [ input

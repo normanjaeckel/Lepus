@@ -3,6 +3,7 @@ module AssignmentTest exposing (suite)
 import Algo
 import Assignment
 import Class
+import Dict
 import Event
 import Expect
 import Pupil
@@ -13,50 +14,54 @@ import Test exposing (..)
 suite : Test
 suite =
     let
-        e1 =
-            Event.Obj "Töpfern (e1)" 2 0
+        ( id1, e1 ) =
+            ( 1, Event.Obj "Töpfern (e1)" 2 0 )
 
-        e2 =
-            Event.Obj "Kochen (e2)" 2 0
+        ( id2, e2 ) =
+            ( 2, Event.Obj "Kochen (e2)" 2 0 )
 
-        e3 =
-            Event.Obj "Theater (e3)" 2 0
+        ( id3, e3 ) =
+            ( 3, Event.Obj "Theater (e3)" 2 0 )
 
-        e4 =
-            Event.Obj "Outdoor (e4)" 2 0
+        ( id4, e4 ) =
+            ( 4, Event.Obj "Outdoor (e4)" 2 0 )
 
-        e5 =
-            Event.Obj "Song des Tages (e5)" 2 0
+        ( id5, e5 ) =
+            ( 5, Event.Obj "Song des Tages (e5)" 2 0 )
+
+        events : Dict.Dict Int Event.Obj
+        events =
+            [ ( id1, e1 ), ( id2, e2 ), ( id3, e3 ), ( id4, e4 ), ( id5, e5 ) ] |> Dict.fromList
 
         p1 =
-            Pupil.Obj "Max" "1" [] |> setupPupil [ e3, e1 ] [ e5, e4, e3 ] []
+            Pupil.Obj "Max" "1" [] |> setupPupil [ id3, id1 ] [ id5, id4, id2 ] []
 
         p2 =
-            Pupil.Obj "Moritz" "2" [] |> setupPupil [ e2 ] [ e5, e4, e3, e1 ] []
+            Pupil.Obj "Moritz" "2" [] |> setupPupil [ id2 ] [ id5, id4, id3, id1 ] []
 
         p3 =
-            Pupil.Obj "Lisa" "3" [] |> setupPupil [ e1, e2 ] [ e5, e4, e3 ] []
+            Pupil.Obj "Lisa" "3" [] |> setupPupil [ id1, id2 ] [ id5, id4, id3 ] []
 
         p4 =
-            Pupil.Obj "Kim" "4" [] |> setupPupil [ e1 ] [ e5, e4, e3, e2 ] []
+            Pupil.Obj "Kim" "4" [] |> setupPupil [ id1 ] [ id5, id4, id3, id2 ] []
 
         p5 =
-            Pupil.Obj "Anna" "5" [] |> setupPupil [ e4 ] [ e5, e3, e2, e1 ] []
+            Pupil.Obj "Anna" "5" [] |> setupPupil [ id4 ] [ id5, id3, id2, id1 ] []
 
         p6 =
-            Pupil.Obj "Maria" "6" [] |> setupPupil [ e3, e4 ] [ e5, e2, e1 ] []
+            Pupil.Obj "Maria" "6" [] |> setupPupil [ id3, id4 ] [ id5, id2, id1 ] []
 
         p7 =
-            Pupil.Obj "Hans" "7" [] |> setupPupil [ e3, e4 ] [ e5, e2, e1 ] []
+            Pupil.Obj "Hans" "7" [] |> setupPupil [ id3, id4 ] [ id5, id2, id1 ] []
 
         p8 =
-            Pupil.Obj "Ali" "8" [] |> setupPupil [ e3 ] [ e5, e4, e2, e1 ] []
+            Pupil.Obj "Ali" "8" [] |> setupPupil [ id3 ] [ id5, id4, id2, id1 ] []
 
         p9 =
-            Pupil.Obj "Richard" "9" [] |> setupPupil [ e3, e4 ] [ e5, e2, e1 ] []
+            Pupil.Obj "Richard" "9" [] |> setupPupil [ id3, id4 ] [ id5, id2, id1 ] []
 
         p10 =
-            Pupil.Obj "Josua" "10" [] |> setupPupil [] [ e5, e4, e4, e2, e1 ] []
+            Pupil.Obj "Josua" "10" [] |> setupPupil [] [ id5, id4, id3, id2, id1 ] []
     in
     describe "Main functions"
         [ describe "The finalize function"
@@ -66,22 +71,22 @@ suite =
                         pupils =
                             [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ]
                     in
-                    Assignment.finalize pupils (Set.fromList (pupils |> List.map .class))
+                    Assignment.finalize pupils (Set.fromList (pupils |> List.map .class)) events
                         |> Expect.all
                             [ Expect.equalLists
                                 [ ( Algo.VertexLeft p1, Algo.VertexRight { e1 | internalID = 2 } )
-                                , ( Algo.VertexLeft p2, Algo.VertexRight { e2 | internalID = 2 } )
-                                , ( Algo.VertexLeft p3, Algo.VertexRight { e2 | internalID = 1 } )
+                                , ( Algo.VertexLeft p3, Algo.VertexRight { e2 | internalID = 2 } )
+                                , ( Algo.VertexLeft p2, Algo.VertexRight { e2 | internalID = 1 } )
                                 , ( Algo.VertexLeft p4, Algo.VertexRight { e1 | internalID = 1 } )
-                                , ( Algo.VertexLeft p6, Algo.VertexRight { e3 | internalID = 2 } )
-                                , ( Algo.VertexLeft p7, Algo.VertexRight { e4 | internalID = 2 } )
-                                , ( Algo.VertexLeft p8, Algo.VertexRight { e3 | internalID = 1 } )
-                                , ( Algo.VertexLeft p9, Algo.VertexRight { e4 | internalID = 1 } )
+                                , ( Algo.VertexLeft p6, Algo.VertexRight { e4 | internalID = 2 } )
+                                , ( Algo.VertexLeft p7, Algo.VertexRight { e4 | internalID = 1 } )
+                                , ( Algo.VertexLeft p8, Algo.VertexRight { e3 | internalID = 2 } )
+                                , ( Algo.VertexLeft p9, Algo.VertexRight { e3 | internalID = 1 } )
                                 , ( Algo.VertexLeft p5, Algo.VertexRight { e5 | internalID = 2 } )
                                 , ( Algo.VertexLeft p10, Algo.VertexRight { e5 | internalID = 1 } )
                                 ]
                             , List.length >> Expect.equal 10
-                            , howManyGreens pupils (Set.fromList (pupils |> List.map .class)) >> Expect.equal 8
+                            , howManyGreens pupils (Set.fromList (pupils |> List.map .class)) events >> Expect.equal 8
                             ]
 
             -- Alternative mit alter Datenstruktur:  [ Assignment.Model e5 [ p10, p5 ], Assignment.Model e4 [ p7, p9 ], Assignment.Model e3 [ p8, p6 ], Assignment.Model e1 [ p1, p4 ], Assignment.Model e2 [ p2, p3 ]]
@@ -89,23 +94,23 @@ suite =
                 \_ ->
                     let
                         p10a =
-                            p10 |> setupPupil [] [ e1, e2, e3, e4 ] [ e5 ]
+                            p10 |> setupPupil [] [ id1, id2, id3, id4 ] [ id5 ]
 
                         pupils =
                             [ p1, p2, p3, p4, p5, p6, p7, p8, p9, p10a ]
                     in
-                    Assignment.finalize pupils (Set.fromList (pupils |> List.map .class))
+                    Assignment.finalize pupils (Set.fromList (pupils |> List.map .class)) events
                         |> Expect.all
                             [ Expect.equalLists
-                                [ ( Algo.VertexLeft p10a, Algo.VertexRight { e4 | internalID = 1 } )
-                                , ( Algo.VertexLeft p9, Algo.VertexRight { e5 | internalID = 2 } )
+                                [ ( Algo.VertexLeft p10a, Algo.VertexRight { e1 | internalID = 1 } )
+                                , ( Algo.VertexLeft p4, Algo.VertexRight { e5 | internalID = 2 } )
                                 , ( Algo.VertexLeft p1, Algo.VertexRight { e1 | internalID = 2 } )
-                                , ( Algo.VertexLeft p2, Algo.VertexRight { e2 | internalID = 2 } )
-                                , ( Algo.VertexLeft p3, Algo.VertexRight { e2 | internalID = 1 } )
-                                , ( Algo.VertexLeft p4, Algo.VertexRight { e1 | internalID = 1 } )
-                                , ( Algo.VertexLeft p6, Algo.VertexRight { e3 | internalID = 2 } )
-                                , ( Algo.VertexLeft p7, Algo.VertexRight { e4 | internalID = 2 } )
-                                , ( Algo.VertexLeft p8, Algo.VertexRight { e3 | internalID = 1 } )
+                                , ( Algo.VertexLeft p3, Algo.VertexRight { e2 | internalID = 2 } )
+                                , ( Algo.VertexLeft p2, Algo.VertexRight { e2 | internalID = 1 } )
+                                , ( Algo.VertexLeft p6, Algo.VertexRight { e4 | internalID = 2 } )
+                                , ( Algo.VertexLeft p7, Algo.VertexRight { e4 | internalID = 1 } )
+                                , ( Algo.VertexLeft p8, Algo.VertexRight { e3 | internalID = 2 } )
+                                , ( Algo.VertexLeft p9, Algo.VertexRight { e3 | internalID = 1 } )
                                 , ( Algo.VertexLeft p5, Algo.VertexRight { e5 | internalID = 1 } )
                                 ]
 
@@ -121,19 +126,23 @@ suite =
                             -- , ( "Richard (1a)", "Song des Tages-2" )
                             -- ]
                             , List.length >> Expect.equal 10
-                            , howManyGreens pupils (Set.fromList (pupils |> List.map .class)) >> Expect.equal 7
+                            , howManyGreens pupils (Set.fromList (pupils |> List.map .class)) events >> Expect.equal 7
                             ]
             , test "assign pupils in mini example" <|
                 \_ ->
                     let
-                        i1 =
-                            Event.Obj "1" 1 0
+                        ( i1, ii1 ) =
+                            ( 1, Event.Obj "1" 1 0 )
 
-                        i2 =
-                            Event.Obj "2" 1 0
+                        ( i2, ii2 ) =
+                            ( 2, Event.Obj "2" 1 0 )
 
-                        i3 =
-                            Event.Obj "3" 1 0
+                        ( i3, ii3 ) =
+                            ( 3, Event.Obj "3" 1 0 )
+
+                        el : Dict.Dict Int Event.Obj
+                        el =
+                            [ ( i1, ii1 ), ( i2, ii2 ), ( i3, ii3 ) ] |> Dict.fromList
 
                         j1 =
                             Pupil.Obj "A" "1" [] |> setupPupil [ i1 ] [ i2, i3 ] []
@@ -144,32 +153,32 @@ suite =
                         j3 =
                             Pupil.Obj "C" "1" [] |> setupPupil [] [ i1, i2 ] [ i3 ]
                     in
-                    Assignment.finalize [ j1, j2, j3 ] (Set.fromList [ "1" ])
+                    Assignment.finalize [ j1, j2, j3 ] (Set.fromList [ "1" ]) el
                         |> Expect.all
-                            [ howManyGreens [ j1, j2, j3 ] (Set.fromList [ "1" ]) >> Expect.equal 1
+                            [ howManyGreens [ j1, j2, j3 ] (Set.fromList [ "1" ]) el >> Expect.equal 1
                             , List.length >> Expect.equal 3
                             ]
             ]
         ]
 
 
-setupPupil : List Event.Obj -> List Event.Obj -> List Event.Obj -> Pupil.Obj -> Pupil.Obj
+setupPupil : List Int -> List Int -> List Int -> Pupil.Obj -> Pupil.Obj
 setupPupil green yellow red pupil =
     let
         g =
-            green |> List.map (\e -> Pupil.Choice e Pupil.Green)
+            green |> List.map (\e -> Pupil.Choice (e |> Event.intToId) Pupil.Green)
 
         y =
-            yellow |> List.map (\e -> Pupil.Choice e Pupil.Yellow)
+            yellow |> List.map (\e -> Pupil.Choice (e |> Event.intToId) Pupil.Yellow)
 
         r =
-            red |> List.map (\e -> Pupil.Choice e Pupil.Red)
+            red |> List.map (\e -> Pupil.Choice (e |> Event.intToId) Pupil.Red)
     in
     { pupil | choices = g ++ y ++ r }
 
 
-howManyGreens : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Matching Pupil.Obj Event.Obj -> Int
-howManyGreens pupils cls matching =
+howManyGreens : List Pupil.Obj -> Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> Algo.Matching Pupil.Obj Event.Obj -> Int
+howManyGreens pupils cls events matching =
     pupils
         |> List.foldl
             (\pupil count ->
@@ -181,6 +190,16 @@ howManyGreens pupils cls matching =
                         if
                             pupil
                                 |> Pupil.eventGroup Pupil.Green
+                                |> List.foldl
+                                    (\eId l ->
+                                        case Dict.get (eId |> Event.idToInt) events of
+                                            Just e ->
+                                                e :: l
+
+                                            Nothing ->
+                                                l
+                                    )
+                                    []
                                 |> List.foldl (\e l -> Event.extendToCapacityAndRestrictByClass e cls pupil.class ++ l) []
                                 |> List.map Algo.VertexRight
                                 |> List.member vertex

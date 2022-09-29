@@ -2,6 +2,7 @@ module Assignment exposing (Model, Msg, finalize, init, update, view)
 
 import Algo
 import Class
+import Dict
 import Event
 import Helpers exposing (classes, svgIconSortAlphaDown)
 import Html exposing (..)
@@ -74,8 +75,8 @@ update msg model =
 -- VIEW
 
 
-view : Model -> List Pupil.Obj -> Set.Set Class.Classname -> Html Msg
-view model pupils cls =
+view : Model -> List Pupil.Obj -> Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> Html Msg
+view model pupils cls events =
     div [ class "mb-5" ]
         [ h2 [ id "result", class "nav-anchor" ] [ text "Ergebnis" ]
         , case model.visibility of
@@ -91,41 +92,56 @@ view model pupils cls =
                 div []
                     [ button [ classes "btn btn-primary mb-3", onClick <| SetVisibility Hidden ]
                         [ text "Ergebnis ausblenden" ]
-                    , innerView model pupils cls
+                    , innerView model pupils cls events
                     ]
         ]
 
 
-innerView : Model -> List Pupil.Obj -> Set.Set Class.Classname -> Html Msg
-innerView model pupils cls =
+innerView : Model -> List Pupil.Obj -> Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> Html Msg
+innerView model pupils cls events =
     let
         ( matched, unmatched ) =
-            pupils |> matchedAndUnmatchedPupils cls
+            pupils |> matchedAndUnmatchedPupils cls events
 
         ( matched2, unmatched2 ) =
             pupils
-                |> applyMatchingToRedState matched
-                |> matchedAndUnmatchedPupils cls
+                |> applyMatchingToRedState events matched
+                |> matchedAndUnmatchedPupils cls events
     in
     div []
         [ p [] [ text "Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen." ]
-        , day 1 model matched unmatched
-        , day 2 model matched2 unmatched2
+        , day 1 model events matched unmatched
+        , day 2 model events matched2 unmatched2
         ]
 
 
-day : Int -> Model -> List ( Pupil.Obj, Event.Obj ) -> List Pupil.Obj -> Html Msg
-day num model matched unmatched =
+day : Int -> Model -> Dict.Dict Int Event.Obj -> List ( Pupil.Obj, Event.Obj ) -> List Pupil.Obj -> Html Msg
+day num model events matched unmatched =
     let
         tableRow : Pupil.Obj -> Event.Obj -> Html msg
         tableRow =
             \p e ->
+                let
+                    isGreen : Bool
+                    isGreen =
+                        p
+                            |> Pupil.eventGroup Pupil.Green
+                            |> List.any
+                                (\green ->
+                                    case Dict.get (green |> Event.idToInt) events of
+                                        Nothing ->
+                                            False
+
+                                        Just e2 ->
+                                            e2 == e
+                                )
+                in
                 tr []
                     [ td [] [ text <| Pupil.pupilDisplay p ]
                     , td []
                         [ span
                             [ classes <|
-                                if p |> Pupil.eventGroup Pupil.Green |> List.member e then
+                                if isGreen then
                                     "badge text-bg-success"
 
                                 else
@@ -201,17 +217,17 @@ day num model matched unmatched =
         , p []
             [ span [ classes "badge text-bg-secondary me-2", title "Gesamt" ] [ text <| String.fromInt <| List.length matched + List.length unmatched ]
             , span [ class "me-2" ] [ text "=" ]
-            , span [ classes "badge text-bg-success me-2", title "Grün" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Green matched ]
+            , span [ classes "badge text-bg-success me-2", title "Grün" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Green events matched ]
             , span [ class "me-2" ] [ text "+" ]
-            , span [ classes "badge text-bg-warning me-2", title "Gelb" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Yellow matched ]
+            , span [ classes "badge text-bg-warning me-2", title "Gelb" ] [ text <| String.fromInt <| List.length <| onColor Pupil.Yellow events matched ]
             , span [ class "me-2" ] [ text "+" ]
             , span [ classes "badge text-bg-danger", title "Rot" ] [ text <| String.fromInt <| List.length unmatched ]
             ]
         ]
 
 
-onColor : Pupil.ChoiceType -> List ( Pupil.Obj, Event.Obj ) -> List Pupil.Obj
-onColor color matching =
+onColor : Pupil.ChoiceType -> Dict.Dict Int Event.Obj -> List ( Pupil.Obj, Event.Obj ) -> List Pupil.Obj
+onColor color events matching =
     let
         fn : ( Pupil.Obj, Event.Obj ) -> Bool
         fn =
@@ -221,10 +237,20 @@ onColor color matching =
                         (\c ->
                             case ( c.type_, color ) of
                                 ( Pupil.Green, Pupil.Green ) ->
-                                    { event | internalID = 0 } == c.event
+                                    case Dict.get (c.event |> Event.idToInt) events of
+                                        Just ee ->
+                                            { event | internalID = 0 } == ee
+
+                                        Nothing ->
+                                            False
 
                                 ( Pupil.Yellow, Pupil.Yellow ) ->
-                                    { event | internalID = 0 } == c.event
+                                    case Dict.get (c.event |> Event.idToInt) events of
+                                        Just ee ->
+                                            { event | internalID = 0 } == ee
+
+                                        Nothing ->
+                                            False
 
                                 _ ->
                                     False
@@ -239,12 +265,12 @@ onColor color matching =
 -- LOGIC
 
 
-matchedAndUnmatchedPupils : Set.Set Class.Classname -> List Pupil.Obj -> ( List ( Pupil.Obj, Event.Obj ), List Pupil.Obj )
-matchedAndUnmatchedPupils cls pupils =
+matchedAndUnmatchedPupils : Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> List Pupil.Obj -> ( List ( Pupil.Obj, Event.Obj ), List Pupil.Obj )
+matchedAndUnmatchedPupils cls events pupils =
     let
         matched : Algo.Matching Pupil.Obj Event.Obj
         matched =
-            finalize pupils cls
+            finalize pupils cls events
 
         matchedTransformed =
             matched |> List.map (\( Algo.VertexLeft p, Algo.VertexRight e ) -> ( p, { e | internalID = 0 } ))
@@ -263,8 +289,8 @@ matchedAndUnmatchedPupils cls pupils =
     )
 
 
-applyMatchingToRedState : List ( Pupil.Obj, Event.Obj ) -> List Pupil.Obj -> List Pupil.Obj
-applyMatchingToRedState matching pupils =
+applyMatchingToRedState : Dict.Dict Int Event.Obj -> List ( Pupil.Obj, Event.Obj ) -> List Pupil.Obj -> List Pupil.Obj
+applyMatchingToRedState events matching pupils =
     pupils
         |> List.map
             (\pupil ->
@@ -278,36 +304,41 @@ applyMatchingToRedState matching pupils =
                                 pupil.choices
                                     |> List.map
                                         (\c ->
-                                            if c.event == e then
-                                                { c | type_ = Pupil.Red }
+                                            case Dict.get (c.event |> Event.idToInt) events of
+                                                Nothing ->
+                                                    c
 
-                                            else
-                                                c
+                                                Just e2 ->
+                                                    if e2 == e then
+                                                        { c | type_ = Pupil.Red }
+
+                                                    else
+                                                        c
                                         )
                         }
             )
 
 
-finalize : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Matching Pupil.Obj Event.Obj
-finalize pupils cls =
+finalize : List Pupil.Obj -> Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> Algo.Matching Pupil.Obj Event.Obj
+finalize pupils cls events =
     let
         step1 : Algo.Matching Pupil.Obj Event.Obj
         step1 =
-            [] |> Algo.run (toGraphFromGreen pupils cls)
+            [] |> Algo.run (toGraphFromGreen pupils cls events)
 
         step2 : Algo.Matching Pupil.Obj Event.Obj
         step2 =
-            [] |> Algo.run (toGraphFromYellowWithoutMatched pupils cls step1)
+            [] |> Algo.run (toGraphFromYellowWithoutMatched pupils cls events step1)
 
         step3 : Algo.Matching Pupil.Obj Event.Obj -> Algo.Matching Pupil.Obj Event.Obj
         step3 =
-            Algo.run (toGraphFromGreenAndYellow pupils cls)
+            Algo.run (toGraphFromGreenAndYellow pupils cls events)
     in
     (step1 ++ step2) |> step3
 
 
-toGraphFromGreen : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Graph Pupil.Obj Event.Obj
-toGraphFromGreen pupils cls =
+toGraphFromGreen : List Pupil.Obj -> Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
+toGraphFromGreen pupils cls events =
     let
         emptyGraph : Algo.Graph Pupil.Obj Event.Obj
         emptyGraph =
@@ -325,6 +356,16 @@ toGraphFromGreen pupils cls =
                     v =
                         pupil
                             |> Pupil.eventGroup Pupil.Green
+                            |> List.foldl
+                                (\eId l ->
+                                    case Dict.get (eId |> Event.idToInt) events of
+                                        Just e ->
+                                            e :: l
+
+                                        Nothing ->
+                                            l
+                                )
+                                []
                             |> List.foldl (\e l -> Event.extendToCapacityAndRestrictByClass e cls pupil.class ++ l) []
                             |> List.map Algo.VertexRight
                 in
@@ -334,8 +375,8 @@ toGraphFromGreen pupils cls =
         |> List.foldl fn emptyGraph
 
 
-toGraphFromYellowWithoutMatched : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Matching Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
-toGraphFromYellowWithoutMatched pupils cls matching =
+toGraphFromYellowWithoutMatched : List Pupil.Obj -> Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> Algo.Matching Pupil.Obj Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
+toGraphFromYellowWithoutMatched pupils cls events matching =
     let
         onlyRemaining : Pupil.Obj -> Bool
         onlyRemaining =
@@ -364,6 +405,16 @@ toGraphFromYellowWithoutMatched pupils cls matching =
                     v =
                         pupil
                             |> Pupil.eventGroup Pupil.Yellow
+                            |> List.foldl
+                                (\eId l ->
+                                    case Dict.get (eId |> Event.idToInt) events of
+                                        Just e ->
+                                            e :: l
+
+                                        Nothing ->
+                                            l
+                                )
+                                []
                             |> List.foldl (\e l -> Event.extendToCapacityAndRestrictByClass e cls pupil.class ++ l) []
                             |> List.map Algo.VertexRight
                             |> List.filter onlyUnmatchedVertices
@@ -375,8 +426,8 @@ toGraphFromYellowWithoutMatched pupils cls matching =
         |> List.foldl fn emptyGraph
 
 
-toGraphFromGreenAndYellow : List Pupil.Obj -> Set.Set Class.Classname -> Algo.Graph Pupil.Obj Event.Obj
-toGraphFromGreenAndYellow pupils cls =
+toGraphFromGreenAndYellow : List Pupil.Obj -> Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> Algo.Graph Pupil.Obj Event.Obj
+toGraphFromGreenAndYellow pupils cls events =
     let
         emptyGraph : Algo.Graph Pupil.Obj Event.Obj
         emptyGraph =
@@ -390,13 +441,23 @@ toGraphFromGreenAndYellow pupils cls =
                     k =
                         Algo.VertexLeft pupil
 
-                    events : List Event.Obj
-                    events =
-                        (pupil |> Pupil.eventGroup Pupil.Green) ++ (pupil |> Pupil.eventGroup Pupil.Yellow)
+                    combindEvents : List Event.Obj
+                    combindEvents =
+                        ((pupil |> Pupil.eventGroup Pupil.Green) ++ (pupil |> Pupil.eventGroup Pupil.Yellow))
+                            |> List.foldl
+                                (\eId l ->
+                                    case Dict.get (eId |> Event.idToInt) events of
+                                        Just e ->
+                                            e :: l
+
+                                        Nothing ->
+                                            l
+                                )
+                                []
 
                     v : List (Algo.VertexRight Event.Obj)
                     v =
-                        events
+                        combindEvents
                             |> List.foldl (\e l -> Event.extendToCapacityAndRestrictByClass e cls pupil.class ++ l) []
                             |> List.map Algo.VertexRight
                 in

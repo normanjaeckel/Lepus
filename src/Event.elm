@@ -1,4 +1,4 @@
-module Event exposing (Model, Msg, Obj, decoder, decoderEvent, eventToJSON, extendToCapacityAndRestrictByClass, init, modelToJSON, update, view)
+module Event exposing (Id, Model, Msg, Obj, decoder, decoderEvent, eventToJSON, extendToCapacityAndRestrictByClass, idToInt, init, intToId, modelToJSON, update, view)
 
 import Class
 import Dict
@@ -33,9 +33,14 @@ type Id
     = Id Int
 
 
-toInt : Id -> Int
-toInt (Id i) =
+idToInt : Id -> Int
+idToInt (Id i) =
     i
+
+
+intToId : Int -> Id
+intToId =
+    Id
 
 
 type alias Obj =
@@ -194,7 +199,7 @@ update msg model =
                                 |> Id
                     in
                     ( { model
-                        | events = model.events |> Dict.insert (newId |> toInt) newObj
+                        | events = model.events |> Dict.insert (newId |> idToInt) newObj
                         , formData = emptyFormData
                         , formInvalid = False
                       }
@@ -205,7 +210,7 @@ update msg model =
                     ( { model | formInvalid = True }, DontSetStorage )
 
         Edit eId ->
-            case model.events |> Dict.get (eId |> toInt) of
+            case model.events |> Dict.get (eId |> idToInt) of
                 Just obj ->
                     ( { model | editMode = Editing eId obj }, DontSetStorage )
 
@@ -229,14 +234,14 @@ update msg model =
                         validate
                             new.name
                             new.capacity
-                            (model.events |> Dict.remove (eId |> toInt) |> Dict.values |> List.map .name)
+                            (model.events |> Dict.remove (eId |> idToInt) |> Dict.values |> List.map .name)
                     of
                         Just updated ->
                             ( { model
                                 | events =
                                     model.events
                                         |> Dict.update
-                                            (eId |> toInt)
+                                            (eId |> idToInt)
                                             (always (Just updated))
                                 , editMode = Disabled
                               }
@@ -254,7 +259,7 @@ update msg model =
             ( { model | editMode = Disabled }, DontSetStorage )
 
         Delete eId ->
-            ( { model | events = model.events |> Dict.remove (eId |> toInt), formInvalid = False, editMode = Disabled }, SetStorage )
+            ( { model | events = model.events |> Dict.remove (eId |> idToInt), formInvalid = False, editMode = Disabled }, SetStorage )
 
 
 updateFormdata : FormDataInput -> Obj -> Obj
