@@ -6433,7 +6433,7 @@ var $author$project$Event$update = F2(
 					var newObj = _v1.a;
 					var newId = 1 + A2(
 						$elm$core$Maybe$withDefault,
-						1,
+						0,
 						$elm$core$List$maximum(
 							$elm$core$Dict$keys(model.h)));
 					return _Utils_Tuple2(

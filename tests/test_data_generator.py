@@ -1,17 +1,21 @@
 import json
 import random
+import copy
+
+COLORS = ["green", "green", "green", "yellow", "yellow", "yellow", "red"]
+# COLORS = ["green", "green", "yellow", "yellow", "yellow", "yellow", "red"]
 
 CLASSES = ["1a", "1b", "2a", "2b"]
 
-EVENTS = [
-    {"name": "Aquarium", "capacity": 12},
-    {"name": "Meeresverschmutzung", "capacity": 12},
-    {"name": "Wilde Tiere des Meeres", "capacity": 12},
-    {"name": "Wattenmeer", "capacity": 12},
-    {"name": "Wasserkraftwerk", "capacity": 12},
-    {"name": "Nachhaltige Fischerei", "capacity": 12},
-    {"name": "Wasser in der Bibel", "capacity": 12},
-]
+EVENTS = {
+    "1": {"name": "Aquarium", "capacity": 12},
+    "2": {"name": "Meeresverschmutzung", "capacity": 12},
+    "3": {"name": "Wilde Tiere des Meeres", "capacity": 12},
+    "4": {"name": "Wattenmeer", "capacity": 12},
+    "5": {"name": "Wasserkraftwerk", "capacity": 12},
+    "6": {"name": "Nachhaltige Fischerei", "capacity": 12},
+    "7": {"name": "Wasser in der Bibel", "capacity": 12},
+}
 
 NAMES_MALE = [
     "Laurence Bock",
@@ -111,21 +115,24 @@ def names():
 
 def pupils():
     n = iter(names())
-    for c in CLASSES:
+    for cl in CLASSES:
         for i in range(20):
+            choices = {}
+            for i, ch in random_choices():
+                choices[i] = ch
             yield {
                 "name": next(n),
-                "class": c,
-                "choices": list(random_choices()),
+                "class": cl,
+                "choices": choices,
             }
 
 
 def random_choices():
-    colors = ["green", "green", "green", "yellow", "yellow", "yellow", "red"]
-    assert len(colors) == len(EVENTS)
-    random.shuffle(colors)
-    for i, e in enumerate(EVENTS):
-        yield {"event": e, "type": colors[i]}
+    assert len(COLORS) == len(EVENTS)
+    cols = copy.deepcopy(COLORS)
+    random.shuffle(cols)
+    for i, e in enumerate(EVENTS.keys()):
+        yield (e, cols[i])
 
 
 def main():

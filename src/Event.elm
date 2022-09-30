@@ -194,7 +194,7 @@ update msg model =
                             model.events
                                 |> Dict.keys
                                 |> List.maximum
-                                |> Maybe.withDefault 1
+                                |> Maybe.withDefault 0
                                 |> (+) 1
                                 |> Id
                     in
