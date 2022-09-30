@@ -6736,23 +6736,87 @@ var $author$project$Pupil$update = F4(
 					0);
 		}
 	});
-var $elm$core$Dict$union = F2(
-	function (t1, t2) {
-		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+var $elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _v0) {
+				stepState:
+				while (true) {
+					var list = _v0.a;
+					var result = _v0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _v2 = list.a;
+						var lKey = _v2.a;
+						var lValue = _v2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_v0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_v0 = $temp$_v0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _v3 = A3(
+			$elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				$elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _v3.a;
+		var intermediateResult = _v3.b;
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v4, result) {
+					var k = _v4.a;
+					var v = _v4.b;
+					return A3(leftStep, k, v, result);
+				}),
+			intermediateResult,
+			leftovers);
 	});
 var $author$project$Pupil$updateEvents = F2(
 	function (events, model) {
 		var newChoices = function (current) {
-			return A2(
-				$elm$core$Dict$union,
+			return A6(
+				$elm$core$Dict$merge,
+				F3(
+					function (i, _v0, r) {
+						return A3($elm$core$Dict$insert, i, 1, r);
+					}),
+				F4(
+					function (i, e, c, r) {
+						return A3($elm$core$Dict$insert, i, c, r);
+					}),
+				F3(
+					function (_v1, _v2, r) {
+						return r;
+					}),
+				events,
 				current,
-				A2(
-					$elm$core$Dict$map,
-					F2(
-						function (_v0, _v1) {
-							return 1;
-						}),
-					events));
+				$elm$core$Dict$empty);
 		};
 		return _Utils_update(
 			model,
@@ -9215,7 +9279,7 @@ var $author$project$Pupil$innerTable = F2(
 						}),
 					A2($elm$core$Dict$get, i, events)));
 		};
-		return A2(
+		return $elm$core$Dict$isEmpty(events) ? A2($elm$html$Html$div, _List_Nil, _List_Nil) : A2(
 			$elm$html$Html$table,
 			_List_fromArray(
 				[

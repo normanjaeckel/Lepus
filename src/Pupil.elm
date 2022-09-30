@@ -256,7 +256,16 @@ updateEvents events model =
         newChoices : Dict.Dict Int ChoiceType -> Dict.Dict Int ChoiceType
         newChoices =
             \current ->
-                events |> Dict.map (\_ _ -> Yellow) |> Dict.union current
+                Dict.merge
+                    -- If the key is in only in events, it is a new event. Add it with default color.
+                    (\i _ r -> r |> Dict.insert i Yellow)
+                    -- If the key is in both, the event is unchanged. Add it with current color.
+                    (\i e c r -> r |> Dict.insert i c)
+                    -- If the key is only in current, it is a deleted event. Do not add it.
+                    (\_ _ r -> r)
+                    events
+                    current
+                    Dict.empty
     in
     { model | pupils = model.pupils |> List.map (\p -> { p | choices = newChoices p.choices }) }
 
@@ -350,69 +359,73 @@ innerTable events pupil =
                     |> Maybe.andThen (Just << .name)
                     |> Maybe.withDefault "---"
     in
-    table [ classes "table table-striped" ]
-        [ thead []
-            [ tr []
-                [ th [ scope "col", class "col-9" ] [ text "Gruppe" ]
-                , th [ scope "col", colspan 3, class "col-3" ] [ text "Farbe" ]
+    if Dict.isEmpty events then
+        div [] []
+
+    else
+        table [ classes "table table-striped" ]
+            [ thead []
+                [ tr []
+                    [ th [ scope "col", class "col-9" ] [ text "Gruppe" ]
+                    , th [ scope "col", colspan 3, class "col-3" ] [ text "Farbe" ]
+                    ]
                 ]
+            , tbody []
+                (pupil.choices
+                    |> Dict.toList
+                    |> List.sortBy getEventName
+                    |> List.map
+                        (\( i, c ) ->
+                            let
+                                radioGroup : String
+                                radioGroup =
+                                    pupilDisplay pupil ++ (i |> String.fromInt)
+                            in
+                            tr []
+                                [ th [ scope "row" ] [ text <| getEventName ( i, c ) ]
+                                , td []
+                                    [ div [ class "form-check form-check-inline" ]
+                                        [ input
+                                            [ class "form-check-input"
+                                            , type_ "radio"
+                                            , name radioGroup
+                                            , id (radioGroup ++ "Green")
+                                            , checked (c == Green)
+                                            , onClick <| ChangeChoice pupil (i |> Event.intToId) Green
+                                            ]
+                                            []
+                                        , label [ class "form-check-label", for (radioGroup ++ "Green") ] [ span [ class "badge text-bg-success" ] [ text "Grün" ] ]
+                                        ]
+                                    ]
+                                , td []
+                                    [ div [ class "form-check form-check-inline" ]
+                                        [ input
+                                            [ class "form-check-input"
+                                            , type_ "radio"
+                                            , name radioGroup
+                                            , id (radioGroup ++ "Yellow")
+                                            , checked (c == Yellow)
+                                            , onClick <| ChangeChoice pupil (i |> Event.intToId) Yellow
+                                            ]
+                                            []
+                                        , label [ class "form-check-label", for (radioGroup ++ "Yellow") ] [ span [ class "badge text-bg-warning" ] [ text "Gelb" ] ]
+                                        ]
+                                    ]
+                                , td []
+                                    [ div [ class "form-check form-check-inline" ]
+                                        [ input
+                                            [ class "form-check-input"
+                                            , type_ "radio"
+                                            , name radioGroup
+                                            , id (radioGroup ++ "Red")
+                                            , checked (c == Red)
+                                            , onClick <| ChangeChoice pupil (i |> Event.intToId) Red
+                                            ]
+                                            []
+                                        , label [ class "form-check-label", for (radioGroup ++ "Red") ] [ span [ class "badge text-bg-danger" ] [ text "Rot" ] ]
+                                        ]
+                                    ]
+                                ]
+                        )
+                )
             ]
-        , tbody []
-            (pupil.choices
-                |> Dict.toList
-                |> List.sortBy getEventName
-                |> List.map
-                    (\( i, c ) ->
-                        let
-                            radioGroup : String
-                            radioGroup =
-                                pupilDisplay pupil ++ (i |> String.fromInt)
-                        in
-                        tr []
-                            [ th [ scope "row" ] [ text <| getEventName ( i, c ) ]
-                            , td []
-                                [ div [ class "form-check form-check-inline" ]
-                                    [ input
-                                        [ class "form-check-input"
-                                        , type_ "radio"
-                                        , name radioGroup
-                                        , id (radioGroup ++ "Green")
-                                        , checked (c == Green)
-                                        , onClick <| ChangeChoice pupil (i |> Event.intToId) Green
-                                        ]
-                                        []
-                                    , label [ class "form-check-label", for (radioGroup ++ "Green") ] [ span [ class "badge text-bg-success" ] [ text "Grün" ] ]
-                                    ]
-                                ]
-                            , td []
-                                [ div [ class "form-check form-check-inline" ]
-                                    [ input
-                                        [ class "form-check-input"
-                                        , type_ "radio"
-                                        , name radioGroup
-                                        , id (radioGroup ++ "Yellow")
-                                        , checked (c == Yellow)
-                                        , onClick <| ChangeChoice pupil (i |> Event.intToId) Yellow
-                                        ]
-                                        []
-                                    , label [ class "form-check-label", for (radioGroup ++ "Yellow") ] [ span [ class "badge text-bg-warning" ] [ text "Gelb" ] ]
-                                    ]
-                                ]
-                            , td []
-                                [ div [ class "form-check form-check-inline" ]
-                                    [ input
-                                        [ class "form-check-input"
-                                        , type_ "radio"
-                                        , name radioGroup
-                                        , id (radioGroup ++ "Red")
-                                        , checked (c == Red)
-                                        , onClick <| ChangeChoice pupil (i |> Event.intToId) Red
-                                        ]
-                                        []
-                                    , label [ class "form-check-label", for (radioGroup ++ "Red") ] [ span [ class "badge text-bg-danger" ] [ text "Rot" ] ]
-                                    ]
-                                ]
-                            ]
-                    )
-            )
-        ]
