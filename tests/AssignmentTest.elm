@@ -34,34 +34,34 @@ suite =
             [ ( id1, e1 ), ( id2, e2 ), ( id3, e3 ), ( id4, e4 ), ( id5, e5 ) ] |> Dict.fromList
 
         p1 =
-            Pupil.Obj "Max" "1" [] |> setupPupil [ id3, id1 ] [ id5, id4, id2 ] []
+            Pupil.Obj "Max" "1" Dict.empty |> setupPupil [ id3, id1 ] [ id5, id4, id2 ] []
 
         p2 =
-            Pupil.Obj "Moritz" "2" [] |> setupPupil [ id2 ] [ id5, id4, id3, id1 ] []
+            Pupil.Obj "Moritz" "2" Dict.empty |> setupPupil [ id2 ] [ id5, id4, id3, id1 ] []
 
         p3 =
-            Pupil.Obj "Lisa" "3" [] |> setupPupil [ id1, id2 ] [ id5, id4, id3 ] []
+            Pupil.Obj "Lisa" "3" Dict.empty |> setupPupil [ id1, id2 ] [ id5, id4, id3 ] []
 
         p4 =
-            Pupil.Obj "Kim" "4" [] |> setupPupil [ id1 ] [ id5, id4, id3, id2 ] []
+            Pupil.Obj "Kim" "4" Dict.empty |> setupPupil [ id1 ] [ id5, id4, id3, id2 ] []
 
         p5 =
-            Pupil.Obj "Anna" "5" [] |> setupPupil [ id4 ] [ id5, id3, id2, id1 ] []
+            Pupil.Obj "Anna" "5" Dict.empty |> setupPupil [ id4 ] [ id5, id3, id2, id1 ] []
 
         p6 =
-            Pupil.Obj "Maria" "6" [] |> setupPupil [ id3, id4 ] [ id5, id2, id1 ] []
+            Pupil.Obj "Maria" "6" Dict.empty |> setupPupil [ id3, id4 ] [ id5, id2, id1 ] []
 
         p7 =
-            Pupil.Obj "Hans" "7" [] |> setupPupil [ id3, id4 ] [ id5, id2, id1 ] []
+            Pupil.Obj "Hans" "7" Dict.empty |> setupPupil [ id3, id4 ] [ id5, id2, id1 ] []
 
         p8 =
-            Pupil.Obj "Ali" "8" [] |> setupPupil [ id3 ] [ id5, id4, id2, id1 ] []
+            Pupil.Obj "Ali" "8" Dict.empty |> setupPupil [ id3 ] [ id5, id4, id2, id1 ] []
 
         p9 =
-            Pupil.Obj "Richard" "9" [] |> setupPupil [ id3, id4 ] [ id5, id2, id1 ] []
+            Pupil.Obj "Richard" "9" Dict.empty |> setupPupil [ id3, id4 ] [ id5, id2, id1 ] []
 
         p10 =
-            Pupil.Obj "Josua" "10" [] |> setupPupil [] [ id5, id4, id3, id2, id1 ] []
+            Pupil.Obj "Josua" "10" Dict.empty |> setupPupil [] [ id5, id4, id3, id2, id1 ] []
     in
     describe "Main functions"
         [ describe "The finalize function"
@@ -145,13 +145,13 @@ suite =
                             [ ( i1, ii1 ), ( i2, ii2 ), ( i3, ii3 ) ] |> Dict.fromList
 
                         j1 =
-                            Pupil.Obj "A" "1" [] |> setupPupil [ i1 ] [ i2, i3 ] []
+                            Pupil.Obj "A" "1" Dict.empty |> setupPupil [ i1 ] [ i2, i3 ] []
 
                         j2 =
-                            Pupil.Obj "B" "1" [] |> setupPupil [] [ i1, i2, i3 ] []
+                            Pupil.Obj "B" "1" Dict.empty |> setupPupil [] [ i1, i2, i3 ] []
 
                         j3 =
-                            Pupil.Obj "C" "1" [] |> setupPupil [] [ i1, i2 ] [ i3 ]
+                            Pupil.Obj "C" "1" Dict.empty |> setupPupil [] [ i1, i2 ] [ i3 ]
                     in
                     Assignment.finalize [ j1, j2, j3 ] (Set.fromList [ "1" ]) el
                         |> Expect.all
@@ -166,15 +166,15 @@ setupPupil : List Int -> List Int -> List Int -> Pupil.Obj -> Pupil.Obj
 setupPupil green yellow red pupil =
     let
         g =
-            green |> List.map (\e -> Pupil.Choice (e |> Event.intToId) Pupil.Green)
+            green |> List.map (\color -> ( color, Pupil.Green ))
 
         y =
-            yellow |> List.map (\e -> Pupil.Choice (e |> Event.intToId) Pupil.Yellow)
+            yellow |> List.map (\color -> ( color, Pupil.Yellow ))
 
         r =
-            red |> List.map (\e -> Pupil.Choice (e |> Event.intToId) Pupil.Red)
+            red |> List.map (\color -> ( color, Pupil.Red ))
     in
-    { pupil | choices = g ++ y ++ r }
+    { pupil | choices = Dict.fromList (g ++ y ++ r) }
 
 
 howManyGreens : List Pupil.Obj -> Set.Set Class.Classname -> Dict.Dict Int Event.Obj -> Algo.Matching Pupil.Obj Event.Obj -> Int
@@ -192,7 +192,7 @@ howManyGreens pupils cls events matching =
                                 |> Pupil.eventGroup Pupil.Green
                                 |> List.foldl
                                     (\eId l ->
-                                        case Dict.get (eId |> Event.idToInt) events of
+                                        case Dict.get eId events of
                                             Just e ->
                                                 e :: l
 

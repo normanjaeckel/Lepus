@@ -214,7 +214,7 @@ readme : Html Msg
 readme =
     div [ class "mb-5" ]
         [ h1 [] [ text "Projektgruppenverteilung" ]
-        , p [ classes "fs-5 col-md-8" ] [ text "Dieses Tool speichert die Eingaben im Local Storage des Browsers. Es werden keine eigegebenen Daten über das Internet gesendet." ]
+        , p [ classes "fs-5 col-md-9" ] [ text "Dieses Tool speichert die Eingaben im Local Storage des Browsers. Es werden keine eigegebenen Daten über das Internet gesendet." ]
         ]
 
 

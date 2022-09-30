@@ -142,7 +142,7 @@ allClasses c =
 
 oneClassLi : Classname -> Html Msg
 oneClassLi c =
-    li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
+    li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-9 col-lg-7 col-xl-5" ]
         [ div [ classes "ms-2 me-auto" ] [ text c ]
         , a
             [ class "link-danger"

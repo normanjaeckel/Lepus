@@ -294,7 +294,7 @@ view : Model -> Html Msg
 view model =
     div [ class "mb-5" ]
         [ h2 [ id "events", class "nav-anchor" ] [ text "Projektgruppen" ]
-        , p [ class "col-md-8" ]
+        , p [ class "col-md-9" ]
             [ text
                 """Abhängig von der Anzahl der Klassen und der Anzahl der Plätze in einer Gruppe gibt es feste Plätze
                 für Schüler und Schülerinnen aus bestimmten Klassen und freie Plätze. Es erfolgt eine ganzzahlige Teilung
@@ -365,7 +365,7 @@ oneEventLi editMode ( eId, event ) =
     let
         fixedLine : Html Msg
         fixedLine =
-            li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
+            li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-9 col-lg-7 col-xl-5" ]
                 [ div [ classes "ms-2 me-auto" ]
                     [ text event.name
                     , span [ classes "ms-2 badge bg-primary rounded-pill", title "Anzahl der Plätze", attribute "aria-label" "Anzahl der Plätze" ] [ text <| String.fromInt event.capacity ]
@@ -399,7 +399,7 @@ oneEventLi editMode ( eId, event ) =
                 fixedLine
 
             else
-                li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5" ]
+                li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-9 col-lg-7 col-xl-5" ]
                     [ form [ classes "ms-2 row g-1", onSubmit SaveEdit ]
                         [ div [ class "col-7" ]
                             [ input

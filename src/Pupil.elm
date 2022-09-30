@@ -1,11 +1,11 @@
-module Pupil exposing (Choice, ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, pupilDisplay, pupilSorting, update, updateEvents, view)
+module Pupil exposing (ChoiceType(..), Model, Msg, Obj, decoder, eventGroup, init, modelToJSON, pupilDisplay, pupilSorting, update, updateEvents, view)
 
 import Class
 import Dict
 import Event
 import Helpers exposing (Persistence(..), classes, svgIconXLg, tagWithInvalidFeedback)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, checked, class, for, hidden, id, name, placeholder, required, rows, scope, tabindex, title, type_, value)
+import Html.Attributes exposing (attribute, checked, class, colspan, for, hidden, id, name, placeholder, required, rows, scope, tabindex, title, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Lazy exposing (lazy)
 import Json.Decode as D
@@ -43,7 +43,7 @@ emptyFormData =
 type alias Obj =
     { name : String
     , class : Class.Classname
-    , choices : List Choice
+    , choices : Dict.Dict Int ChoiceType
     }
 
 
@@ -55,12 +55,6 @@ pupilDisplay pupil =
 pupilSorting : Obj -> String
 pupilSorting pupil =
     pupil.class ++ pupil.name
-
-
-type alias Choice =
-    { event : Event.Id
-    , type_ : ChoiceType
-    }
 
 
 type ChoiceType
@@ -82,11 +76,11 @@ choiceTypeToString c =
             "red"
 
 
-eventGroup : ChoiceType -> Obj -> List Event.Id
+eventGroup : ChoiceType -> Obj -> List Int
 eventGroup choiceType pupil =
     pupil.choices
-        |> List.filter (\c -> c.type_ == choiceType)
-        |> List.map (\c -> c.event)
+        |> Dict.filter (\_ c -> c == choiceType)
+        |> Dict.keys
 
 
 decoder : D.Decoder Model
@@ -95,37 +89,40 @@ decoder =
         (\p -> Model p emptyFormData False)
         (D.list
             (D.map3
-                Obj
+                (\n c ch ->
+                    Obj
+                        n
+                        c
+                        (ch
+                            |> Dict.toList
+                            |> List.map (\( k, v ) -> ( String.toInt k |> Maybe.withDefault 0, v ))
+                            |> Dict.fromList
+                        )
+                )
                 (D.field "name" D.string)
                 (D.field "class" D.string)
-                (D.field "choices" (D.list decoderChoice))
+                (D.field "choices" (D.dict decoderChoiceType))
             )
         )
 
 
-decoderChoice : D.Decoder Choice
-decoderChoice =
-    D.map2
-        Choice
-        (D.field "event" (D.map Event.intToId D.int))
-        (D.field "type"
-            (D.string
-                |> D.andThen
-                    (\t ->
-                        if t == "green" then
-                            D.succeed Green
+decoderChoiceType : D.Decoder ChoiceType
+decoderChoiceType =
+    D.string
+        |> D.andThen
+            (\t ->
+                if t == "green" then
+                    D.succeed Green
 
-                        else if t == "yellow" then
-                            D.succeed Yellow
+                else if t == "yellow" then
+                    D.succeed Yellow
 
-                        else if t == "red" then
-                            D.succeed Red
+                else if t == "red" then
+                    D.succeed Red
 
-                        else
-                            D.fail "invalid choice type"
-                    )
+                else
+                    D.fail "invalid choice type"
             )
-        )
 
 
 modelToJSON : Model -> E.Value
@@ -139,16 +136,13 @@ pupilToJSON =
         E.object
             [ ( "name", E.string p.name )
             , ( "class", E.string p.class )
-            , ( "choices", p.choices |> E.list choiceToJSON )
+            , ( "choices"
+              , p.choices
+                    |> E.dict
+                        String.fromInt
+                        (choiceTypeToString >> E.string)
+              )
             ]
-
-
-choiceToJSON : Choice -> E.Value
-choiceToJSON choice =
-    E.object
-        [ ( "event", choice.event |> Event.idToInt |> E.int )
-        , ( "type", E.string <| choiceTypeToString choice.type_ )
-        ]
 
 
 
@@ -216,9 +210,9 @@ savePupils model events cls namesRaw classRaw =
         let
             ( pupils, err ) =
                 let
-                    yellowEvents : List Choice
+                    yellowEvents : Dict.Dict Int ChoiceType
                     yellowEvents =
-                        events |> Dict.keys |> List.map Event.intToId |> List.map (\i -> Choice i Yellow)
+                        events |> Dict.map (\_ _ -> Yellow)
 
                     fn : String -> ( List Obj, Bool ) -> ( List Obj, Bool )
                     fn =
@@ -244,18 +238,12 @@ changeChoice pupils pupil event newChoiceType =
         |> List.map
             (\p ->
                 if p == pupil then
-                    { p
-                        | choices =
-                            p.choices
-                                |> List.map
-                                    (\c ->
-                                        if c.event == event then
-                                            Choice event newChoiceType
-
-                                        else
-                                            c
-                                    )
-                    }
+                    let
+                        newChoices : Dict.Dict Int ChoiceType
+                        newChoices =
+                            p.choices |> Dict.update (event |> Event.idToInt) (\_ -> Just newChoiceType)
+                    in
+                    { p | choices = newChoices }
 
                 else
                     p
@@ -265,18 +253,10 @@ changeChoice pupils pupil event newChoiceType =
 updateEvents : Dict.Dict Int Event.Obj -> Model -> Model
 updateEvents events model =
     let
-        newChoices : List Choice -> List Choice
+        newChoices : Dict.Dict Int ChoiceType -> Dict.Dict Int ChoiceType
         newChoices =
             \current ->
-                events
-                    |> Dict.keys
-                    |> List.map
-                        (\k ->
-                            current
-                                |> List.filter (\c -> k == (c.event |> Event.idToInt))
-                                |> List.head
-                                |> Maybe.withDefault (Choice (k |> Event.intToId) Yellow)
-                        )
+                events |> Dict.map (\_ _ -> Yellow) |> Dict.union current
     in
     { model | pupils = model.pupils |> List.map (\p -> { p | choices = newChoices p.choices }) }
 
@@ -342,10 +322,10 @@ allPupils events pupils =
 
 onePupilLi : Dict.Dict Int Event.Obj -> Obj -> Html Msg
 onePupilLi events pupil =
-    li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-8 col-lg-7 col-xl-5 pt-4 pb-2" ]
+    li [ classes "list-group-item d-flex justify-content-between align-items-start col-md-9 col-lg-7 col-xl-7 pt-4 pb-2" ]
         [ div [ classes "ms-2 w-100" ]
             [ div [] [ text <| pupilDisplay pupil ]
-            , innerTable events pupil
+            , div [ class "table-responsive" ] [ innerTable events pupil ]
             ]
         , a
             [ class "link-danger"
@@ -361,31 +341,35 @@ onePupilLi events pupil =
 
 innerTable : Dict.Dict Int Event.Obj -> Obj -> Html Msg
 innerTable events pupil =
+    let
+        getEventName : ( Int, ChoiceType ) -> String
+        getEventName =
+            \( i, _ ) ->
+                events
+                    |> Dict.get i
+                    |> Maybe.andThen (Just << .name)
+                    |> Maybe.withDefault "---"
+    in
     table [ classes "table table-striped" ]
         [ thead []
             [ tr []
-                [ th [ scope "col" ] [ text "Gruppe" ]
-                , th [ scope "col" ] [ text "Farbe" ]
+                [ th [ scope "col", class "col-9" ] [ text "Gruppe" ]
+                , th [ scope "col", colspan 3, class "col-3" ] [ text "Farbe" ]
                 ]
             ]
         , tbody []
             (pupil.choices
-                |> List.sortBy
-                    (\c ->
-                        events
-                            |> Dict.get (c.event |> Event.idToInt)
-                            |> Maybe.andThen (Just << .name)
-                            |> Maybe.withDefault ""
-                    )
+                |> Dict.toList
+                |> List.sortBy getEventName
                 |> List.map
-                    (\c ->
+                    (\( i, c ) ->
                         let
                             radioGroup : String
                             radioGroup =
-                                pupilDisplay pupil ++ (c.event |> Event.idToInt |> String.fromInt)
+                                pupilDisplay pupil ++ (i |> String.fromInt)
                         in
                         tr []
-                            [ th [ scope "row" ] [ text "c.event.name" ]
+                            [ th [ scope "row" ] [ text <| getEventName ( i, c ) ]
                             , td []
                                 [ div [ class "form-check form-check-inline" ]
                                     [ input
@@ -393,32 +377,36 @@ innerTable events pupil =
                                         , type_ "radio"
                                         , name radioGroup
                                         , id (radioGroup ++ "Green")
-                                        , checked (c.type_ == Green)
-                                        , onClick <| ChangeChoice pupil c.event Green
+                                        , checked (c == Green)
+                                        , onClick <| ChangeChoice pupil (i |> Event.intToId) Green
                                         ]
                                         []
                                     , label [ class "form-check-label", for (radioGroup ++ "Green") ] [ span [ class "badge text-bg-success" ] [ text "Grün" ] ]
                                     ]
-                                , div [ class "form-check form-check-inline" ]
+                                ]
+                            , td []
+                                [ div [ class "form-check form-check-inline" ]
                                     [ input
                                         [ class "form-check-input"
                                         , type_ "radio"
                                         , name radioGroup
                                         , id (radioGroup ++ "Yellow")
-                                        , checked (c.type_ == Yellow)
-                                        , onClick <| ChangeChoice pupil c.event Yellow
+                                        , checked (c == Yellow)
+                                        , onClick <| ChangeChoice pupil (i |> Event.intToId) Yellow
                                         ]
                                         []
                                     , label [ class "form-check-label", for (radioGroup ++ "Yellow") ] [ span [ class "badge text-bg-warning" ] [ text "Gelb" ] ]
                                     ]
-                                , div [ class "form-check form-check-inline" ]
+                                ]
+                            , td []
+                                [ div [ class "form-check form-check-inline" ]
                                     [ input
                                         [ class "form-check-input"
                                         , type_ "radio"
                                         , name radioGroup
                                         , id (radioGroup ++ "Red")
-                                        , checked (c.type_ == Red)
-                                        , onClick <| ChangeChoice pupil c.event Red
+                                        , checked (c == Red)
+                                        , onClick <| ChangeChoice pupil (i |> Event.intToId) Red
                                         ]
                                         []
                                     , label [ class "form-check-label", for (radioGroup ++ "Red") ] [ span [ class "badge text-bg-danger" ] [ text "Rot" ] ]

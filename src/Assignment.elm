@@ -108,7 +108,7 @@ innerView model pupils cls events =
                 |> applyMatchingToRedState events matched
                 |> matchedAndUnmatchedPupils cls events
     in
-    div []
+    div [ class "col-md-9" ]
         [ p [] [ text "Das Ergebnis wird mit jeder Eingabe automatisch aktualisiert. Man kann es markieren, kopieren und anschließend in Excel, Word u. a. einfügen." ]
         , day 1 model events matched unmatched
         , day 2 model events matched2 unmatched2
@@ -128,7 +128,7 @@ day num model events matched unmatched =
                             |> Pupil.eventGroup Pupil.Green
                             |> List.any
                                 (\green ->
-                                    case Dict.get (green |> Event.idToInt) events of
+                                    case Dict.get green events of
                                         Nothing ->
                                             False
 
@@ -151,7 +151,7 @@ day num model events matched unmatched =
                         ]
                     ]
     in
-    div [ classes "col-md-8 mb-4" ]
+    div [ classes "col-md-10 mb-4" ]
         [ h3 [] [ text <| "Tag " ++ String.fromInt num ]
         , h4 []
             [ text "Zugeteilte Schüler/Schülerinnen" ]
@@ -233,11 +233,12 @@ onColor color events matching =
         fn =
             \( pupil, event ) ->
                 pupil.choices
+                    |> Dict.toList
                     |> List.any
-                        (\c ->
-                            case ( c.type_, color ) of
+                        (\( i, c ) ->
+                            case ( c, color ) of
                                 ( Pupil.Green, Pupil.Green ) ->
-                                    case Dict.get (c.event |> Event.idToInt) events of
+                                    case Dict.get i events of
                                         Just ee ->
                                             { event | internalID = 0 } == ee
 
@@ -245,7 +246,7 @@ onColor color events matching =
                                             False
 
                                 ( Pupil.Yellow, Pupil.Yellow ) ->
-                                    case Dict.get (c.event |> Event.idToInt) events of
+                                    case Dict.get i events of
                                         Just ee ->
                                             { event | internalID = 0 } == ee
 
@@ -299,23 +300,19 @@ applyMatchingToRedState events matching pupils =
                         pupil
 
                     Just ( _, e ) ->
-                        { pupil
-                            | choices =
-                                pupil.choices
-                                    |> List.map
-                                        (\c ->
-                                            case Dict.get (c.event |> Event.idToInt) events of
-                                                Nothing ->
-                                                    c
+                        let
+                            eventIdInt : Int
+                            eventIdInt =
+                                events
+                                    |> Dict.filter (\_ v -> v == e)
+                                    |> Dict.keys
+                                    |> List.head
+                                    |> Maybe.withDefault 0
 
-                                                Just e2 ->
-                                                    if e2 == e then
-                                                        { c | type_ = Pupil.Red }
-
-                                                    else
-                                                        c
-                                        )
-                        }
+                            newChoices =
+                                pupil.choices |> Dict.update eventIdInt (Maybe.andThen (always (Just Pupil.Red)))
+                        in
+                        { pupil | choices = newChoices }
             )
 
 
@@ -358,7 +355,7 @@ toGraphFromGreen pupils cls events =
                             |> Pupil.eventGroup Pupil.Green
                             |> List.foldl
                                 (\eId l ->
-                                    case Dict.get (eId |> Event.idToInt) events of
+                                    case Dict.get eId events of
                                         Just e ->
                                             e :: l
 
@@ -407,7 +404,7 @@ toGraphFromYellowWithoutMatched pupils cls events matching =
                             |> Pupil.eventGroup Pupil.Yellow
                             |> List.foldl
                                 (\eId l ->
-                                    case Dict.get (eId |> Event.idToInt) events of
+                                    case Dict.get eId events of
                                         Just e ->
                                             e :: l
 
@@ -446,7 +443,7 @@ toGraphFromGreenAndYellow pupils cls events =
                         ((pupil |> Pupil.eventGroup Pupil.Green) ++ (pupil |> Pupil.eventGroup Pupil.Yellow))
                             |> List.foldl
                                 (\eId l ->
-                                    case Dict.get (eId |> Event.idToInt) events of
+                                    case Dict.get eId events of
                                         Just e ->
                                             e :: l
 
