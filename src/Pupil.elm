@@ -260,7 +260,7 @@ updateEvents events model =
                     -- If the key is in only in events, it is a new event. Add it with default color.
                     (\i _ r -> r |> Dict.insert i Yellow)
                     -- If the key is in both, the event is unchanged. Add it with current color.
-                    (\i e c r -> r |> Dict.insert i c)
+                    (\i _ c r -> r |> Dict.insert i c)
                     -- If the key is only in current, it is a deleted event. Do not add it.
                     (\_ _ r -> r)
                     events
