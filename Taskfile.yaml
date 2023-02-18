@@ -2,24 +2,18 @@
 
 version: '3'
 
+includes:
+  client:
+    taskfile: ./client
+    dir: ./client
+
+  server:
+    taskfile: ./server
+    dir: ./server
+
 tasks:
   default:
-    - task: build
-
-  build:
-    desc: Compiles all Elm files to our assets/elm.js
+    desc: Runs the tasks client:build and server:build.
     cmds:
-      - elm make --output=assets/elm.js --optimize src/Main.elm
-    sources:
-      - src/**/*.elm
-    generates:
-      - assets/elm.js
-
-  dev-server:
-    desc: Starts a small Python server for development purposes
-    deps:
-      - build
-    cmds:
-      - task: build
-      - python -m http.server --bind 127.0.0.1 8000
-
+      - task: client:build
+      - task: server:build

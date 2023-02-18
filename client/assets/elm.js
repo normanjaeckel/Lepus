@@ -6807,11 +6807,11 @@ var $author$project$Pupil$updateEvents = F2(
 						return A3($elm$core$Dict$insert, i, 1, r);
 					}),
 				F4(
-					function (i, e, c, r) {
+					function (i, _v1, c, r) {
 						return A3($elm$core$Dict$insert, i, c, r);
 					}),
 				F3(
-					function (_v1, _v2, r) {
+					function (_v2, _v3, r) {
 						return r;
 					}),
 				events,
