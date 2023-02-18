@@ -2,10 +2,3 @@
 
 .task/
 elm-stuff/
-tests/.venv
-
-tests/data*.json
-tests/ap-data.py
-tests/export-AP.json
-tests/export-AP-neu.json
-tests/test_data_generator.py
