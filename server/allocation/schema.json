@@ -8,7 +8,7 @@
             "description": "All events of all project days.",
             "type": "object",
             "patternProperties": {
-                "^[1-9][0-9]*$": {
+                "^event_[1-9][0-9]*$": {
                     "description": "One event.",
                     "type": "object",
                     "properties": {
@@ -17,7 +17,7 @@
                             "type": "array",
                             "items": {
                                 "type": "string",
-                                "pattern": "^[1-9][0-9]*$"
+                                "pattern": "^day_[1-9][0-9]*$"
                             },
                             "minItems": 1,
                             "uniqueItems": true
@@ -68,7 +68,7 @@
             "description": "All pupils",
             "type": "object",
             "patternProperties": {
-                "^[1-9][0-9]*$": {
+                "^pupil_[1-9][0-9]*$": {
                     "description": "One pupil.",
                     "type": "object",
                     "properties": {
@@ -81,6 +81,17 @@
                             "description": "Set to true if this pupil a special pupil.",
                             "type": "boolean"
                         },
+                        "fixedAllocation": {
+                            "description": "The pupils is set to this event on the given day without any choices.",
+                            "type": "object",
+                            "patternProperties": {
+                                "^day_[1-9][0-9]*$": {
+                                    "type": "string",
+                                    "pattern": "^event_[1-9][0-9]*$"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
                         "choices": {
                             "description": "Choices of the pupil. Events that are neither green nor red are considered as yellow.",
                             "type": "object",
@@ -89,7 +100,7 @@
                                     "type": "array",
                                     "items": {
                                         "type": "string",
-                                        "pattern": "^[1-9][0-9]*$"
+                                        "pattern": "^event_[1-9][0-9]*$"
                                     },
                                     "uniqueItems": true
                                 },
@@ -97,7 +108,7 @@
                                     "type": "array",
                                     "items": {
                                         "type": "string",
-                                        "pattern": "^[1-9][0-9]*$"
+                                        "pattern": "^event_[1-9][0-9]*$"
                                     },
                                     "uniqueItems": true
                                 }
