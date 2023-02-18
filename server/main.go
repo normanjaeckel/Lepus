@@ -7,15 +7,17 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 
+	"github.com/normanjaeckel/Lepus/server/allocation"
 	"github.com/normanjaeckel/Lepus/server/public"
 	"golang.org/x/sys/unix"
 )
 
 const (
-	Host string = "localhost"
-	Port int    = 8000
+	Host           string = "localhost"
+	PortEnvVarName string = "LEPUS_PORT"
 )
 
 type Logger interface {
@@ -28,9 +30,16 @@ func main() {
 
 	logger := log.Default()
 
+	port := os.Getenv(PortEnvVarName)
+	if port == "" {
+		port = "8000"
+	} else if _, err := strconv.Atoi(port); err != nil {
+		logger.Fatalf("Error: Environment variable %s must be an integer and not %q", PortEnvVarName, port)
+	}
+
 	onSignals(logger, cancel)
 
-	addr := fmt.Sprintf("%s:%d", Host, Port)
+	addr := fmt.Sprintf("%s:%s", Host, port)
 	if err := start(ctx, logger, addr); err != nil {
 		logger.Fatalf("Error: %v", err)
 	}
@@ -94,8 +103,11 @@ func start(ctx context.Context, logger Logger, addr string) error {
 func handler(logger Logger, mux *sync.Mutex) http.Handler {
 	serveMux := http.NewServeMux()
 
+	// Allocation
+	serveMux.Handle("/allocation", allocation.Handle(logger))
+
 	// Root
-	serveMux.Handle("/", public.Files())
+	serveMux.HandleFunc("/", public.Files)
 
 	return serveMux
 }

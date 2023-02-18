@@ -13,13 +13,7 @@ import (
 //go:embed files
 var files embed.FS
 
-func Files() http.Handler {
-	return handler{}
-}
-
-type handler struct{}
-
-func (handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func Files(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		w.Header().Set("Allow", "GET")
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
