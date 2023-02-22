@@ -3,6 +3,7 @@ package allocation_test
 import (
 	"testing"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/normanjaeckel/Lepus/server/allocation"
 )
 
@@ -39,7 +40,7 @@ func TestValidate(t *testing.T) {
 			}
 		`)
 
-		p, err := allocation.Validate(body)
+		p, err := allocation.Validate(body, validator.New())
 
 		if err != nil {
 			t.Fatalf("expected correct validation, got error %q", err.Error())

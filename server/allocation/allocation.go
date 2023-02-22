@@ -19,11 +19,12 @@ type Logger interface {
 // Handling
 
 type handler struct {
-	logger Logger
+	logger   Logger
+	validate *validator.Validate
 }
 
 func Handle(logger Logger) http.Handler {
-	return handler{logger}
+	return handler{logger, validator.New()}
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -34,7 +35,8 @@ func (h handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	p, err := Validate(body)
+	// Validate body
+	p, err := Validate(body, h.validate)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: validating request body: %v", err), http.StatusBadRequest)
 
@@ -44,7 +46,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 }
 
-// Payload and Validation
+// Payload and validation
 
 type payload struct {
 	Events map[eventID]event `validate:"required,dive"`
@@ -80,14 +82,14 @@ type pupil struct {
 	}
 }
 
-func Validate(body []byte) (payload, error) {
+func Validate(body []byte, v *validator.Validate) (payload, error) {
 	var p payload
 	if err := json.Unmarshal(body, &p); err != nil {
 		return p, fmt.Errorf("decoding request payload: %w", err)
 
 	}
 
-	if err := validator.New().Struct(p); err != nil {
+	if err := v.Struct(p); err != nil {
 		return p, fmt.Errorf("validating request payload: %w", err)
 	}
 
