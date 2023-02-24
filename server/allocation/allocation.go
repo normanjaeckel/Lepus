@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 )
 
 // Data types
@@ -81,28 +82,31 @@ func doEverything(days map[dayID]bool, pupils map[pupilID]pupil, events map[even
 	}
 
 	for dID := range days {
-
 		orderedPupils := make([]pupilID, 0, len(res[dID].UnassignedPupils))
 		for pID := range res[dID].UnassignedPupils {
 			orderedPupils = append(orderedPupils, pID)
 		}
+		sort.Slice(orderedPupils, func(i, j int) bool { return orderedPupils[i] < orderedPupils[j] })
 
 		orderedEvents := make([]eventID, 0, len(events))
 		for eID, e := range events {
 			if found := e.days[dID]; found {
 				orderedEvents = append(orderedEvents, eID)
 			}
-
 		}
+		sort.Slice(orderedEvents, func(i, j int) bool { return orderedEvents[i] < orderedEvents[j] })
 
-		i := 0
+		i := -1
 		for _, pID := range orderedPupils {
-			eID := orderedEvents[i%len(orderedEvents)]
-			if events[eID].amount > len(res[dID].Events[eID]) {
-				res[dID].Events[eID] = append(res[dID].Events[eID], pID)
-				delete(res[dID].UnassignedPupils, pID)
+			for k := 0; k < len(orderedEvents); k++ {
+				i++
+				eID := orderedEvents[i%len(orderedEvents)]
+				if events[eID].amount > len(res[dID].Events[eID]) {
+					res[dID].Events[eID] = append(res[dID].Events[eID], pID)
+					delete(res[dID].UnassignedPupils, pID)
+					break
+				}
 			}
-			i += 1
 		}
 	}
 
