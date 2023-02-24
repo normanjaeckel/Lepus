@@ -18,7 +18,8 @@ type decodedData struct {
 }
 
 type event struct {
-	days map[dayID]bool
+	days   map[dayID]bool
+	amount int
 }
 
 type pupil struct{}
@@ -85,7 +86,7 @@ func (v *decoder) decode(r io.Reader) (decodedData, error) {
 	data.days = make(map[dayID]bool)
 	data.events = make(map[eventID]event)
 	for eID, e := range body.Events {
-		data.events[eID] = event{days: make(map[dayID]bool)}
+		data.events[eID] = event{days: make(map[dayID]bool), amount: e.Amount}
 		for _, dID := range e.Days {
 			data.events[eID].days[dID] = true
 			data.days[dID] = true
