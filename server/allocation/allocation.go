@@ -6,49 +6,21 @@ package allocation
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-
-	"github.com/go-playground/validator/v10"
 )
+
+// Data types
+
+type eventID string
+type dayID string
+type classID string
+type pupilID string
+
+// Handling
 
 type logger interface {
 	Printf(format string, v ...any)
 }
-
-// // Data type
-
-// type Data struct {
-// 	Events map[eventID]struct {
-// 		Days    []dayID   `validate:"min=1"`
-// 		Amount  int       `validate:"min=1"`
-// 		Classes []classID `validate:"min=1"`
-// 	} `validate:"required,dive"`
-
-// 	Pupils map[pupilID]struct {
-// 		Class           classID `validate:"required"`
-// 		Special         bool
-// 		FixedAllocation map[dayID]eventID `validate:"dive,required"`
-// 		Choices         struct {
-// 			Green []eventID `validate:"dive,required"`
-// 			Red   []eventID `validate:"dive,required"`
-// 		}
-// 	} `validate:"required,dive"`
-
-// 	Config struct {
-// 		HowManySpecialPupils int `validate:"min=1"`
-// 		Timeout              int `validate:"min=1"`
-// 		NumberOfCycles       int `validate:"min=0"`
-// 	} `validate:"required"`
-// }
-
-type eventID string
-type dayID string
-
-// type classID string
-type pupilID string
-
-// Handling
 
 type handler struct {
 	logger  logger
@@ -60,13 +32,13 @@ func Handle(logger logger) http.Handler {
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fixedPupilInfos, err := h.decoder.decode(r.Body)
+	data, err := h.decoder.decode(r.Body)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: invalid request body: %v", err), http.StatusBadRequest)
 		return
 	}
 
-	res := doEverything(fixedPupilInfos)
+	res := doEverything(data.days, data.pupils, data.fpiList)
 
 	// Encode result
 	w.Header().Set("Content-Type", "application/json")
@@ -75,97 +47,37 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type decoder struct {
-	validate *validator.Validate
-}
-
-func (v *decoder) decode(r io.Reader) ([]fixedPupilInfo, error) {
-	if v.validate == nil {
-		v.validate = validator.New()
-	}
-
-	// Decode request body
-
-	var body struct {
-		Events map[string]struct {
-			Days    []string `validate:"min=1"`
-			Amount  int      `validate:"min=1"`
-			Classes []string `validate:"min=1"`
-		} `validate:"required,dive"`
-
-		Pupils map[string]struct {
-			Class           string `validate:"required"`
-			Special         bool
-			FixedAllocation map[string]string `validate:"dive,required"`
-			Choices         struct {
-				Green []string `validate:"dive,required"`
-				Red   []string `validate:"dive,required"`
-			}
-		} `validate:"required,dive"`
-
-		Config struct {
-			HowManySpecialPupils int `validate:"min=1"`
-			Timeout              int `validate:"min=1"`
-			NumberOfCycles       int `validate:"min=0"`
-		} `validate:"required"`
-	}
-
-	if err := json.NewDecoder(r).Decode(&body); err != nil {
-		return nil, fmt.Errorf("decoding: %w", err)
-	}
-
-	// Validate request body
-
-	if err := v.validate.Struct(body); err != nil {
-		return nil, fmt.Errorf("validating: %w", err)
-
-	}
-
-	// Transform request body
-
-	var fpiList []fixedPupilInfo
-	for pID, pData := range body.Pupils {
-		for dID, eID := range pData.FixedAllocation {
-			fpi := fixedPupilInfo{
-				pupil: pupilID(pID),
-				event: eventID(eID),
-				day:   dayID(dID),
-			}
-			fpiList = append(fpiList, fpi)
-		}
-
-	}
-
-	return fpiList, nil
-
-}
-
 // Allocation
 
 type result map[dayID]dayResult
 
 type dayResult struct {
 	Events           map[eventID][]pupilID
-	UnassignedPupils []pupilID
+	UnassignedPupils map[pupilID]bool
 }
 
-type fixedPupilInfo struct {
-	pupil pupilID
-	event eventID
-	day   dayID
-}
-
-func doEverything(fixedPupils []fixedPupilInfo) map[dayID]dayResult {
-
+func newResult(days map[dayID]bool, pupils map[pupilID]pupil) result {
 	res := make(result)
+	for dID := range days {
+		dayRes := dayResult{
+			Events:           make(map[eventID][]pupilID),
+			UnassignedPupils: make(map[pupilID]bool),
+		}
+		for pID := range pupils {
+			dayRes.UnassignedPupils[pID] = true
+		}
+		res[dID] = dayRes
+	}
+
+	return res
+}
+
+func doEverything(days map[dayID]bool, pupils map[pupilID]pupil, fixedPupils []fixedPupilInfo) map[dayID]dayResult {
+	res := newResult(days, pupils)
 
 	for _, fpi := range fixedPupils {
-		day := fpi.day
-		if _, ok := res[day]; !ok {
-			res[day] = dayResult{Events: make(map[eventID][]pupilID)}
-		}
-		res[day].Events[fpi.event] = append(res[day].Events[fpi.event], fpi.pupil)
-
+		res[fpi.day].Events[fpi.event] = append(res[fpi.day].Events[fpi.event], fpi.pupil)
+		delete(res[fpi.day].UnassignedPupils, fpi.pupil)
 	}
 
 	return res
