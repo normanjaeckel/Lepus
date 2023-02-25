@@ -49,7 +49,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Allocation
 
-func doEverything(days [][]eventID, allPupilIDs []pupilID, fixedPupils []fixedPupilInfo) map[pupilID][]eventID {
+func doEverything(days [][]event, allPupilIDs []pupilID, fixedPupils []fixedPupilInfo) map[pupilID][]eventID {
 
 	pupils := make(map[pupilID][]eventID, len(allPupilIDs))
 
@@ -58,17 +58,23 @@ func doEverything(days [][]eventID, allPupilIDs []pupilID, fixedPupils []fixedPu
 	}
 
 	for _, fpi := range fixedPupils {
-		pupils[fpi.pupil][fpi.day] = fpi.event
+		pupils[fpi.pID][fpi.dIdx] = fpi.eID
 	}
 
+	dayOffset := make([]int, len(days))
 	for _, pID := range allPupilIDs {
 		for dIdx, events := range days {
 			if pupils[pID][dIdx] != "" {
 				continue
 			}
-			event := events[0]
-			// TODO: Event nehmen, bei dem Regel stimmen, und dann:
-			pupils[pID][dIdx] = event
+			offset := dayOffset[dIdx] % len(events)
+			for j := 0; j < len(events); j++ {
+				e := events[(j+offset)%len(events)]
+				if canPupilVisitThisEvent(pID, e, dIdx, pupils) {
+					pupils[pID][dIdx] = e.id
+					dayOffset[dIdx] = j + offset + 1
+				}
+			}
 		}
 	}
 
@@ -104,6 +110,12 @@ func doEverything(days [][]eventID, allPupilIDs []pupilID, fixedPupils []fixedPu
 	return pupils
 }
 
-// func canPupilVisitThisEvent(p pupil, dID dayID, e event) bool {
-// 	return true
-// }
+func canPupilVisitThisEvent(p pupilID, e event, dIdx int, currentPupils map[pupilID][]eventID) bool {
+	occupied := 0
+	for _, eList := range currentPupils {
+		if eList[dIdx] != "" {
+			occupied++
+		}
+	}
+	return e.amount > occupied
+}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"sort"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -11,21 +12,20 @@ import (
 // Decoded data
 
 type decodedData struct {
-	days [][]eventID
-	//events  map[eventID]event
+	days    [][]event
 	fpiList []fixedPupilInfo
 	pupils  []pupilID
 }
 
-// type event struct {
-// 	days   map[dayID]bool
-// 	amount int
-// }
+type event struct {
+	id     eventID
+	amount int
+}
 
 type fixedPupilInfo struct {
-	pupil pupilID
-	event eventID
-	day   int
+	pID  pupilID
+	eID  eventID
+	dIdx int
 }
 
 // Decoder
@@ -79,7 +79,8 @@ func (d decoder) decode(r io.Reader) (decodedData, error) {
 
 	// Transform request body to decoded data
 
-	// Get all days
+	// Get all days from body's events map and transform it to a list of list of
+	// event IDs.
 	daySet := make(map[dayID]struct{})
 	for _, e := range body.Events {
 		for _, dID := range e.Days {
@@ -90,16 +91,16 @@ func (d decoder) decode(r io.Reader) (decodedData, error) {
 	for dID := range daySet {
 		dayList = append(dayList, dID)
 	}
+	sort.Slice(dayList, func(i, j int) bool { return dayList[i] < dayList[j] })
 	dayMap := make(map[dayID]int)
 	for idx, dID := range dayList {
 		dayMap[dID] = idx
 	}
-
-	days := make([][]eventID, len(dayMap))
+	days := make([][]event, len(dayMap))
 	for eID, e := range body.Events {
 		for _, dID := range e.Days {
 			dayIdx := dayMap[dID]
-			days[dayIdx] = append(days[dayIdx], eID)
+			days[dayIdx] = append(days[dayIdx], event{id: eID, amount: e.Amount})
 		}
 
 	}
@@ -114,24 +115,26 @@ func (d decoder) decode(r io.Reader) (decodedData, error) {
 	var fpiList []fixedPupilInfo
 	for pID, pData := range body.Pupils {
 		for dID, eID := range pData.FixedAllocation {
-
-			// TODO: Reimplement checks ...
-			// if _, ok := days[dID]; !ok {
-			// 	return decodedData{}, fmt.Errorf("day ID %q does not exist in events map", dID)
-			// }
-			// if _, ok := data.events[eID]; !ok {
-			// 	return decodedData{}, fmt.Errorf("event ID %q does not exist in events map", eID)
-			// }
-			// if _, ok := data.events[eID].days[dID]; !ok {
-			// 	return decodedData{}, fmt.Errorf("event with ID %q is not sheduled at day %q", eID, dID)
-			// }
-
+			dIdx, ok := dayMap[dID]
+			if !ok {
+				return decodedData{}, fmt.Errorf("day ID %q does not exist in events map", dID)
+			}
+			found := false
+			for _, e := range days[dIdx] {
+				if eID == e.id {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return decodedData{}, fmt.Errorf("event with ID %q is not sheduled at day %q or does not exist", eID, dID)
+			}
 			fpiList = append(
 				fpiList,
 				fixedPupilInfo{
-					pupil: pID,
-					event: eID,
-					day:   dayMap[dID],
+					pID:  pID,
+					eID:  eID,
+					dIdx: dayMap[dID],
 				},
 			)
 		}

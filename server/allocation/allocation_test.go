@@ -117,7 +117,7 @@ func TestValidate(t *testing.T) {
 		if err == nil {
 			t.Fatal("got nil, expected decoding error")
 		}
-		expected := `event ID "event_2" does not exist in events map`
+		expected := `event with ID "event_2" is not sheduled at day "day_1" or does not exist`
 		if err.Error() != expected {
 			t.Fatalf("wrong error: got %q, expected %q", err.Error(), expected)
 		}
@@ -160,7 +160,7 @@ func TestValidate(t *testing.T) {
 		if err == nil {
 			t.Fatal("got nil, expected decoding error")
 		}
-		expected := `event with ID "event_2" is not sheduled at day "day_1"`
+		expected := `event with ID "event_2" is not sheduled at day "day_1" or does not exist`
 		if err.Error() != expected {
 			t.Fatalf("wrong error: got %q, expected %q", err.Error(), expected)
 		}
@@ -168,9 +168,14 @@ func TestValidate(t *testing.T) {
 
 }
 
-func getTestData() ([][]eventID, []pupilID) {
-	days := [][]eventID{
-		{"e1"},
+func getTestData() ([][]event, []pupilID) {
+	days := [][]event{
+		{
+			{
+				id:     "e1",
+				amount: 2,
+			},
+		},
 	}
 
 	pupils := []pupilID{
@@ -179,10 +184,6 @@ func getTestData() ([][]eventID, []pupilID) {
 		"p3",
 	}
 
-	// events := map[eventID]event{
-	// 	"e1": {days: days, amount: 2},
-	// }
-
 	return days, pupils
 }
 
@@ -190,8 +191,8 @@ func TestDoEverything(t *testing.T) {
 	t.Run("test small set of data 1", func(t *testing.T) {
 		days, pupils := getTestData()
 		fpiList := []fixedPupilInfo{
-			{pupil: "p1", event: "e1", day: 0},
-			{pupil: "p2", event: "e1", day: 0},
+			{pID: "p1", eID: "e1", dIdx: 0},
+			{pID: "p2", eID: "e1", dIdx: 0},
 		}
 
 		got := doEverything(days, pupils, fpiList)
@@ -206,29 +207,28 @@ func TestDoEverything(t *testing.T) {
 		}
 	})
 
-	// t.Run("test small set of data 2", func(t *testing.T) {
-	// 	days, pupils, events := getTestData()
-	// 	e := events["e1"]
-	// 	e.amount = 3
-	// 	events["e1"] = e
+	t.Run("test small set of data 2", func(t *testing.T) {
+		days, pupils := getTestData()
+		e := days[0][0]
+		e.amount = 3
+		days[0][0] = e
 
-	// 	fpiList := []fixedPupilInfo{
-	// 		{pupil: "p1", event: "e1", day: "d1"},
-	// 		{pupil: "p2", event: "e1", day: "d1"},
-	// 	}
+		fpiList := []fixedPupilInfo{
+			{pID: "p1", eID: "e1", dIdx: 0},
+			{pID: "p2", eID: "e1", dIdx: 0},
+		}
 
-	// 	got := doEverything(days, pupils, events, fpiList)
+		got := doEverything(days, pupils, fpiList)
 
-	// 	expected := map[dayID]dayResult{
-	// 		"d1": {
-	// 			Events:           map[eventID][]pupilID{"e1": {"p1", "p2", "p3"}},
-	// 			UnassignedPupils: map[pupilID]bool{},
-	// 		},
-	// 	}
-	// 	if !reflect.DeepEqual(got, expected) {
-	// 		t.Fatalf("wrong result: got %v, expected %v", got, expected)
-	// 	}
-	// })
+		expected := map[pupilID][]eventID{
+			"p1": {"e1"},
+			"p2": {"e1"},
+			"p3": {"e1"},
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatalf("wrong result: got %v, expected %v", got, expected)
+		}
+	})
 
 	// t.Run("test small set of data 3", func(t *testing.T) {
 	// 	days, pupils, events := getTestData()
