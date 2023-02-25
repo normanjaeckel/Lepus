@@ -11,23 +11,21 @@ import (
 // Decoded data
 
 type decodedData struct {
-	days    map[dayID]bool
-	events  map[eventID]event
+	days [][]eventID
+	//events  map[eventID]event
 	fpiList []fixedPupilInfo
-	pupils  map[pupilID]pupil
+	pupils  []pupilID
 }
 
-type event struct {
-	days   map[dayID]bool
-	amount int
-}
-
-type pupil struct{}
+// type event struct {
+// 	days   map[dayID]bool
+// 	amount int
+// }
 
 type fixedPupilInfo struct {
 	pupil pupilID
 	event eventID
-	day   dayID
+	day   int
 }
 
 // Decoder
@@ -36,10 +34,11 @@ type decoder struct {
 	validate *validator.Validate
 }
 
-func (v *decoder) decode(r io.Reader) (decodedData, error) {
-	if v.validate == nil {
-		v.validate = validator.New()
-	}
+func newDecoder() decoder {
+	return decoder{validate: validator.New()}
+}
+
+func (d decoder) decode(r io.Reader) (decodedData, error) {
 
 	// Decode request body
 
@@ -73,53 +72,72 @@ func (v *decoder) decode(r io.Reader) (decodedData, error) {
 
 	// Validate request body
 
-	if err := v.validate.Struct(body); err != nil {
+	if err := d.validate.Struct(body); err != nil {
 		return decodedData{}, fmt.Errorf("validating: %w", err)
 
 	}
 
 	// Transform request body to decoded data
 
-	data := decodedData{}
-
-	// Get all days and events
-	data.days = make(map[dayID]bool)
-	data.events = make(map[eventID]event)
-	for eID, e := range body.Events {
-		data.events[eID] = event{days: make(map[dayID]bool), amount: e.Amount}
+	// Get all days
+	daySet := make(map[dayID]struct{})
+	for _, e := range body.Events {
 		for _, dID := range e.Days {
-			data.events[eID].days[dID] = true
-			data.days[dID] = true
+			daySet[dID] = struct{}{}
 		}
+	}
+	dayList := make([]dayID, 0, len(daySet))
+	for dID := range daySet {
+		dayList = append(dayList, dID)
+	}
+	dayMap := make(map[dayID]int)
+	for idx, dID := range dayList {
+		dayMap[dID] = idx
+	}
+
+	days := make([][]eventID, len(dayMap))
+	for eID, e := range body.Events {
+		for _, dID := range e.Days {
+			dayIdx := dayMap[dID]
+			days[dayIdx] = append(days[dayIdx], eID)
+		}
+
 	}
 
 	// Get all pupils
-	data.pupils = make(map[pupilID]pupil)
+	pupils := make([]pupilID, len(body.Pupils))
 	for pID := range body.Pupils {
-		data.pupils[pID] = pupil{}
+		pupils = append(pupils, pID)
 	}
 
 	// Get fixed pupils
+	var fpiList []fixedPupilInfo
 	for pID, pData := range body.Pupils {
 		for dID, eID := range pData.FixedAllocation {
-			if _, ok := data.days[dID]; !ok {
-				return decodedData{}, fmt.Errorf("day ID %q does not exist in events map", dID)
-			}
-			if _, ok := data.events[eID]; !ok {
-				return decodedData{}, fmt.Errorf("event ID %q does not exist in events map", eID)
-			}
-			if _, ok := data.events[eID].days[dID]; !ok {
-				return decodedData{}, fmt.Errorf("event with ID %q is not sheduled at day %q", eID, dID)
-			}
 
-			fpi := fixedPupilInfo{
-				pupil: pID,
-				event: eID,
-				day:   dID,
-			}
-			data.fpiList = append(data.fpiList, fpi)
+			// TODO: Reimplement checks ...
+			// if _, ok := days[dID]; !ok {
+			// 	return decodedData{}, fmt.Errorf("day ID %q does not exist in events map", dID)
+			// }
+			// if _, ok := data.events[eID]; !ok {
+			// 	return decodedData{}, fmt.Errorf("event ID %q does not exist in events map", eID)
+			// }
+			// if _, ok := data.events[eID].days[dID]; !ok {
+			// 	return decodedData{}, fmt.Errorf("event with ID %q is not sheduled at day %q", eID, dID)
+			// }
+
+			fpiList = append(
+				fpiList,
+				fixedPupilInfo{
+					pupil: pID,
+					event: eID,
+					day:   dayMap[dID],
+				},
+			)
 		}
 
 	}
-	return data, nil
+
+	return decodedData{days, fpiList, pupils}, nil
+
 }

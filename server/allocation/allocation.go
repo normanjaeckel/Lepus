@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sort"
 )
 
 // Data types
@@ -29,7 +28,7 @@ type handler struct {
 }
 
 func Handle(logger logger) http.Handler {
-	return handler{logger, decoder{}}
+	return handler{logger, newDecoder()}
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +38,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := doEverything(data.days, data.pupils, data.events, data.fpiList)
+	res := doEverything(data.days, data.pupils, data.fpiList)
 
 	// Encode result
 	w.Header().Set("Content-Type", "application/json")
@@ -50,65 +49,61 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Allocation
 
-type result map[dayID]dayResult
+func doEverything(days [][]eventID, allPupilIDs []pupilID, fixedPupils []fixedPupilInfo) map[pupilID][]eventID {
 
-type dayResult struct {
-	Events           map[eventID][]pupilID
-	UnassignedPupils map[pupilID]bool
-}
+	pupils := make(map[pupilID][]eventID, len(allPupilIDs))
 
-func newResult(days map[dayID]bool, pupils map[pupilID]pupil) result {
-	res := make(result)
-	for dID := range days {
-		dayRes := dayResult{
-			Events:           make(map[eventID][]pupilID),
-			UnassignedPupils: make(map[pupilID]bool),
-		}
-		for pID := range pupils {
-			dayRes.UnassignedPupils[pID] = true
-		}
-		res[dID] = dayRes
+	for _, pID := range allPupilIDs {
+		pupils[pID] = make([]eventID, len(days))
 	}
-
-	return res
-}
-
-func doEverything(days map[dayID]bool, pupils map[pupilID]pupil, events map[eventID]event, fixedPupils []fixedPupilInfo) map[dayID]dayResult {
-	res := newResult(days, pupils)
 
 	for _, fpi := range fixedPupils {
-		res[fpi.day].Events[fpi.event] = append(res[fpi.day].Events[fpi.event], fpi.pupil)
-		delete(res[fpi.day].UnassignedPupils, fpi.pupil)
+		pupils[fpi.pupil][fpi.day] = fpi.event
 	}
 
-	for dID := range days {
-		orderedPupils := make([]pupilID, 0, len(res[dID].UnassignedPupils))
-		for pID := range res[dID].UnassignedPupils {
-			orderedPupils = append(orderedPupils, pID)
-		}
-		sort.Slice(orderedPupils, func(i, j int) bool { return orderedPupils[i] < orderedPupils[j] })
-
-		orderedEvents := make([]eventID, 0, len(events))
-		for eID, e := range events {
-			if found := e.days[dID]; found {
-				orderedEvents = append(orderedEvents, eID)
+	for _, pID := range allPupilIDs {
+		for dIdx, events := range days {
+			if pupils[pID][dIdx] != "" {
+				continue
 			}
-		}
-		sort.Slice(orderedEvents, func(i, j int) bool { return orderedEvents[i] < orderedEvents[j] })
-
-		i := -1
-		for _, pID := range orderedPupils {
-			for k := 0; k < len(orderedEvents); k++ {
-				i++
-				eID := orderedEvents[i%len(orderedEvents)]
-				if events[eID].amount > len(res[dID].Events[eID]) {
-					res[dID].Events[eID] = append(res[dID].Events[eID], pID)
-					delete(res[dID].UnassignedPupils, pID)
-					break
-				}
-			}
+			event := events[0]
+			// TODO: Event nehmen, bei dem Regel stimmen, und dann:
+			pupils[pID][dIdx] = event
 		}
 	}
 
-	return res
+	// for dID := range days {
+	// 	orderedPupils := make([]pupilID, 0, len(res[dID].UnassignedPupils))
+	// 	for pID := range res[dID].UnassignedPupils {
+	// 		orderedPupils = append(orderedPupils, pID)
+	// 	}
+	// 	sort.Slice(orderedPupils, func(i, j int) bool { return orderedPupils[i] < orderedPupils[j] })
+
+	// 	orderedEvents := make([]eventID, 0, len(events))
+	// 	for eID, e := range events {
+	// 		if found := e.days[dID]; found {
+	// 			orderedEvents = append(orderedEvents, eID)
+	// 		}
+	// 	}
+	// 	sort.Slice(orderedEvents, func(i, j int) bool { return orderedEvents[i] < orderedEvents[j] })
+
+	// 	i := -1
+	// 	for _, pID := range orderedPupils {
+	// 		for k := 0; k < len(orderedEvents); k++ {
+	// 			i++
+	// 			eID := orderedEvents[i%len(orderedEvents)]
+	// 			if events[eID].amount > len(res[dID].Events[eID]) {
+	// 				res[dID].Events[eID] = append(res[dID].Events[eID], pID)
+	// 				delete(res[dID].UnassignedPupils, pID)
+	// 				break
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	return pupils
 }
+
+// func canPupilVisitThisEvent(p pupil, dID dayID, e event) bool {
+// 	return true
+// }
