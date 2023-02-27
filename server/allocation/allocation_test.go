@@ -230,69 +230,69 @@ func TestDoEverything(t *testing.T) {
 		}
 	})
 
-	// t.Run("test small set of data 3", func(t *testing.T) {
-	// 	days, pupils, events := getTestData()
-	// 	fpiList := []fixedPupilInfo{
-	// 		{pupil: "p3", event: "e1", day: "d1"},
-	// 	}
+	t.Run("test small set of data 3", func(t *testing.T) {
+		days, pupils := getTestData()
+		fpiList := []fixedPupilInfo{
+			{pID: "p3", eID: "e1", dIdx: 0},
+		}
 
-	// 	got := doEverything(days, pupils, events, fpiList)
+		got := doEverything(days, pupils, fpiList)
 
-	// 	expected := map[dayID]dayResult{
-	// 		"d1": {
-	// 			Events:           map[eventID][]pupilID{"e1": {"p3", "p1"}},
-	// 			UnassignedPupils: map[pupilID]bool{"p2": true},
-	// 		},
-	// 	}
-	// 	if !reflect.DeepEqual(got, expected) {
-	// 		t.Fatalf("wrong result: got %v, expected %v", got, expected)
-	// 	}
-	// })
+		expected := map[pupilID][]eventID{
+			"p1": {"e1"},
+			"p2": {""},
+			"p3": {"e1"},
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatalf("wrong result: got %v, expected %v", got, expected)
+		}
+	})
 
-	// t.Run("test small set of data 4", func(t *testing.T) {
-	// 	days, pupils, events := getTestData()
-	// 	pupils = append(pupils, pupil{"p4"})
-	// 	events["e2"] = event{days: days, amount: 2}
-	// 	e := events["e1"]
-	// 	e.amount = 1
-	// 	events["e1"] = e
+	t.Run("test small set of data 4", func(t *testing.T) {
+		days, pupils := getTestData()
+		pupils = append(pupils, "p4")
+		e := days[0][0]
+		e.amount = 1
+		days[0][0] = e
+		days[0] = append(days[0], event{id: "e2", amount: 2})
+		fpiList := []fixedPupilInfo{
+			{pID: "p3", eID: "e1", dIdx: 0},
+		}
 
-	// 	fpiList := []fixedPupilInfo{
-	// 		{pupil: "p3", event: "e1", day: "d1"},
-	// 	}
+		got := doEverything(days, pupils, fpiList)
 
-	// 	got := doEverything(days, pupils, events, fpiList)
+		expected := map[pupilID][]eventID{
+			"p1": {"e2"},
+			"p2": {"e2"},
+			"p3": {"e1"},
+			"p4": {""},
+		}
 
-	// 	expected := map[dayID]dayResult{
-	// 		"d1": {
-	// 			Events:           map[eventID][]pupilID{"e1": {"p3"}, "e2": {"p1", "p2"}},
-	// 			UnassignedPupils: map[pupilID]bool{"p4": true},
-	// 		},
-	// 	}
-	// 	if !reflect.DeepEqual(got, expected) {
-	// 		t.Fatalf("wrong result: got %v, expected %v", got, expected)
-	// 	}
-	// })
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatalf("wrong result: got %v, expected %v", got, expected)
+		}
+	})
 
-	// t.Run("test small set of data 5", func(t *testing.T) {
-	// 	days, pupils, events := getTestData()
-	// 	pupils = append(pupils, pupil{"p4"})
-	// 	pupils = append(pupils, pupil{"p5"})
-	// 	events["e2"] = event{days: days, amount: 2}
+	t.Run("test small set of data 5", func(t *testing.T) {
+		days, pupils := getTestData()
+		pupils = append(pupils, "p4")
+		pupils = append(pupils, "p5")
+		days[0] = append(days[0], event{id: "e2", amount: 2})
 
-	// 	fpiList := []fixedPupilInfo{}
+		fpiList := []fixedPupilInfo{}
 
-	// 	got := doEverything(days, pupils, events, fpiList)
+		got := doEverything(days, pupils, fpiList)
 
-	// 	expected := map[dayID]dayResult{
-	// 		"d1": {
-	// 			Events:           map[eventID][]pupilID{"e1": {"p1", "p3"}, "e2": {"p2", "p4"}},
-	// 			UnassignedPupils: map[pupilID]bool{"p5": true},
-	// 		},
-	// 	}
-	// 	if !reflect.DeepEqual(got, expected) {
-	// 		t.Fatalf("wrong result: got %v, expected %v", got, expected)
-	// 	}
-	// })
+		expected := map[pupilID][]eventID{
+			"p1": {"e1"},
+			"p2": {"e2"},
+			"p3": {"e1"},
+			"p4": {"e2"},
+			"p5": {""},
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatalf("wrong result: got %v, expected %v", got, expected)
+		}
+	})
 
 }

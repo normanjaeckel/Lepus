@@ -73,6 +73,7 @@ func doEverything(days [][]event, allPupilIDs []pupilID, fixedPupils []fixedPupi
 				if canPupilVisitThisEvent(pID, e, dIdx, pupils) {
 					pupils[pID][dIdx] = e.id
 					dayOffset[dIdx] = j + offset + 1
+					break
 				}
 			}
 		}
@@ -113,7 +114,7 @@ func doEverything(days [][]event, allPupilIDs []pupilID, fixedPupils []fixedPupi
 func canPupilVisitThisEvent(p pupilID, e event, dIdx int, currentPupils map[pupilID][]eventID) bool {
 	occupied := 0
 	for _, eList := range currentPupils {
-		if eList[dIdx] != "" {
+		if eList[dIdx] == e.id {
 			occupied++
 		}
 	}
