@@ -29,7 +29,7 @@ type pupil struct {
 }
 
 type fixedPupilInfo struct {
-	pID  pupilID
+	p    pupil
 	eID  eventID
 	dIdx int
 }
@@ -111,15 +111,13 @@ func (d decoder) decode(r io.Reader) (decodedData, error) {
 
 	}
 
-	// Get all pupils
+	// Get all pupils and fixed pupils
 	pupils := make([]pupil, len(body.Pupils))
-	for pID, p := range body.Pupils {
-		pupils = append(pupils, pupil{id: pID, class: p.Class})
-	}
-
-	// Get fixed pupils
 	var fpiList []fixedPupilInfo
 	for pID, pData := range body.Pupils {
+		p := pupil{id: pID, class: pData.Class}
+		pupils = append(pupils, p)
+
 		for dID, eID := range pData.FixedAllocation {
 			dIdx, ok := dayMap[dID]
 			if !ok {
@@ -138,15 +136,13 @@ func (d decoder) decode(r io.Reader) (decodedData, error) {
 			fpiList = append(
 				fpiList,
 				fixedPupilInfo{
-					pID:  pID,
+					p:    p,
 					eID:  eID,
 					dIdx: dayMap[dID],
 				},
 			)
 		}
-
 	}
 
 	return decodedData{days, fpiList, pupils}, nil
-
 }
