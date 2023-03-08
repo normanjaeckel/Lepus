@@ -14,12 +14,18 @@ import (
 type decodedData struct {
 	days    [][]event
 	fpiList []fixedPupilInfo
-	pupils  []pupilID
+	pupils  []pupil
 }
 
 type event struct {
-	id     eventID
-	amount int
+	id      eventID
+	amount  int
+	classes []classID
+}
+
+type pupil struct {
+	id    pupilID
+	class classID
 }
 
 type fixedPupilInfo struct {
@@ -100,15 +106,15 @@ func (d decoder) decode(r io.Reader) (decodedData, error) {
 	for eID, e := range body.Events {
 		for _, dID := range e.Days {
 			dayIdx := dayMap[dID]
-			days[dayIdx] = append(days[dayIdx], event{id: eID, amount: e.Amount})
+			days[dayIdx] = append(days[dayIdx], event{id: eID, amount: e.Amount, classes: e.Classes})
 		}
 
 	}
 
 	// Get all pupils
-	pupils := make([]pupilID, len(body.Pupils))
-	for pID := range body.Pupils {
-		pupils = append(pupils, pID)
+	pupils := make([]pupil, len(body.Pupils))
+	for pID, p := range body.Pupils {
+		pupils = append(pupils, pupil{id: pID, class: p.Class})
 	}
 
 	// Get fixed pupils
