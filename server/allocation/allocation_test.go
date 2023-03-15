@@ -207,10 +207,10 @@ func TestDoEverything(t *testing.T) {
 
 		got := doEverything(noShuffleSrc, days, pupils, fpiList)
 
-		expected := map[pupil][]eventID{
-			{"p1", "2a"}: {"e1"},
-			{"p2", "2a"}: {"e1"},
-			{"p3", "2a"}: {""},
+		expected := map[pupilID][]eventID{
+			"p1": {"e1"},
+			"p2": {"e1"},
+			"p3": {""},
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("wrong result: got %v, expected %v", got, expected)
@@ -230,10 +230,10 @@ func TestDoEverything(t *testing.T) {
 
 		got := doEverything(noShuffleSrc, days, pupils, fpiList)
 
-		expected := map[pupil][]eventID{
-			{"p1", "2a"}: {"e1"},
-			{"p2", "2a"}: {"e1"},
-			{"p3", "2a"}: {"e1"},
+		expected := map[pupilID][]eventID{
+			"p1": {"e1"},
+			"p2": {"e1"},
+			"p3": {"e1"},
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("wrong result: got %v, expected %v", got, expected)
@@ -248,10 +248,10 @@ func TestDoEverything(t *testing.T) {
 
 		got := doEverything(noShuffleSrc, days, pupils, fpiList)
 
-		expected := map[pupil][]eventID{
-			{"p1", "2a"}: {"e1"},
-			{"p2", "2a"}: {""},
-			{"p3", "2a"}: {"e1"},
+		expected := map[pupilID][]eventID{
+			"p1": {"e1"},
+			"p2": {""},
+			"p3": {"e1"},
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("wrong result: got %v, expected %v", got, expected)
@@ -271,11 +271,11 @@ func TestDoEverything(t *testing.T) {
 
 		got := doEverything(noShuffleSrc, days, pupils, fpiList)
 
-		expected := map[pupil][]eventID{
-			{"p1", "2a"}: {"e2"},
-			{"p2", "2a"}: {"e2"},
-			{"p3", "2a"}: {"e1"},
-			{"p4", "2a"}: {""},
+		expected := map[pupilID][]eventID{
+			"p1": {"e2"},
+			"p2": {"e2"},
+			"p3": {"e1"},
+			"p4": {""},
 		}
 
 		if !reflect.DeepEqual(got, expected) {
@@ -293,12 +293,12 @@ func TestDoEverything(t *testing.T) {
 
 		got := doEverything(reverseShuffleSrc, days, pupils, fpiList)
 
-		expected := map[pupil][]eventID{
-			{"p1", "2a"}: {""},
-			{"p2", "2a"}: {"e1"},
-			{"p3", "2a"}: {"e2"},
-			{"p4", "2a"}: {"e1"},
-			{"p5", "2a"}: {"e2"},
+		expected := map[pupilID][]eventID{
+			"p1": {""},
+			"p2": {"e1"},
+			"p3": {"e2"},
+			"p4": {"e2"},
+			"p5": {"e1"},
 		}
 
 		if !reflect.DeepEqual(got, expected) {
@@ -315,10 +315,10 @@ func TestDoEverything(t *testing.T) {
 
 		got := doEverything(reverseShuffleSrc, days, pupils, fpiList)
 
-		expected := map[pupil][]eventID{
-			{"p1", "2a"}: {"e1"},
-			{"p2", "1a"}: {""},
-			{"p3", "2a"}: {"e1"},
+		expected := map[pupilID][]eventID{
+			"p1": {"e1"},
+			"p2": {""},
+			"p3": {"e1"},
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("wrong result: got %v, expected %v", got, expected)
@@ -343,10 +343,10 @@ func TestDoEverything(t *testing.T) {
 
 		got := doEverything(noShuffleSrc, days, pupils, fpiList)
 
-		expected := map[pupil][]eventID{
-			{"p1", "2a"}: {"e1", "e2"},
-			{"p2", "2a"}: {"e1", "e2"},
-			{"p3", "2a"}: {"", "e1"},
+		expected := map[pupilID][]eventID{
+			"p1": {"e1", "e2"},
+			"p2": {"e1", "e2"},
+			"p3": {"", "e1"},
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("wrong result: got %v, expected %v", got, expected)
@@ -373,12 +373,12 @@ func TestDoEverything(t *testing.T) {
 
 		got := doEverything(noShuffleSrc, days, pupils, fpiList)
 
-		expected := map[pupil][]eventID{
-			{"p1", "2a"}: {"e1", "e2"},
-			{"p2", "2a"}: {"e1", "e2"},
-			{"p3", "2a"}: {"", "e1"},
-			{"p4", "2a"}: {"", "e1"},
-			{"p5", "2a"}: {"", ""},
+		expected := map[pupilID][]eventID{
+			"p1": {"e1", "e2"},
+			"p2": {"e1", "e2"},
+			"p3": {"", "e1"},
+			"p4": {"", "e1"},
+			"p5": {"", ""},
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("wrong result: got %v, expected %v", got, expected)
@@ -407,21 +407,75 @@ func TestDoEverything(t *testing.T) {
 
 		got := doEverything(noShuffleSrc, days, pupils, fpiList)
 
-		expected := map[pupil][]eventID{
-			{"p1", "2a"}:  {"e1"},
-			{"p2", "2a"}:  {"e1"},
-			{"p3", "2a"}:  {"e1"},
-			{"p4", "2b"}:  {"e1"},
-			{"p5", "2a"}:  {""},
-			{"p6", "2a"}:  {""},
-			{"p7", "2b"}:  {"e1"},
-			{"p8", "2b"}:  {""},
-			{"p9", "2b"}:  {""},
-			{"p10", "2b"}: {""},
+		expected := map[pupilID][]eventID{
+			"p1":  {"e1"},
+			"p2":  {"e1"},
+			"p3":  {"e1"},
+			"p4":  {"e1"},
+			"p5":  {""},
+			"p6":  {""},
+			"p7":  {"e1"},
+			"p8":  {""},
+			"p9":  {""},
+			"p10": {""},
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("wrong result: got %v, expected %v", got, expected)
 		}
+	})
+
+	t.Run("test small set of data with one red state", func(t *testing.T) {
+		days, pupils := getTestData()
+		fpiList := []fixedPupilInfo{}
+		p2 := pupils[1]
+		p2.redState = []eventID{"e1"}
+		pupils[1] = p2
+
+		got := doEverything(noShuffleSrc, days, pupils, fpiList)
+
+		expected := map[pupilID][]eventID{
+			"p1": {"e1"},
+			"p2": {""},
+			"p3": {"e1"},
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatalf("wrong result: got %v, expected %v", got, expected)
+		}
+	})
+
+	t.Run("test small set of data with equal allocation to the events", func(t *testing.T) {
+		_, pupils := getTestData()
+		fpiList := []fixedPupilInfo{}
+		days := [][]event{
+			{
+				{
+					id:      "e1",
+					amount:  5,
+					classes: []classID{"2a"},
+				},
+				{
+					id:      "e2",
+					amount:  5,
+					classes: []classID{"2a"},
+				},
+			},
+		}
+		pupils = append(pupils, pupil{id: "p4", class: "2a"})
+		pupils = append(pupils, pupil{id: "p5", class: "2a"})
+
+		got := doEverything(noShuffleSrc, days, pupils, fpiList)
+
+		expected := map[pupilID][]eventID{
+			"p1": {"e1"},
+			"p2": {"e2"},
+			"p3": {"e2"},
+			"p4": {"e1"},
+			"p5": {"e1"},
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatalf("wrong result: got %v, expected %v", got, expected)
+		}
+
 	})
 
 }

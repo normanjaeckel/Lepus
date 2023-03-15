@@ -24,8 +24,9 @@ type event struct {
 }
 
 type pupil struct {
-	id    pupilID
-	class classID
+	id       pupilID
+	class    classID
+	redState []eventID
 }
 
 type fixedPupilInfo struct {

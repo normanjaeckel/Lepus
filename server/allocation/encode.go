@@ -6,12 +6,8 @@ import (
 	"io"
 )
 
-func encode(res map[pupil][]eventID, w io.Writer) error {
-	output := make(map[pupilID][]eventID, len(res))
-	for p, eList := range res {
-		output[p.id] = eList
-	}
-	if err := json.NewEncoder(w).Encode(output); err != nil {
+func encode(result map[pupilID][]eventID, w io.Writer) error {
+	if err := json.NewEncoder(w).Encode(result); err != nil {
 		return fmt.Errorf("marshalling JSON: %w", err)
 	}
 	return nil
